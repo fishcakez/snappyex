@@ -303,7 +303,7 @@
 
 %% struct 'JSONNode'
 
--record('JSONNode', {'pairs' :: #{},
+-record('JSONNode', {'pairs' :: dict:dict(),
                      'singleField' :: 'JSONField'(),
                      'refId' :: integer()}).
 -type 'JSONNode'() :: #'JSONNode'{}.
@@ -347,7 +347,7 @@
                             'dateTimeFunctions' = [] :: list(),
                             'searchStringEscape' :: string() | binary(),
                             'extraNameCharacters' :: string() | binary(),
-                            'supportedCONVERT' = #{} :: #{},
+                            'supportedCONVERT' = dict:new() :: dict:dict(),
                             'schemaTerm' :: string() | binary(),
                             'procedureTerm' :: string() | binary(),
                             'catalogTerm' :: string() | binary(),
@@ -377,10 +377,10 @@
                             'defaultResultSetHoldabilityHoldCursorsOverCommit' :: boolean(),
                             'sqlStateIsXOpen' :: boolean(),
                             'catalogAtStart' :: boolean(),
-                            'transactionDefaults' = #{} :: #{},
+                            'transactionDefaults' = dict:new() :: dict:dict(),
                             'rowIdLifeTime' :: integer(),
                             'supportedFeatures' = sets:new() :: sets:set(),
-                            'featuresWithParams' = #{} :: #{}}).
+                            'featuresWithParams' = dict:new() :: dict:dict()}).
 -type 'ServiceMetaData'() :: #'ServiceMetaData'{}.
 
 %% struct 'ServiceMetaDataArgs'
@@ -410,7 +410,7 @@
                                'password' :: string() | binary(),
                                'tokenSize' :: integer(),
                                'useStringForDecimal' :: boolean(),
-                               'properties' :: #{}}).
+                               'properties' :: dict:dict()}).
 -type 'OpenConnectionArgs'() :: #'OpenConnectionArgs'{}.
 
 %% struct 'ConnectionProperties'
@@ -462,7 +462,7 @@
                            'possibleDuplicate' :: boolean(),
                            'poolable' :: boolean(),
                            'doEscapeProcessing' :: boolean(),
-                           'pendingTransactionAttrs' :: #{}}).
+                           'pendingTransactionAttrs' :: dict:dict()}).
 -type 'StatementAttrs'() :: #'StatementAttrs'{}.
 
 %% struct 'DateTime'
