@@ -14,7 +14,8 @@ defmodule TcpConnection.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :db_connection]]
+    [applications: [:logger, :db_connection],
+     mod: {Snappy, []}]
   end
 
   defp deps do

@@ -3,7 +3,7 @@ defmodule Snappy.Client do
   structs: Snappy.Models,
   client_opts: [
     host: "192.168.1.74",
-    port: 9090,
+    port: 10000,
     retries: 3,
     framed: true
   ],

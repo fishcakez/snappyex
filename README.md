@@ -38,5 +38,7 @@ sudo make install
 cd - 
 mix deps.get
 mix compile 
+iex -S mix
+Snappy.Client.openConnection(Snappy.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "Home", userName: "APP", password: "APP",  security: Snappy.Models.SecurityMechanism.plain, properties: :dict.new()))
 ```
 
