@@ -7,7 +7,6 @@ defmodule Snappy.Client do
     retries: 3,
     framed: true
   ],
-  auto_import_structs: false,
   service: :g_f_x_d_service_thrift,
   import: [:getPreferredServer,
            :getAllServersWithPreferredServer,
