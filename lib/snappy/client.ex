@@ -302,4 +302,5 @@ defmodule Snappy.Client do
   enumerize_function getUDTs(ServiceMetaDataArgs,
                              {:list, GFXDType}), returns: RowSet
   enumerize_function getSchemaMetaData(ServiceMetaDataCall, ServiceMetaDataArgs), returns: RowSet
+  enumerize_function openConnection(OpenConnectionArgs), returns: ConnectionProperties
 end
