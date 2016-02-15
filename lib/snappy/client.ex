@@ -5,7 +5,7 @@ defmodule Snappy.Client do
     host: "fire-elementary",
     port: 10000,
     retries: 3,
-    framed: true
+    framed: false
   ],
   service: :g_f_x_d_service_thrift,
   import: [:getPreferredServer,
@@ -291,7 +291,8 @@ defmodule Snappy.Client do
     :plain -> 1
     :diffie_hellman -> 2
   end
-  
+
+  enumerize_struct HostAddress, serverType: ServerType
   enumerize_struct FieldDescriptor, type: FieldType    
   enumerize_struct OpenConnectionArgs, security: SecurityMechanism
   enumerize_struct StatementAttrs, pendingTransactionAttrs: {:map, {TransactionAttribute, :bool}}
@@ -299,8 +300,10 @@ defmodule Snappy.Client do
   enumerize_struct ServiceMetaDataArgs, typeId: GFXDType
   enumerize_struct ColumnDescriptor, type: GFXDType
   enumerize_struct OutputParameter, type: GFXDType
+  enumerize_function executeQuery(_, _, StatementAttrs, _) 
   enumerize_function getUDTs(ServiceMetaDataArgs,
                              {:list, GFXDType}), returns: RowSet
-  enumerize_function getSchemaMetaData(ServiceMetaDataCall, ServiceMetaDataArgs), returns: RowSet
+  enumerize_function getSchemaMetaData(ServiceMetaDataCall, ServiceMetaDataArgs)
   enumerize_function openConnection(OpenConnectionArgs), returns: ConnectionProperties
+  enumerize_function getPreferredServer({:set, ServerType}, _, HostAddress)
 end

@@ -39,6 +39,9 @@ cd -
 mix deps.get
 mix compile 
 iex -S mix
-Snappy.Client.openConnection(Snappy.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "Home", userName: "APP", password: "APP",  security: Snappy.Models.SecurityMechanism.plain, properties: :dict.new()))
+conn = Snappy.Client.openConnection(Snappy.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "Home", userName: "APP", password: "APP",  security: Snappy.Models.SecurityMechanism.plain, properties: :dict.new()))    
+connId = elem(conn, 1)  
+token = elem(conn, 5)  
+Snappy.Client.executeQuery(connId, "select * from fortune", Snappy.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
 ```
 
