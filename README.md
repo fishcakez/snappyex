@@ -44,4 +44,7 @@ connId = elem(conn, 1)
 token = elem(conn, 5)  
 Snappy.Client.executeQuery(connId, "select * from fortune", Snappy.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
 ```
+Download and install:
 
+* Elixir
+* Thrift
