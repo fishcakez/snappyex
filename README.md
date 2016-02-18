@@ -49,3 +49,5 @@ Download and install:
 * Elixir
 * Download Thrift https://www.us.apache.org/dist/thrift/0.9.3/thrift-0.9.3.exe 
 , rename to thrift.exe and copy to repository.
+
+See [https://github.com/SnappyDataInc/snappydata/blob/master/snappy-tools/README-thrift.md](README-thrift.md) for SnappyData programming documents.
