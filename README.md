@@ -47,4 +47,5 @@ Snappy.Client.executeQuery(connId, "select * from fortune", Snappy.Models.Statem
 Download and install:
 
 * Elixir
-* Thrift
+* Download Thrift https://www.us.apache.org/dist/thrift/0.9.3/thrift-0.9.3.exe 
+, rename to thrift.exe and copy to repository.
