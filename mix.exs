@@ -15,7 +15,7 @@ defmodule Snappyex.Mixfile do
 
   def application do
     [applications: [:logger, :db_connection],
-     mod: {Snappyex, []}]
+     mod: {Snappyex.App, []}]
   end
 
   defp deps do
