@@ -43,8 +43,10 @@ iex -S mix
 # Execute sql
 Snappyex.Client.execute(connId, "create table foo (bar int primary key)", nil,
 nil, token)
-Snappyex.Client.execute(connId, "insert into foo values (1), (2)", nil, nil,
+Snappyex.Client.execute(connId, "insert into foo values (1)", nil, nil,
 token)
+# Execute sql query
+Snappyex.Client.executeQuery(connId, "select * from fortune", Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
 # Execute prepared statement
 pstmt = Snappyex.Client.prepareStatement(connId, "insert into foo values (?)", nil, nil, token)
 Snappyex.Client.executePreparedUpdate(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 1)]), token)
@@ -58,9 +60,11 @@ Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(
 Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 3)]), token)
 Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 4)]), token)
 Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 5)]), token)
+# Get rows
+pstmt = Snappyex.Client.prepareStatement(connId, "select * from foo", nil, nil, token)
+Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: []), token)  
+# Close connection
 Snappyex.Client.closeConnection(connId, token)
-# Execute sql query
-Snappyex.Client.executeQuery(connId, "select * from fortune", Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
 ```
 Download and install:
 
