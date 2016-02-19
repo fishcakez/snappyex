@@ -39,8 +39,28 @@ cd -
 mix deps.get
 mix compile 
 iex -S mix
-{:ConnectionProperties, connId, _, _, token} = Snappy.Client.openConnection(Snappy.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "ElixirClient1|" <> Base.encode16(inspect self), userName: "APP", password: "APP",  security: Snappy.Models.SecurityMechanism.plain, properties: :dict.new()))
-Snappy.Client.executeQuery(connId, "select * from fortune", Snappy.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
+{:ConnectionProperties, connId, clientHostName, clientId, _, token} = Snappyex.Client.openConnection(Snappyex.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: "APP", password: "APP",  security: Snappyex.Models.SecurityMechanism.plain, properties: :dict.new()))
+# Execute sql
+Snappyex.Client.execute(connId, "create table foo (bar int primary key)", nil,
+nil, token)
+Snappyex.Client.execute(connId, "insert into foo values (1), (2)", nil, nil,
+token)
+# Execute prepared statement
+pstmt = Snappyex.Client.prepareStatement(connId, "insert into foo values (?)", nil, nil, token)
+Snappyex.Client.executePreparedUpdate(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 1)]), token)
+Snappyex.Client.executePreparedUpdate(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 2)]), token)
+Snappyex.Client.executePreparedUpdate(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 3)]), token)
+Snappyex.Client.executePreparedUpdate(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 4)]), token)
+Snappyex.Client.executePreparedUpdate(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 5)]), token)
+pstmt = Snappyex.Client.prepareStatement(connId, "select * from foo where bar=?", nil, nil, token)
+Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 1)]), token)
+Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 2)]), token)
+Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 3)]), token)
+Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 4)]), token)
+Snappyex.Client.executePreparedQuery(pstmt.statementId, Snappyex.Models.Row.new(values: [Snappyex.Models.ColumnValue.new(i32_val: 5)]), token)
+Snappyex.Client.closeConnection(connId, token)
+# Execute sql query
+Snappyex.Client.executeQuery(connId, "select * from fortune", Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
 ```
 Download and install:
 
