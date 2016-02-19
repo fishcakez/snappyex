@@ -1,6 +1,6 @@
-defmodule Snappy.Client do
+defmodule Snappyex.Client do
   use Riffed.Client,
-  structs: Snappy.Models,
+  structs: Snappyex.Models,
   client_opts: [
     host: "fire-elementary",
     port: 1531,

@@ -1,6 +1,6 @@
-defmodule Snappy.Locator do
+defmodule Snappyex.Locator do
   use Riffed.Client,
-  structs: Snappy.Locator.Models,
+  structs: Snappyex.Locator.Models,
   client_opts: [
     host: "fire-elementary",
     port: 1530,

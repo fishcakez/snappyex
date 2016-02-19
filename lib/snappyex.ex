@@ -1,4 +1,4 @@
-defmodule Snappy do
+defmodule Snappyex do
   use Application
 
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
@@ -7,12 +7,12 @@ defmodule Snappy do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Snappy.Client, []),
+      worker(Snappyex.Client, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Snappy.Supervisor]
+    opts = [strategy: :one_for_one, name: Snappyex.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

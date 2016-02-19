@@ -1,8 +1,8 @@
-defmodule TcpConnection.Mixfile do
+defmodule Snappyex.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :tcp_connection,
+    [app: :snappyex,
      version: "0.0.1",
      elixir: "~> 1.2.2",
      compilers: [:thrift | Mix.compilers],
