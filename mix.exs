@@ -19,7 +19,7 @@ defmodule TcpConnection.Mixfile do
   end
 
   defp deps do
-    [{:db_connection, ">= 0.0.0"},
+    [{:db_connection, "~> 0.2"},
      {:riffed, github: "pinterest/riffed", submodules: true}
     ]
   end
