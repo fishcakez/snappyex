@@ -5,8 +5,8 @@ defmodule Snappyex.Protocol do
   
   def connect(opts) do
     state = Keyword.merge(Keyword.new(), opts) 
-    {:ok, host} = Keyword.fetch(opts, :hostname)
-    {:ok, port} = Keyword.fetch(opts, :port)
+    host = Keyword.get(opts, :hostname, 'localhost')
+    port = Keyword.get(opts, :port, 1531)
     {:ok, username} = Keyword.fetch(opts, :username)
     {:ok, password} = Keyword.fetch(opts, :password)
     {:ok, properties} = Keyword.fetch(opts, :properties)
@@ -22,14 +22,35 @@ defmodule Snappyex.Protocol do
   end
 
   def checkout(s) do
-      {:ok, s}
+    {:ok, s}
   end
-  
+
+  def checkin(s) do
+    {:ok, s}
+  end
+
+  def disconnect(err, %{types: ref}) when is_reference(ref) do
+    raise err
+  end
+
+  def disconnect(_, state) do
+    {:ok, connection_id} = Keyword.fetch(state, :connection_id)
+    {:ok, token} = Keyword.fetch(state, :token)
+    Snappyex.Client.closeConnection(connection_id, token)
+    :ok
+  end
+
   @spec ping(state :: any) ::
   {:ok, new_state :: any} |
   {:disconnect, Exception.t, new_state :: any}
   def ping(state) do
-    {:ok, state}
+    query  = %Query{statement: 'SELECT 1'}
+    case handle_execute_close(query,  HashDict.new, [], state) do
+      {:ok, %Snappyex.Result{}, state} ->
+        {:ok, state}
+      true -> 
+        {:disconnect, Exception.t, state}
+    end
   end
 
   def handle_execute(query, params, opts, state) do
@@ -39,9 +60,10 @@ defmodule Snappyex.Protocol do
     parameters_batch = Keyword.get(state, :parameters_batch, [])
     statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
     result = Map.new
-    %Snappyex.Models.StatementResult{resultSet: result_set, generatedKeys: generated_keys} = Snappyex.Client.prepareAndExecute(connection_id, query.statement, parameters_batch, pending_transaction_attrs, Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: statement_attributes), token)
+    %Snappyex.Models.StatementResult{resultSet: result_set, generatedKeys: generated_keys, preparedResult: prepared_result} = Snappyex.Client.prepareAndExecute(connection_id, query.statement, parameters_batch, pending_transaction_attrs, Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: statement_attributes), token)
     result = Map.put_new(result, :result_set,  result_set)
     result = Map.put_new(result, :generated_keys, generated_keys)
+    result = Map.put_new(result, :statement_id, prepared_result.statementId)
     {:ok, result, state}
   end
 

@@ -79,7 +79,6 @@ See [README-thrift.md](https://github.com/SnappyDataInc/snappydata/blob/master/s
       serverType, null, null)`
 3. `Snappy.Client.getPreferredServer([Snappy.Models.ServerType.thrift_gfxd_bp], ["default"], [Snappy.Models.HostAddress.new(hostName: "example.com", port: 1, ipAddress: "127.0.0.1", serverType: Snappy.Models.ServerType.thrift_gfxd_bp)])`
 
-
 Alternative
 
 1. `opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',

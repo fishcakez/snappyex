@@ -7,6 +7,15 @@ defmodule Snappyex do
     DBConnection.start_link(Snappyex.Protocol, opts)
   end
 
+  def disconnect(err, state) do
+    case DBConnection.disconnect(err, state) do
+      {error, err} ->
+        raise err
+      other ->
+        other
+    end    
+  end
+  
   def query(conn, statement, params, opts \\ []) do
     query = %Query{name: "", statement: statement}
     case DBConnection.query(conn, query, params, defaults(opts)) do
