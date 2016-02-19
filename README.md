@@ -78,3 +78,11 @@ See [README-thrift.md](https://github.com/SnappyDataInc/snappydata/blob/master/s
 2. `Snappy.Client.getPreferredServer(
       serverType, null, null)`
 3. `Snappy.Client.getPreferredServer([Snappy.Models.ServerType.thrift_gfxd_bp], ["default"], [Snappy.Models.HostAddress.new(hostName: "example.com", port: 1, ipAddress: "127.0.0.1", serverType: Snappy.Models.ServerType.thrift_gfxd_bp)])`
+
+
+Alternative
+
+1. `opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
+             password: 'APP', properties: HashDict.new() ]
+    {:ok, pid} = Snappyex.start_link(opts)
+    {:ok, %Snappyex.Result{columns: nil, rows: nil}} = Snappyex.query(pid, 'SELECT 123', HashDict.new, [])`
