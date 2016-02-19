@@ -3,7 +3,7 @@ defmodule Snappy.Client do
   structs: Snappy.Models,
   client_opts: [
     host: "fire-elementary",
-    port: 10000,
+    port: 1531,
     retries: 3,
     framed: false
   ],
@@ -47,7 +47,6 @@ defmodule Snappy.Client do
            :closeStatement,
            :closeConnection,
            :bulkClose]
-
   
   defenum FieldType do
     :boolean           -> 1
@@ -118,25 +117,15 @@ defmodule Snappy.Client do
   end
   
   defenum ServerType do
-    # old DRDA servers
     :drda -> 1
-    # Thrift LocatorService using TCompactProtocol
-    :thrift_locator_cp -> 2
-        # Thrift LocatorService using TBinaryProtocol
-        :thrift_locator_bp -> 3
-          # Thrift LocatorService using TCompactProtocol over SSL
-          :thrift_locator_cp_ssl -> 4
-            # Thrift LocatorService using TBinaryProtocol over SSL
-            :thrift_locator_bp_ssl -> 5
-
-              # Thrift GFXDService using TCompactProtocol
-              :thrift_gfxd_cp -> 6
-                # Thrift GFXDService using TBinaryProtocol
-                :thrift_gfxd_bp -> 7
-                  # Thrift GFXDService using TCompactProtocol over SSL
-                  :thrift_gfxd_cp_ssl -> 8
-                    # Thrift GFXDService using TBinaryProtocol over SSL
-                    :thrift_gfxd_bp_ssl -> 9
+    :thrift_locator_cp -> 2    
+    :thrift_locator_bp -> 3
+    :thrift_locator_cp_ssl -> 4
+    :thrift_locator_bp_ssl -> 5
+    :thrift_gfxd_cp -> 6 
+    :thrift_gfxd_bp -> 7
+    :thrift_gfxd_cp_ssl -> 8
+    :thrift_gfxd_bp_ssl -> 9
   end
 
   defenum TransactionAttribute do
@@ -305,5 +294,5 @@ defmodule Snappy.Client do
                              {:list, GFXDType}), returns: RowSet
   enumerize_function getSchemaMetaData(ServiceMetaDataCall, ServiceMetaDataArgs)
   enumerize_function openConnection(OpenConnectionArgs), returns: ConnectionProperties
-  enumerize_function getPreferredServer({:set, ServerType}, _, HostAddress)
+  enumerize_function getPreferredServer({:set, ServerType}, _, _, HostAddress)
 end

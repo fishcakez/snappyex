@@ -39,9 +39,7 @@ cd -
 mix deps.get
 mix compile 
 iex -S mix
-conn = Snappy.Client.openConnection(Snappy.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "Home", userName: "APP", password: "APP",  security: Snappy.Models.SecurityMechanism.plain, properties: :dict.new()))    
-connId = elem(conn, 1)  
-token = elem(conn, 5)  
+{:ConnectionProperties, connId, _, _, token} = Snappy.Client.openConnection(Snappy.Models.OpenConnectionArgs.new(clientHostName: "fire-elementary", clientID: "ElixirClient1|" <> Base.encode16(inspect self), userName: "APP", password: "APP",  security: Snappy.Models.SecurityMechanism.plain, properties: :dict.new()))
 Snappy.Client.executeQuery(connId, "select * from fortune", Snappy.Models.StatementAttrs.new(pendingTransactionAttrs: HashDict.new), token)
 ```
 Download and install:
@@ -51,3 +49,8 @@ Download and install:
 , rename to thrift.exe and copy to repository.
 
 See [README-thrift.md](https://github.com/SnappyDataInc/snappydata/blob/master/snappy-tools/README-thrift.md) for SnappyData programming documents.
+
+1. Connect to locator
+2. `Snappy.Client.getPreferredServer(
+      serverType, null, null)`
+3. `Snappy.Client.getPreferredServer([Snappy.Models.ServerType.thrift_gfxd_bp], ["default"], [Snappy.Models.HostAddress.new(hostName: "example.com", port: 1, ipAddress: "127.0.0.1", serverType: Snappy.Models.ServerType.thrift_gfxd_bp)])`
