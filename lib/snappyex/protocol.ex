@@ -70,17 +70,31 @@ defmodule Snappyex.Protocol do
   def handle_execute_close(query, params, opts, state) do
     {:ok, connection_id} = Keyword.fetch(state, :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    pending_transaction_attrs = Keyword.get(state, :pending_transaction_attrs, HashDict.new)
-    parameters_batch = Keyword.get(state, :parameters_batch, [])
-    statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
+    pending_transaction_attrs = Keyword.get(query, :pending_transaction_attrs, HashDict.new)
+    parameters_batch = Keyword.get(query, :parameters_batch, [])
+    statement_attributes = Keyword.get(query, :statement_attributes, HashDict.new)
     %Snappyex.Models.StatementResult{resultSet: result_set, generatedKeys: generated_keys, preparedResult: prepared_result} = Snappyex.Client.prepareAndExecute(connection_id, query.statement, parameters_batch, pending_transaction_attrs, Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: statement_attributes), token)
+    result = Map.new
     result = %Snappyex.Result{columns: generated_keys, rows: result_set}
     Snappyex.Client.closeStatement(prepared_result.statementId, token)
     {:ok, result, state}
   end
 
   def handle_prepare(query, opts, state) do
-  # Todo
+    {:ok, connection_id} = Keyword.fetch(state,
+                                         :connection_id)
+    {:ok, token} = Keyword.fetch(state,
+                                 :token)
+    output_parameters = Map.get(query,
+                                    :output_parameters,
+                                    HashDict.new)
+    statement_attributes = Map.get(query,
+                                       :statement_attributes, HashDict.new)
+    %Snappyex.Models.PrepareResult{statementId: statement_id} = Snappyex.Client.prepareStatement(connection_id,
+                                                                                                 query.statement, Snappyex.Models.OutputParameter.new(scale: :undefined, type: :undefined), Snappyex.Models.StatementAttrs.new(attrs: statement_attributes), token)    
+    query = Map.put_new(query,
+                        :statement_id,
+                        Snappex.Models.PrepareResult.statement_id)
     {:ok, query, state}
   end
 end

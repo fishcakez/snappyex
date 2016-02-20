@@ -1,7 +1,7 @@
 defmodule Snappyex do
 
   @timeout 5000
-  
+
   alias Snappyex.Query
   def start_link(opts) do
     DBConnection.start_link(Snappyex.Protocol, opts)
@@ -13,12 +13,21 @@ defmodule Snappyex do
         raise err
       other ->
         other
-    end    
+    end
   end
-  
+
   def query(conn, statement, params, opts \\ []) do
     query = %Query{name: "", statement: statement}
     case DBConnection.query(conn, query, params, defaults(opts)) do
+      {:error, %ArgumentError{} = err} ->
+        raise err
+      other ->
+        other
+    end
+  end
+
+  def prepare(conn, query, opts \\ []) do
+    case DBConnection.prepare(conn, query, defaults(opts)) do
       {:error, %ArgumentError{} = err} ->
         raise err
       other ->

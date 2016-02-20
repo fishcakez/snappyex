@@ -7,7 +7,7 @@ defmodule Snappyex.Mixfile do
      elixir: "~> 1.2.2",
      compilers: [:thrift | Mix.compilers],
      thrift_files: Mix.Utils.extract_files(["thrift"], [:thrift]),
-     thrift_version: ">= 0.9.3",     
+     thrift_version: ">= 0.9.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
