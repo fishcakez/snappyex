@@ -1,12 +1,14 @@
 defmodule QueryTest do
   use ExUnit.Case
+  import Snappyex.TestHelper
   alias Snappyex, as: S
 
   setup context do
     opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
-             password: 'APP', properties: HashDict.new(), backoff_type: :stop]
-    {:ok, pid} = S.start_link(opts)
-    {:ok, [pid: pid]}
+             password: 'APP', properties: HashDict.new, backoff_type: :stop
+             prepare: context[:prepare] || :named]
+   {:ok, pid} = S.start_link(opts)   
+   {:ok, [pid: pid]} 
   end
   
   test "iodata", context do
@@ -15,7 +17,7 @@ defmodule QueryTest do
 
   test "decode basic types", context do
     assert [[nil]] = query("SELECT NULL", [])
-    assert [[true, false]] = query("SELECT true, false", [])
+    assert [[true, false]] = S.query("SELECT true, false", [])
     assert [["e"]] = query("SELECT 'e'::char", [])
     assert [["ẽ"]] = query("SELECT 'ẽ'::char", [])
     assert [[42]] = query("SELECT 42", [])
