@@ -81,7 +81,19 @@ See [README-thrift.md](https://github.com/SnappyDataInc/snappydata/blob/master/s
 
 Alternative
 
-1. `opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
-             password: 'APP', properties: HashDict.new() ]
-    {:ok, pid} = Snappyex.start_link(opts)
-    {:ok, %Snappyex.Result{columns: nil, rows: nil}} = Snappyex.query(pid, 'SELECT 123', HashDict.new, [])`
+1.
+```elixir
+opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
+password: 'APP', properties: HashDict.new() ]
+{:ok, pid} = Snappyex.start_link(opts)
+{:ok, %Snappyex.Result{columns: nil, rows: nil}} = Snappyex.query(pid, 'SELECT 123', HashDict.new, [])```
+2.
+```
+```elixir
+opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
+password: 'APP', properties: HashDict.new() ]
+{:ok, pid} = Snappyex.start_link(opts)
+Snappyex.prepare(pid, [statement:  'SELECT 123'], HashDict.new)
+```
+
+Project is based on code in db_connection and postgrex.

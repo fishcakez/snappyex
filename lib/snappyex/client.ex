@@ -1,49 +1,49 @@
 defmodule Snappyex.Client do
-    use Riffed.Client,
-    structs: Snappyex.Models,
-    client_opts: [
-      retries: 3
-    ],
-    service: :g_f_x_d_service_thrift,
-    import: [:getPreferredServer,
-             :getAllServersWithPreferredServer,
-             :openConnection,
-             :execute,
-             :executeUpdate,
-             :executeQuery,
-             :prepareStatement,
-             :executePrepared,
-             :executePreparedUpdate,
-             :executePreparedQuery,
-             :executePreparedBatch,
-             :prepareAndExecute,
-             :beginTransaction,
-             :setTransactionAttributes,
-             :getTransactionAttributes,
-             :commitTransaction,
-             :rollbackTransaction,
-             :prepareCommitTransaction,
-             :getNextResultSet,
-             :getBlobChunk,
-             :getClobChunk,
-             :sendBlobChunk,
-             :sendClobChunk,
-             :freeLob,
-             :scrollCursor,
-             :executeCursorUpdate,
-             :getServiceMetaData,
-             :getSchemaMetaData,
-             :getIndexInfo,
-             :getUDTs,
-             :getBestRowIdentifier,
-             # end meta-data API
-             :fetchActiveConnections,
-             :fetchActiveStatements,
-             :cancelStatement,
-             :closeResultSet,
-             :closeStatement,
-             :closeConnection,
-             :bulkClose]
+  use Riffed.Client,
+  structs: Snappyex.Models,
+  client_opts: [
+    retries: 3
+  ],
+  service: :g_f_x_d_service_thrift,
+  import: [:getPreferredServer,
+           :getAllServersWithPreferredServer,
+           :openConnection,
+           :execute,
+           :executeUpdate,
+           :executeQuery,
+           :prepareStatement,
+           :executePrepared,
+           :executePreparedUpdate,
+           :executePreparedQuery,
+           :executePreparedBatch,
+           :prepareAndExecute,
+           :beginTransaction,
+           :setTransactionAttributes,
+           :getTransactionAttributes,
+           :commitTransaction,
+           :rollbackTransaction,
+           :prepareCommitTransaction,
+           :getNextResultSet,
+           :getBlobChunk,
+           :getClobChunk,
+           :sendBlobChunk,
+           :sendClobChunk,
+           :freeLob,
+           :scrollCursor,
+           :executeCursorUpdate,
+           :getServiceMetaData,
+           :getSchemaMetaData,
+           :getIndexInfo,
+           :getUDTs,
+           :getBestRowIdentifier,
+           # end meta-data API
+           :fetchActiveConnections,
+           :fetchActiveStatements,
+           :cancelStatement,
+           :closeResultSet,
+           :closeStatement,
+           :closeConnection,
+           :bulkClose]
   
   defenum FieldType do
     :boolean           -> 1
@@ -116,13 +116,13 @@ defmodule Snappyex.Client do
   defenum ServerType do
     :drda -> 1
     :thrift_locator_cp -> 2    
-    :thrift_locator_bp -> 3
-    :thrift_locator_cp_ssl -> 4
-    :thrift_locator_bp_ssl -> 5
-    :thrift_gfxd_cp -> 6 
-    :thrift_gfxd_bp -> 7
-    :thrift_gfxd_cp_ssl -> 8
-    :thrift_gfxd_bp_ssl -> 9
+:thrift_locator_bp -> 3
+:thrift_locator_cp_ssl -> 4
+:thrift_locator_bp_ssl -> 5
+:thrift_gfxd_cp -> 6
+:thrift_gfxd_bp -> 7
+:thrift_gfxd_cp_ssl -> 8
+:thrift_gfxd_bp_ssl -> 9
   end
 
   defenum TransactionAttribute do
@@ -291,5 +291,6 @@ defmodule Snappyex.Client do
                              {:list, GFXDType}), returns: RowSet
   enumerize_function getSchemaMetaData(ServiceMetaDataCall, ServiceMetaDataArgs)
   enumerize_function openConnection(OpenConnectionArgs), returns: ConnectionProperties
+  enumerize_function prepareStatement(_, _, _, StatementAttrs, _)
   enumerize_function getPreferredServer({:set, ServerType}, _, _, HostAddress)
 end
