@@ -4,7 +4,7 @@ defmodule Snappyex.Client do
   client_opts: [
     retries: 3
   ],
-  service: :g_f_x_d_service_thrift,
+  service: :snappy_data_service_thrift,
   import: [:getPreferredServer,
            :getAllServersWithPreferredServer,
            :openConnection,
