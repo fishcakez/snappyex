@@ -1,9 +1,10 @@
 defmodule Snappyex.Client do
   use Riffed.Client,
   structs: Snappyex.Models,
-  client_opts: [
-    retries: 3
-  ],
+    client_opts: [
+      retries: 3,
+      framed: false
+    ],
   service: :snappy_data_service_thrift,
   import: [:getPreferredServer,
            :getAllServersWithPreferredServer,
@@ -44,37 +45,8 @@ defmodule Snappyex.Client do
            :closeStatement,
            :closeConnection,
            :bulkClose]
-  
-  defenum FieldType do
-    :boolean           -> 1
-    :byte              -> 2
-    :short             -> 3
-    :integer           -> 4
-    :long              -> 5
-    :float             -> 6
-    :double            -> 7
-    :char              -> 8
-    :string            -> 9
-    :decimal           -> 10
-    :timestamp         -> 11
-    :binary            -> 12
-    :ref               -> 13
-    :boolean_array     -> 14
-    :char_array        -> 15
-    :short_array       -> 16
-    :int_array         -> 17
-    :long_array        -> 18
-    :float_array       -> 19
-    :double_array      -> 20
-    :string_array      -> 21
-    :array             -> 22
-    :array_of_binary   -> 23
-    :pdx_object        -> 24
-    :native_object     -> 25
-  end
 
-
-  defenum GFXDType do
+  defenum SnappyType do
     :boolean           -> 1
     :tinyint           -> 2
     :smallint          -> 3
@@ -93,36 +65,34 @@ defmodule Snappyex.Client do
     :binary            -> 16
     :varbinary         -> 17
     :longvarbinary     -> 18
-    :nulltype          -> 19
-    :other             -> 20
-    :java_object       -> 21
-    :distinct          -> 22
-    :struct            -> 23
-    :array             -> 24
-    :blob              -> 25
-    :clob              -> 26
-    :ref               -> 27
-    :datalink          -> 28
-    :rowid             -> 29
-    :nchar             -> 30
-    :nvarchar          -> 31
-    :longnvarchar      -> 32
-    :nclob             -> 33
-    :sqlxml            -> 34
-    :pdx_object        -> 35
-    :json_object       -> 36
+    :blob              -> 19
+    :clob              -> 20
+    :sqlxml            -> 21
+    :nulltype          -> 22
+    :array             -> 23
+    :json_object       -> 24
+    :java_object       -> 25
   end
-  
+
   defenum ServerType do
+    # old DRDA servers
     :drda -> 1
-    :thrift_locator_cp -> 2    
-:thrift_locator_bp -> 3
-:thrift_locator_cp_ssl -> 4
-:thrift_locator_bp_ssl -> 5
-:thrift_gfxd_cp -> 6
-:thrift_gfxd_bp -> 7
-:thrift_gfxd_cp_ssl -> 8
-:thrift_gfxd_bp_ssl -> 9
+    # Thrift LocatorService using TCompactProtocol
+    :thrift_locator_cp -> 2
+    # Thrift LocatorService using TBinaryProtocol
+    :thrift_locator_bp -> 3
+    # Thrift LocatorService using TCompactProtocol over SSL
+    :thrift_locator_cp_ssl -> 4
+    # Thrift LocatorService using TBinaryProtocol over SSL
+    :thrift_locator_bp_ssl -> 5
+    # Thrift SnappyDataService using TCompactProtocol
+    :thrift_gfxd_cp -> 6
+    # Thrift SnappyDataService using TBinaryProtocol
+    :thrift_gfxd_bp -> 7
+    # Thrift SnappyDataService using TCompactProtocol over SSL
+    :thrift_gfxd_cp_ssl -> 8
+    # Thrift SnappyDataService using TBinaryProtocol over SSL
+    :thrift_gfxd_bp_ssl -> 9
   end
 
   defenum TransactionAttribute do
@@ -277,20 +247,20 @@ defmodule Snappyex.Client do
     :plain -> 1
     :diffie_hellman -> 2
   end
-
+  
   enumerize_struct HostAddress, serverType: ServerType
   enumerize_struct FieldDescriptor, type: FieldType    
   enumerize_struct OpenConnectionArgs, security: SecurityMechanism
   enumerize_struct StatementAttrs, pendingTransactionAttrs: {:map, {TransactionAttribute, :bool}}
-  enumerize_struct ServiceMetaData, supportedCONVERT: {:map, {GFXDType, {:set, GFXDType}}}
-  enumerize_struct ServiceMetaDataArgs, typeId: GFXDType
-  enumerize_struct ColumnDescriptor, type: GFXDType
-  enumerize_struct OutputParameter, type: GFXDType
+  enumerize_struct ServiceMetaData, supportedCONVERT: {:map, {SnappyType, {:set, SnappyType}}}
+  enumerize_struct ServiceMetaDataArgs, typeId: SnappyType
+  enumerize_struct ColumnDescriptor, type: SnappyType
+  enumerize_struct OutputParameter, type: SnappyType
   enumerize_function executeQuery(_, _, StatementAttrs, _) 
   enumerize_function getUDTs(ServiceMetaDataArgs,
-                             {:list, GFXDType}), returns: RowSet
+                             {:list, SnappyType}), returns: RowSet
   enumerize_function getSchemaMetaData(ServiceMetaDataCall, ServiceMetaDataArgs)
   enumerize_function openConnection(OpenConnectionArgs), returns: ConnectionProperties
-  enumerize_function prepareStatement(_, _, _, StatementAttrs, _)
+  enumerize_function prepareStatement(_, _, {:map, {:i32, OutputParameter}}, StatementAttrs, _)
   enumerize_function getPreferredServer({:set, ServerType}, _, _, HostAddress)
 end
