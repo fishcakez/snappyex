@@ -112,7 +112,7 @@ Snappyex.Protocol.handle_prepare( %Snappyex.Query{statement: 'SELECT 1'}, %{}, s
 ```elixir
 args = [clientHostName: 'snappydata', clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), port: 1531, userName: "APP", password: "APP",  security: Snappyex.Models.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
 {:ok, pid} = Snappyex.start_link(args)
-Snappyex.prepare_execute(pid, 'SELECT 1', HashDict.new, [])
+Snappyex.prepare_execute(pid, 'SELECT * FROM NEWTABLE', HashDict.new, [])
 ```
 
 Project is based on code in db_connection and postgrex.

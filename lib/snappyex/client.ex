@@ -248,6 +248,7 @@ defmodule Snappyex.Client do
     :diffie_hellman -> 2
   end
   
+  enumerize_struct RowSet, rows: {:list, Row}
   enumerize_struct HostAddress, serverType: ServerType
   enumerize_struct FieldDescriptor, type: FieldType    
   enumerize_struct OpenConnectionArgs, security: SecurityMechanism
