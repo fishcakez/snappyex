@@ -114,7 +114,7 @@ args = [clientHostName: 'snappydata', clientID: "ElixirClient1|0x" <> Base.encod
 {:ok, pid} = Snappyex.start_link(args)
 params = Map.put_new(Map.new, :params, Snappyex.Models.Row.new(values: []))
 {:ok, {query,result}} = Snappyex.prepare_execute(pid, 'SELECT * FROM NEWTABLE', params, [])
-{:ok, result} = Snappyex.execute(pid, query, params, [])
+Snappyex.execute(pid, query, params, [])
 ```
 
 Project is based on code in db_connection and postgrex.

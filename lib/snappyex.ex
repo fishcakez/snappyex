@@ -43,6 +43,14 @@ defmodule Snappyex do
     end
   end
 
+  @doc """
+  Returns a supervisor child specification for a DBConnection pool.
+  """
+  @spec child_spec(Keyword.t) :: Supervisor.Spec.spec
+  def child_spec(opts) do
+    DBConnection.child_spec(Snappy.Protocol, opts)
+  end
+
   defp defaults(opts) do
     Keyword.put_new(opts, :timeout, @timeout)
   end
