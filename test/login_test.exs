@@ -6,9 +6,10 @@ defmodule LoginTest do
   test "login cleartext password" do
     Process.flag(:trap_exit, true)
 
-    opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
-             password: 'APP', properties: HashDict.new() ]
+    opts = [ hostname: 'snappydata', port: 1531, username: 'APP',
+             password: 'APP',  security: Snappyex.Models.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new ]
     assert {:ok, pid} = S.start_link(opts)
-    assert {:ok, %Snappyex.Result{columns: nil, rows: nil}} = S.query(pid, 'SELECT 123', HashDict.new, [])
+    params = Map.put_new(Map.new, :params, Snappyex.Models.Row.new(values: []))
+    assert {:ok, {_, _}} = S.prepare_execute(pid, 'SELECT 1', params, [])
   end
 end
