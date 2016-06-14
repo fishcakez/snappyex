@@ -93,7 +93,7 @@ args = Snappyex.Models.OpenConnectionArgs.new(clientHostName: "snappydata", clie
 ```
 2.
 ```elixir
-opts = [ hostname: 'fire-elementary', port: 1531, username: 'APP',
+opts = [ hostname: 'snappydata', port: 1531, username: 'APP',
 password: 'APP', properties: HashDict.new() ]
 {:ok, pid} = Snappyex.start_link(opts)
 Snappyex.prepare(pid, [statement:  'SELECT 123'], HashDict.new)
@@ -107,6 +107,12 @@ Snappyex.Protocol.ping(state)
 Snappyex.Protocol.handle_execute( %Snappyex.Query{statement: 'SELECT * FROM NEWTABLE'}, HashDict.new, [], state)
 Snappyex.Protocol.handle_execute( %Snappyex.Query{statement: 'SELECT 1'}, HashDict.new, [], state)
 Snappyex.Protocol.handle_prepare( %Snappyex.Query{statement: 'SELECT 1'}, %{}, state)
+```
+4.
+```elixir
+args = [clientHostName: 'snappydata', clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), port: 1531, userName: "APP", password: "APP",  security: Snappyex.Models.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
+{:ok, pid} = Snappyex.start_link(args)
+{:ok, %Snappyex.Result{columns: nil, rows: nil}} = Snappyex.query(pid, 'SELECT 1', HashDict.new, [])
 ```
 
 Project is based on code in db_connection and postgrex.
