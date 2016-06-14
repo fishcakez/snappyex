@@ -62,8 +62,9 @@ defmodule Snappyex.Protocol do
     attrs = Keyword.get(state, :attrs, HashDict.new)
     output_parameters = Keyword.get(state, :output_parameters, [])
     statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
+    {:ok, statement} = Map.fetch(query, :statement)
     result = Map.new
-    %Snappyex.Models.StatementResult{batchUpdateCounts: batch_update_counts, generatedKeys: generated_keys, preparedResult: prepared_result, procedureOutParams: procedure_out_params, resultSet: result_set, updateCount: update_count, warnings: warnings} = Snappyex.Client.prepareAndExecute(connection_id, query.statement, output_parameters, attrs, Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: statement_attributes), token)
+    %Snappyex.Models.StatementResult{batchUpdateCounts: batch_update_counts, generatedKeys: generated_keys, preparedResult: prepared_result, procedureOutParams: procedure_out_params, resultSet: result_set, updateCount: update_count, warnings: warnings} = Snappyex.Client.prepareAndExecute(connection_id, statement, output_parameters, attrs, Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: statement_attributes), token)
     result = Map.put_new(result, :batch_update_counts, batch_update_counts)
     result = Map.put_new(result, :generated_keys, generated_keys)
     result = Map.put_new(result, :prepared_result, prepared_result)
@@ -79,9 +80,9 @@ defmodule Snappyex.Protocol do
       :connection_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
-    #output_parameters = Map.get(query,
-    #  :output_parameters,
-    #  %Snappyex.Models.OutputParameter{})
+    output_parameters = Map.get(query,
+      :output_parameters,
+      %Snappyex.Models.OutputParameter{})
     attributes = Map.get(query,
       :attributes, %Snappyex.Models.StatementAttrs{})
     %Snappyex.Models.PrepareResult{statementId: statement_id} = Snappyex.Client.prepareStatement(connection_id,
