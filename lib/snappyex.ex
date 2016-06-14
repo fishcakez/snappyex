@@ -16,7 +16,11 @@ defmodule Snappyex do
   end
 
   def execute(conn, query, params, opts \\ []) do
-    DBConnection.execute(conn, query, params, defaults(opts))
+    case DBConnection.execute(conn, query, params, defaults(opts)) do
+      {:ok, result, state} -> {:ok, result}
+      other ->
+        other
+  end
   end
 
   def prepare_execute(conn, statement, params, opts \\ []) do
