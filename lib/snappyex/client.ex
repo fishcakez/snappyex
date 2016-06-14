@@ -1,6 +1,6 @@
 defmodule Snappyex.Client do
   use Riffed.Client,
-  structs: Snappyex.Models,
+  structs: Snappyex.Model,
     client_opts: [
       retries: 3,
       framed: false

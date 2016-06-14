@@ -1,13 +1,13 @@
 ExUnit.start()
 
 defmodule Snappyex.TestHelper do
-  defmacro query(stat, params, opts \\ []) do
+  defmacro prepare_execute(stat, params, opts \\ []) do
     quote do
-      case Snappyex.query(var!(context)[:pid], unquote(stat),
+      case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
                           unquote(params), unquote(opts)) do
         {:ok, %Snappyex.Result{rows: nil}} -> :ok
         {:ok, %Snappyex.Result{rows: rows}} -> rows
-        {:error, %Snappyex.Error{} = err} -> err
+        #{:error, %Snappyex.Error{} = err} -> err
       end
     end
   end

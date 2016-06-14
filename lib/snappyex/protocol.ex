@@ -13,15 +13,16 @@ defmodule Snappyex.Protocol do
     username = Keyword.get(opts, :username, 'APP')
     password = Keyword.get(opts, :password, 'APP')
     properties = Keyword.get(opts, :properties, HashDict.new)
-    {:ok, client} = :thrift_client_util.new(host, port, :snappy_data_service_thrift, [])
-    Snappyex.Client.start_link(client)
-    {:ConnectionProperties, connection_id, client_hostname, client_id, _, token} = Snappyex.Client.openConnection( Snappyex.Models.OpenConnectionArgs.new(clientHostName: host, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Models.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
-    state = Keyword.put_new(state, :connection_id, connection_id)
-    state = Keyword.put_new(state, :client_host_name, client_hostname)
-    state = Keyword.put_new(state, :client_id, client_id)
-    state = Keyword.put_new(state, :token, token)
-    IO.inspect state
-    {:ok, state}
+    case :thrift_client_util.new(host, port, :snappy_data_service_thrift, []) do
+      {:ok, client} -> Snappyex.Client.start_link(client)
+      {:ConnectionProperties, connection_id, client_hostname, client_id, _, token} = Snappyex.Client.openConnection( Snappyex.Model.OpenConnectionArgs.new(clientHostName: host, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+      state = Keyword.put_new(state, :connection_id, connection_id)
+      state = Keyword.put_new(state, :client_host_name, client_hostname)
+      state = Keyword.put_new(state, :client_id, client_id)
+      state = Keyword.put_new(state, :token, token)
+      {:ok, state}
+      {:error, :nxdomain} -> {:error, :nxdomain}
+    end
   end
 
   def checkout(s) do
@@ -49,7 +50,7 @@ defmodule Snappyex.Protocol do
   def ping(state) do
     query  = %Snappyex.Query{statement: 'SELECT 1'}
     {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
-    params = Map.put_new(Map.new, :params, Snappyex.Models.Row.new(values: []))
+    params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
     case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
       {:ok, result, state} ->
         {:ok, state}
@@ -79,10 +80,10 @@ defmodule Snappyex.Protocol do
       :token)
     output_parameters = Map.get(query,
       :output_parameters,
-      %Snappyex.Models.OutputParameter{})
+      %Snappyex.Model.OutputParameter{})
     attributes = Map.get(query,
-      :attributes, %Snappyex.Models.StatementAttrs{})
-    %Snappyex.Models.PrepareResult{statementId: statement_id} = Snappyex.Client.prepareStatement(connection_id,
+      :attributes, %Snappyex.Model.StatementAttrs{})
+    %Snappyex.Model.PrepareResult{statementId: statement_id} = Snappyex.Client.prepareStatement(connection_id,
       query.statement, nil, nil, token)
     query = Map.put_new(query,
       :statement_id,
