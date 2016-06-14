@@ -47,9 +47,11 @@ defmodule Snappyex.Protocol do
   {:ok, new_state :: any} |
   {:disconnect, Exception.t, new_state :: any}
   def ping(state) do
-    query  = %Query{statement: 'SELECT 1'}
-    case handle_execute(query, HashDict.new , [], state) do
-      {:ok, %{}, state} ->
+    query  = %Snappyex.Query{statement: 'SELECT 1'}
+    {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
+    params = Map.put_new(Map.new, :params, Snappyex.Models.Row.new(values: []))
+    case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
+      {:ok, result, state} ->
         {:ok, state}
       true -> 
         {:disconnect, Exception.t, state}
@@ -60,18 +62,13 @@ defmodule Snappyex.Protocol do
     {:ok, connection_id} = Keyword.fetch(state, :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
     attrs = Keyword.get(state, :attrs, HashDict.new)
-    output_parameters = Keyword.get(state, :output_parameters, [])
     statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
-    {:ok, statement} = Map.fetch(query, :statement)
+    {:ok, statement_id} = Map.fetch(query, :statement_id)
+
+    {:ok, params} = Map.fetch(params, :params)
     result = Map.new
-    %Snappyex.Models.StatementResult{batchUpdateCounts: batch_update_counts, generatedKeys: generated_keys, preparedResult: prepared_result, procedureOutParams: procedure_out_params, resultSet: result_set, updateCount: update_count, warnings: warnings} = Snappyex.Client.prepareAndExecute(connection_id, statement, output_parameters, attrs, Snappyex.Models.StatementAttrs.new(pendingTransactionAttrs: statement_attributes), token)
-    result = Map.put_new(result, :batch_update_counts, batch_update_counts)
-    result = Map.put_new(result, :generated_keys, generated_keys)
-    result = Map.put_new(result, :prepared_result, prepared_result)
-    result = Map.put_new(result, :procedure_out_params, procedure_out_params)
-    result = Map.put_new(result, :result_set,  result_set)
-    result = Map.put_new(result, :update_count, update_count)
-    result = Map.put_new(result, :warnings, warnings)
+    rowset = Snappyex.Client.executePreparedQuery(statement_id, params, token)
+    result = Map.put_new(result, :row_set, rowset)
     {:ok, result, state}
   end
 

@@ -1,5 +1,4 @@
 defmodule Snappyex do
-
   @timeout 5000
 
   alias Snappyex.Query
@@ -14,6 +13,10 @@ defmodule Snappyex do
       other ->
         other
     end
+  end
+
+  def execute(conn, query, params, opts \\ []) do
+    DBConnection.execute(conn, query, params, defaults(opts))
   end
 
   def prepare_execute(conn, statement, params, opts \\ []) do
