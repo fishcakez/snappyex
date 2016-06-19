@@ -12,6 +12,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     params
   end
 
+  @gs_epoch :calendar.datetime_to_gregorian_seconds({{1970,1, 1}, {0, 0, 0}})
+
   @bool_val 1
   @byte_val 2
   @i16_val 3
@@ -50,8 +52,16 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(column_value, :char), do: elem(column_value, @string_val)
   def decode_field(column_value, :varchar), do: elem(column_value, @string_val)
 #  def decode_field(column_value, :longvarchar), do: elem(column_value, @string_val)
-  def decode_field(column_value, :date), do: elem(column_value, @date_val)
-  def decode_field(column_value, :time), do: elem(column_value, @time_val)
+  def decode_field(column_value, :date) do
+    {:DateTime, date} = elem(column_value, @date_val)
+    {{year, month, day}, {hour, min, sec}} = :calendar.gregorian_seconds_to_datetime(div(date, 1000) + @gs_epoch)
+    {year, month, day}
+  end
+  def decode_field(column_value, :time) do
+    {:DateTime, date} = elem(column_value, @time_val)
+    {{year, month, day}, {hour, min, sec}} = :calendar.gregorian_seconds_to_datetime(div(date, 1000) + @gs_epoch)
+    {hour, min, sec}
+  end
   def decode_field(column_value, :timestamp), do: elem(column_value, @timestamp_val)
   def decode_field(column_value, :binary), do: elem(column_value, @binary_val)
   def decode_field(column_value, :varbinary), do: elem(column_value, @binary_val)
