@@ -70,8 +70,11 @@ defmodule Snappyex.Client do
     :sqlxml            -> 21
     :nulltype          -> 22
     :array             -> 23
-    :json_object       -> 24
-    :java_object       -> 25
+    :map               -> 24
+    :struct            -> 25
+    :other             -> 26
+    :json_object       -> 27
+    :java_object       -> 28
   end
 
   defenum ServerType do
