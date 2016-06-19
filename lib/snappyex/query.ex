@@ -44,10 +44,10 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(column_value, :boolean), do: elem(column_value, @bool_val)
   def decode_field(column_value, :tinyint), do: elem(column_value, @i16_val)
   def decode_field(column_value, :integer), do: elem(column_value, @i32_val)
-  def decode_field(column_value, :bigint), do: elem(column_value, @float_val)
-  def decode_field(column_value, :float), do: elem(column_value, @double_val)
+  def decode_field(column_value, :bigint), do: elem(column_value, @i64_val)
+  def decode_field(column_value, :float), do: elem(column_value, @float_val)
 #  def decode_field(column_value, :real), do: elem(column_value, @decimal_val)
-  def decode_field(column_value, :double), do: elem(column_value, @string_val)
+  def decode_field(column_value, :double), do: elem(column_value, @double_val)
   def decode_field(column_value, :decimal), do: elem(column_value, @decimal_val)
   def decode_field(column_value, :char), do: elem(column_value, @string_val)
   def decode_field(column_value, :varchar), do: elem(column_value, @string_val)
@@ -62,7 +62,12 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     {{year, month, day}, {hour, min, sec}} = :calendar.gregorian_seconds_to_datetime(div(date, 1000) + @gs_epoch)
     {hour, min, sec}
   end
-  def decode_field(column_value, :timestamp), do: elem(column_value, @timestamp_val)
+  def decode_field(column_value, :timestamp) do
+    # TODO Extract nanoseconds and add it to time
+    # https://github.com/elixir-ecto/postgrex/blob/master/lib/postgrex/extensions/timestamp.ex#L24
+    # Handle < epoch case
+    elem(column_value, @timestamp_val)
+  end
   def decode_field(column_value, :binary), do: elem(column_value, @binary_val)
   def decode_field(column_value, :varbinary), do: elem(column_value, @binary_val)
   def decode_field(column_value, :longvarbinary), do: elem(column_value, @binary_val)
