@@ -42,7 +42,7 @@ defmodule Snappyex do
   """
   @spec child_spec(Keyword.t) :: Supervisor.Spec.spec
   def child_spec(opts) do
-    DBConnection.child_spec(Snappy.Protocol, opts)
+    DBConnection.child_spec(Snappyex.Protocol, opts)
   end
 
   defp defaults(opts) do
