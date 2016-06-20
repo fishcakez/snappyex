@@ -5,8 +5,9 @@ defmodule Snappyex.Protocol do
   alias Snappyex.Query
   
   def connect(opts) do
-    state = Keyword.merge(Keyword.new(), opts) 
-    host = Keyword.get(opts, :hostname, 'snappydata')
+    state = Keyword.merge(Keyword.new(), opts)
+    host = Keyword.get(opts, :hostname, "snappydata")
+    host = String.to_char_list(host)
     port = Keyword.get(opts, :port, 1531)
     token_size = Keyword.get(opts, :token_size, 16)
     use_string_for_decimal = Keyword.get(opts, :use_string_for_decimal, false)
@@ -65,10 +66,8 @@ defmodule Snappyex.Protocol do
     attrs = Keyword.get(state, :attrs, HashDict.new)
     statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-
-    {:ok, params} = Map.fetch(params, :params)
     result = Map.new
-    rowset = Snappyex.Client.executePreparedQuery(statement_id, params, token)
+    rowset = Snappyex.Client.executePreparedQuery(statement_id, Snappyex.Model.Row.new(values: []), token)
     result = Map.put_new(result, :row_set, rowset)
     {:ok, result, state}
   end
