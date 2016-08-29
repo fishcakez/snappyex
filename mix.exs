@@ -4,7 +4,7 @@ defmodule Snappyex.Mixfile do
   def project do
     [app: :snappyex,
      version: "0.0.1",
-     elixir: "~> 1.2.2",
+     elixir: "~> 1.3",
      compilers: [:thrift | Mix.compilers],
      thrift_files: Mix.Utils.extract_files(["thrift"], [:thrift]),
      thrift_version: ">= 0.9.3",
@@ -19,7 +19,7 @@ defmodule Snappyex.Mixfile do
   end
 
   defp deps do
-    [{:db_connection, "~> 1.0.0-rc.0"},
+    [{:db_connection, "~> 1.0.0-rc.5"},
      {:riffed, github: "pinterest/riffed", tag: "rift_1_5_0", submodules: true}
     ]
   end
