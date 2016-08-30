@@ -311,7 +311,7 @@ function_info('scrollCursor', exceptions) ->
 % executeCursorUpdate(This, CursorId, Operations, ChangedRows, ChangedColumnsList, ChangedRowIndexes, Token)
 function_info('executeCursorUpdate', params_type) ->
   {struct, [{1, i32},
-          {2, {list, byte}},
+          {2, {list, i32}},
           {3, {list, {struct, {'snappydata_types', 'Row'}}}},
           {4, {list, {list, i32}}},
           {5, {list, i32}},

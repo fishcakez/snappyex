@@ -6,9 +6,9 @@
 -define(SNAPPYDATA_SNAPPYTYPE_SMALLINT, 3).
 -define(SNAPPYDATA_SNAPPYTYPE_INTEGER, 4).
 -define(SNAPPYDATA_SNAPPYTYPE_BIGINT, 5).
--define(SNAPPYDATA_SNAPPYTYPE_FLOAT, 6).
--define(SNAPPYDATA_SNAPPYTYPE_REAL, 7).
--define(SNAPPYDATA_SNAPPYTYPE_DOUBLE, 8).
+-define(SNAPPYDATA_SNAPPYTYPE_REAL, 6).
+-define(SNAPPYDATA_SNAPPYTYPE_DOUBLE, 7).
+-define(SNAPPYDATA_SNAPPYTYPE_FLOAT, 8).
 -define(SNAPPYDATA_SNAPPYTYPE_DECIMAL, 9).
 -define(SNAPPYDATA_SNAPPYTYPE_CHAR, 10).
 -define(SNAPPYDATA_SNAPPYTYPE_VARCHAR, 11).
@@ -22,13 +22,13 @@
 -define(SNAPPYDATA_SNAPPYTYPE_BLOB, 19).
 -define(SNAPPYDATA_SNAPPYTYPE_CLOB, 20).
 -define(SNAPPYDATA_SNAPPYTYPE_SQLXML, 21).
--define(SNAPPYDATA_SNAPPYTYPE_NULLTYPE, 22).
--define(SNAPPYDATA_SNAPPYTYPE_ARRAY, 23).
--define(SNAPPYDATA_SNAPPYTYPE_MAP, 24).
--define(SNAPPYDATA_SNAPPYTYPE_STRUCT, 25).
--define(SNAPPYDATA_SNAPPYTYPE_OTHER, 26).
--define(SNAPPYDATA_SNAPPYTYPE_JSON_OBJECT, 27).
--define(SNAPPYDATA_SNAPPYTYPE_JAVA_OBJECT, 28).
+-define(SNAPPYDATA_SNAPPYTYPE_ARRAY, 22).
+-define(SNAPPYDATA_SNAPPYTYPE_MAP, 23).
+-define(SNAPPYDATA_SNAPPYTYPE_STRUCT, 24).
+-define(SNAPPYDATA_SNAPPYTYPE_NULLTYPE, 25).
+-define(SNAPPYDATA_SNAPPYTYPE_JSON, 26).
+-define(SNAPPYDATA_SNAPPYTYPE_JAVA_OBJECT, 27).
+-define(SNAPPYDATA_SNAPPYTYPE_OTHER, 28).
 
 -define(SNAPPYDATA_TRANSACTIONATTRIBUTE_AUTOCOMMIT, 1).
 -define(SNAPPYDATA_TRANSACTIONATTRIBUTE_READ_ONLY_CONNECTION, 2).
@@ -181,6 +181,10 @@
 -define(SNAPPYDATA_SERVERTYPE_THRIFT_SNAPPY_CP_SSL, 8).
 -define(SNAPPYDATA_SERVERTYPE_THRIFT_SNAPPY_BP_SSL, 9).
 
+-define(SNAPPYDATA_CURSORUPDATEOPERATION_UPDATE_OP, 1).
+-define(SNAPPYDATA_CURSORUPDATEOPERATION_INSERT_OP, 2).
+-define(SNAPPYDATA_CURSORUPDATEOPERATION_DELETE_OP, 3).
+
 %% struct 'Decimal'
 
 -record('Decimal', {'signum' :: integer(),
@@ -194,28 +198,22 @@
                       'nanos' :: integer()}).
 -type 'Timestamp'() :: #'Timestamp'{}.
 
-%% struct 'JSONField'
+%% struct 'JSONValue'
 
--record('JSONField', {'string_val' :: string() | binary(),
+-record('JSONValue', {'string_val' :: string() | binary(),
                       'bool_val' :: boolean(),
                       'i32_val' :: integer(),
                       'i64_val' :: integer(),
                       'double_val' :: float(),
-                      'null_val' :: boolean(),
-                      'ref_val' :: integer(),
-                      'array_val' :: list()}).
--type 'JSONField'() :: #'JSONField'{}.
-
-%% struct 'JSONNode'
-
--record('JSONNode', {'pairs' :: dict:dict(),
-                     'singleField' :: 'JSONField'(),
-                     'refId' :: integer()}).
--type 'JSONNode'() :: #'JSONNode'{}.
+                      'object_val' :: dict:dict(),
+                      'array_val' :: list(),
+                      'null_val' :: boolean()}).
+-type 'JSONValue'() :: #'JSONValue'{}.
 
 %% struct 'JSONObject'
 
--record('JSONObject', {'nodes' = [] :: list()}).
+-record('JSONObject', {'pairs' :: dict:dict(),
+                       'array' :: list()}).
 -type 'JSONObject'() :: #'JSONObject'{}.
 
 %% struct 'BlobChunk'
@@ -392,6 +390,9 @@
                         'binary_val' :: string() | binary(),
                         'blob_val' :: 'BlobChunk'(),
                         'clob_val' :: 'ClobChunk'(),
+                        'array_val' :: list(),
+                        'map_val' :: dict:dict(),
+                        'struct_val' :: list(),
                         'null_val' :: boolean(),
                         'json_val' :: 'JSONObject'(),
                         'java_val' :: string() | binary()}).
@@ -400,11 +401,17 @@
 %% struct 'ColumnDescriptor'
 
 -record('ColumnDescriptor', {'type' :: integer(),
-                             'descFlags' :: integer(),
                              'precision' :: integer(),
                              'scale' :: integer(),
                              'name' :: string() | binary(),
                              'fullTableName' :: string() | binary(),
+                             'updatable' :: boolean(),
+                             'definitelyUpdatable' :: boolean(),
+                             'nullable' :: boolean(),
+                             'autoIncrement' :: boolean(),
+                             'parameterIn' :: boolean(),
+                             'parameterOut' :: boolean(),
+                             'elementTypes' :: list(),
                              'udtTypeAndClassName' :: string() | binary()}).
 -type 'ColumnDescriptor'() :: #'ColumnDescriptor'{}.
 
@@ -439,6 +446,7 @@
 %% struct 'PrepareResult'
 
 -record('PrepareResult', {'statementId' :: integer(),
+                          'statementType' :: integer(),
                           'parameterMetaData' = [] :: list(),
                           'resultSetMetaData' :: list(),
                           'warnings' :: 'SnappyExceptionData'()}).
@@ -457,7 +465,7 @@
 -record('StatementResult', {'resultSet' :: 'RowSet'(),
                             'updateCount' :: integer(),
                             'batchUpdateCounts' :: list(),
-                            'procedureOutParams' :: 'Row'(),
+                            'procedureOutParams' :: dict:dict(),
                             'generatedKeys' :: 'RowSet'(),
                             'warnings' :: 'SnappyExceptionData'(),
                             'preparedResult' :: 'PrepareResult'()}).

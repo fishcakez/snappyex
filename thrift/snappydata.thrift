@@ -54,370 +54,365 @@ namespace rb SnappyData.Thrift
 namespace php snappydata.thrift
 namespace perl SnappyData.Thrift
 
+
 struct Decimal {
-  1: required i8     signum
-  2: required i32    scale
-  3: required binary magnitude
+  1: required byte                                         signum
+  2: required i32                                          scale
+  3: required binary                                       magnitude
 }
 
 struct Timestamp {
-  1: required i64 secsSinceEpoch,
-  2: optional i32 nanos
+  1: required i64                                          secsSinceEpoch
+  2: optional i32                                          nanos
 }
 
-struct JSONField {
-  1: optional string    string_val
-  2: optional bool      bool_val
-  3: optional i32       i32_val
-  4: optional i64       i64_val
-  5: optional double    double_val
-  6: optional bool      null_val
-  7: optional i32       ref_val
-  8: optional list<i32> array_val // of refIds
+union JSONValue {
+  1: string                                                string_val
+  2: bool                                                  bool_val
+  3: i32                                                   i32_val
+  4: i64                                                   i64_val
+  5: double                                                double_val
+  6: map<string, JSONValue>                                object_val
+  7: list<JSONValue>                                       array_val
+  8: bool                                                  null_val
 }
 
-struct JSONNode {
-  1: optional map<string, JSONField> pairs
-  2: optional JSONField              singleField // for array
-  3: required i32                    refId       // index in JSONObject
-}
-
-struct JSONObject {
-   // list of all nodes; index into this should be the refId
-  1: required list<JSONNode> nodes
+union JSONObject {
+  1: map<string, JSONValue>                                pairs
+  2: list<JSONValue>                                       array
 }
 
 struct BlobChunk {
-  1: required binary chunk,
-  2: required bool last,
+  1: required binary                                       chunk
+  2: required bool                                         last
   // optional when sending from client to server for update,
   // but required when returning from server to client or for gets
-  3: optional i32 lobId,
-  4: optional i64 offset,
+  3: optional i32                                          lobId
+  4: optional i64                                          offset
   // total length of LOB; will be set for first chunk but optional for rest
-  5: optional i64 totalLength
+  5: optional i64                                          totalLength
 }
 
 struct ClobChunk {
-  1: required string chunk,
-  2: required bool last,
+  1: required string                                       chunk
+  2: required bool                                         last
   // optional when sending from client to server for update,
   // but required when returning from server to client or for gets
-  3: optional i32 lobId,
-  4: optional i64 offset,
+  3: optional i32                                          lobId
+  4: optional i64                                          offset
   // total length of LOB; will be set for first chunk but optional for rest
-  5: optional i64 totalLength
+  5: optional i64                                          totalLength
 }
 
 enum SnappyType {
-  BOOLEAN           = 1
-  TINYINT           = 2
-  SMALLINT          = 3
-  INTEGER           = 4
-  BIGINT            = 5
-  FLOAT             = 6
-  REAL              = 7
-  DOUBLE            = 8
-  DECIMAL           = 9
-  CHAR              = 10
-  VARCHAR           = 11
-  LONGVARCHAR       = 12
-  DATE              = 13
-  TIME              = 14
-  TIMESTAMP         = 15
-  BINARY            = 16
-  VARBINARY         = 17
-  LONGVARBINARY     = 18
-  BLOB              = 19
-  CLOB              = 20
-  SQLXML            = 21
-  NULLTYPE          = 22
-  ARRAY             = 23
-  MAP               = 24
-  STRUCT            = 25
-  OTHER             = 26
-  JSON_OBJECT       = 27
-  JAVA_OBJECT       = 28
+  BOOLEAN                                                  = 1
+  TINYINT                                                  = 2
+  SMALLINT                                                 = 3
+  INTEGER                                                  = 4
+  BIGINT                                                   = 5
+  REAL                                                     = 6
+  DOUBLE                                                   = 7
+  FLOAT                                                    = 8
+  DECIMAL                                                  = 9
+  CHAR                                                     = 10
+  VARCHAR                                                  = 11
+  LONGVARCHAR                                              = 12
+  DATE                                                     = 13
+  TIME                                                     = 14
+  TIMESTAMP                                                = 15
+  BINARY                                                   = 16
+  VARBINARY                                                = 17
+  LONGVARBINARY                                            = 18
+  BLOB                                                     = 19
+  CLOB                                                     = 20
+  SQLXML                                                   = 21
+  ARRAY                                                    = 22
+  MAP                                                      = 23
+  STRUCT                                                   = 24
+  NULLTYPE                                                 = 25
+  JSON                                                     = 26
+  JAVA_OBJECT                                              = 27 // custom Java serialized object
+  OTHER                                                    = 28 // custom UDTs which will be shipped as clobs
 }
 
 // constants for StatementAttrs.resultSetType
-const i8 RESULTSET_TYPE_FORWARD_ONLY = 1;
-const i8 RESULTSET_TYPE_INSENSITIVE = 2;
-const i8 RESULTSET_TYPE_SENSITIVE = 3;
-const i8 RESULTSET_TYPE_UNKNOWN = 4;
+const byte RESULTSET_TYPE_FORWARD_ONLY                     = 1;
+const byte RESULTSET_TYPE_INSENSITIVE                      = 2;
+const byte RESULTSET_TYPE_SENSITIVE                        = 3;
+const byte RESULTSET_TYPE_UNKNOWN                          = 4;
 
 // defaults for connection/statement attributes
-const bool DEFAULT_AUTOCOMMIT = false;
-const i8   DEFAULT_RESULTSET_TYPE = RESULTSET_TYPE_FORWARD_ONLY;
-const bool DEFAULT_RESULTSET_UPDATABLE = false;
-const bool DEFAULT_RESULTSET_HOLD_CURSORS_OVER_COMMIT = false;
+const bool DEFAULT_AUTOCOMMIT                              = false;
+const byte DEFAULT_RESULTSET_TYPE                          = RESULTSET_TYPE_FORWARD_ONLY;
+const bool DEFAULT_RESULTSET_UPDATABLE                     = false;
+const bool DEFAULT_RESULTSET_HOLD_CURSORS_OVER_COMMIT      = false;
 
 // additional flags for transactions
 enum TransactionAttribute {
-  AUTOCOMMIT = 1,
-  READ_ONLY_CONNECTION = 2,
-  WAITING_MODE = 3,
-  DISABLE_BATCHING = 4,
-  SYNC_COMMITS = 5
+  AUTOCOMMIT                                               = 1
+  READ_ONLY_CONNECTION                                     = 2
+  WAITING_MODE                                             = 3
+  DISABLE_BATCHING                                         = 4
+  SYNC_COMMITS                                             = 5
 }
 
 enum RowIdLifetime {
   // Indicates that this data source does not support the ROWID type.
-  ROWID_UNSUPPORTED = 1,
+  ROWID_UNSUPPORTED                                        = 1
   // Indicates that the lifetime of a RowId from this data source is
   // indeterminate; but not one of ROWID_VALID_TRANSACTION,
   // ROWID_VALID_SESSION, or, ROWID_VALID_FOREVER.
-  ROWID_VALID_OTHER = 2,
+  ROWID_VALID_OTHER                                        = 2
   // Indicates that the lifetime of a RowId from this data source
   // is at least the containing session.
-  ROWID_VALID_SESSION = 3,
+  ROWID_VALID_SESSION                                      = 3
   // Indicates that the lifetime of a RowId from this data source
   // is at least the containing transaction.
-  ROWID_VALID_TRANSACTION = 4,
+  ROWID_VALID_TRANSACTION                                  = 4
   // Indicates that the lifetime of a RowId from this data source
   // is, effectively, unlimited.
-  ROWID_VALID_FOREVER = 5
+  ROWID_VALID_FOREVER                                      = 5
 }
 
 enum ServiceFeature {
-  ALL_PROCEDURES_CALLABLE = 1,
-  ALL_TABLES_SELECTABLE = 2,
-  INTEGRITY_ENHANCEMENT = 3,
-  NULLS_SORTED_HIGH = 4,
-  NULLS_SORTED_LOW = 5,
-  NULLS_SORTED_START = 6,
-  NULLS_SORTED_END = 7,
-  USES_LOCAL_FILES = 8,
-  USES_LOCAL_FILE_PER_TABLE = 9,
-  MIXEDCASE_IDENTIFIERS = 10,
-  MIXEDCASE_QUOTED_IDENTIFIERS = 11,
-  STORES_UPPERCASE_IDENTIFIERS = 12,
-  STORES_LOWERCASE_IDENTIFIERS = 13,
-  STORES_MIXEDCASE_IDENTIFIERS = 14,
-  STORES_UPPERCASE_QUOTED_IDENTIFIERS = 15,
-  STORES_LOWERCASE_QUOTED_IDENTIFIERS = 16,
-  STORES_MIXEDCASE_QUOTED_IDENTIFIERS = 17,
-  ALTER_TABLE_ADD_COLUMN = 18,
-  ALTER_TABLE_DROP_COLUMN = 19,
-  COLUMN_ALIASING = 20,
-  NULL_CONCAT_NON_NULL_IS_NULL = 21,
-  CONVERT = 22,
-  TABLE_CORRELATION_NAMES = 23,
-  TABLE_CORRELATION_NAMES_DIFFERENT = 24,
-  ORDER_BY_EXPRESSIONS = 25,
-  ORDER_BY_UNRELATED = 26,
-  GROUP_BY = 27,
-  GROUP_BY_UNRELATED = 28,
-  GROUP_BY_BEYOND_SELECT = 29,
-  LIKE_ESCAPE = 30,
-  MULTIPLE_RESULTSETS = 31,
-  MULTIPLE_TRANSACTIONS = 32,
-  NON_NULLABLE_COLUMNS = 33,
-  SQL_GRAMMAR_MINIMUM = 34,
-  SQL_GRAMMAR_CORE = 35,
-  SQL_GRAMMAR_EXTENDED = 36,
-  SQL_GRAMMAR_ANSI92_ENTRY = 37,
-  SQL_GRAMMAR_ANSI92_INTERMEDIATE = 38,
-  SQL_GRAMMAR_ANSI92_FULL = 39,
-  OUTER_JOINS = 40,
-  OUTER_JOINS_FULL = 41,
-  OUTER_JOINS_LIMITED = 42,
-  SCHEMAS_IN_DMLS = 43,
-  SCHEMAS_IN_PROCEDURE_CALLS = 44,
-  SCHEMAS_IN_TABLE_DEFS = 45,
-  SCHEMAS_IN_INDEX_DEFS = 46,
-  SCHEMAS_IN_PRIVILEGE_DEFS = 47,
-  AUTOCOMMIT_FAILURE_CLOSES_ALL_RESULTSETS = 48,
-  CATALOGS_IN_DMLS = 49,
-  CATALOGS_IN_PROCEDURE_CALLS = 50,
-  CATALOGS_IN_TABLE_DEFS = 51,
-  CATALOGS_IN_INDEX_DEFS = 52,
-  CATALOGS_IN_PRIVILEGE_DEFS = 53,
-  POSITIONED_DELETE = 54,
-  POSITIONED_UPDATE = 55,
-  SELECT_FOR_UPDATE = 56,
-  STORED_PROCEDURES = 57,
-  SUBQUERIES_IN_COMPARISONS = 58,
-  SUBQUERIES_IN_EXISTS = 59,
-  SUBQUERIES_IN_INS = 60,
-  SUBQUERIES_IN_QUANTIFIEDS = 61,
-  SUBQUERIES_CORRELATED = 62,
-  UNION = 63,
-  UNION_ALL = 64,
-  OPEN_CURSORS_ACROSS_COMMIT = 65,
-  OPEN_CURSORS_ACROSS_ROLLBACK = 66,
-  OPEN_STATEMENTS_ACROSS_COMMIT = 67,
-  OPEN_STATEMENTS_ACROSS_ROLLBACK = 68,
-  MAX_ROWSIZE_INCLUDES_BLOBSIZE = 69,
-  TRANSACTIONS = 70,
-  TRANSACTIONS_BOTH_DMLS_AND_DDLS = 71,
-  TRANSACTIONS_DMLS_ONLY = 72,
-  TRANSACTIONS_DDLS_IMPLICIT_COMMIT = 73,
-  TRANSACTIONS_DDLS_IGNORED = 74,
-  TRANSACTIONS_SAVEPOINTS = 75,
-  CALLABLE_NAMED_PARAMETERS = 76,
-  CALLABLE_MULTIPLE_OPEN_RESULTSETS = 77,
-  GENERATED_KEYS_RETRIEVAL = 78,
-  GENERATED_KEYS_ALWAYS_RETURNED = 79,
-  BATCH_UPDATES = 80,
-  RESULTSET_FORWARD_ONLY = 81,
-  RESULTSET_SCROLL_INSENSITIVE = 82,
-  RESULTSET_SCROLL_SENSITIVE = 83,
-  RESULTSET_HOLDABILITY_CLOSE_CURSORS_AT_COMMIT = 84,
-  RESULTSET_HOLDABILITY_HOLD_CURSORS_OVER_COMMIT = 85,
-  LOB_UPDATES_COPY = 86,
-  STATEMENT_POOLING = 87,
-  STORED_FUNCTIONS_USING_CALL = 88
+  ALL_PROCEDURES_CALLABLE                                  = 1
+  ALL_TABLES_SELECTABLE                                    = 2
+  INTEGRITY_ENHANCEMENT                                    = 3
+  NULLS_SORTED_HIGH                                        = 4
+  NULLS_SORTED_LOW                                         = 5
+  NULLS_SORTED_START                                       = 6
+  NULLS_SORTED_END                                         = 7
+  USES_LOCAL_FILES                                         = 8
+  USES_LOCAL_FILE_PER_TABLE                                = 9
+  MIXEDCASE_IDENTIFIERS                                    = 10
+  MIXEDCASE_QUOTED_IDENTIFIERS                             = 11
+  STORES_UPPERCASE_IDENTIFIERS                             = 12
+  STORES_LOWERCASE_IDENTIFIERS                             = 13
+  STORES_MIXEDCASE_IDENTIFIERS                             = 14
+  STORES_UPPERCASE_QUOTED_IDENTIFIERS                      = 15
+  STORES_LOWERCASE_QUOTED_IDENTIFIERS                      = 16
+  STORES_MIXEDCASE_QUOTED_IDENTIFIERS                      = 17
+  ALTER_TABLE_ADD_COLUMN                                   = 18
+  ALTER_TABLE_DROP_COLUMN                                  = 19
+  COLUMN_ALIASING                                          = 20
+  NULL_CONCAT_NON_NULL_IS_NULL                             = 21
+  CONVERT                                                  = 22
+  TABLE_CORRELATION_NAMES                                  = 23
+  TABLE_CORRELATION_NAMES_DIFFERENT                        = 24
+  ORDER_BY_EXPRESSIONS                                     = 25
+  ORDER_BY_UNRELATED                                       = 26
+  GROUP_BY                                                 = 27
+  GROUP_BY_UNRELATED                                       = 28
+  GROUP_BY_BEYOND_SELECT                                   = 29
+  LIKE_ESCAPE                                              = 30
+  MULTIPLE_RESULTSETS                                      = 31
+  MULTIPLE_TRANSACTIONS                                    = 32
+  NON_NULLABLE_COLUMNS                                     = 33
+  SQL_GRAMMAR_MINIMUM                                      = 34
+  SQL_GRAMMAR_CORE                                         = 35
+  SQL_GRAMMAR_EXTENDED                                     = 36
+  SQL_GRAMMAR_ANSI92_ENTRY                                 = 37
+  SQL_GRAMMAR_ANSI92_INTERMEDIATE                          = 38
+  SQL_GRAMMAR_ANSI92_FULL                                  = 39
+  OUTER_JOINS                                              = 40
+  OUTER_JOINS_FULL                                         = 41
+  OUTER_JOINS_LIMITED                                      = 42
+  SCHEMAS_IN_DMLS                                          = 43
+  SCHEMAS_IN_PROCEDURE_CALLS                               = 44
+  SCHEMAS_IN_TABLE_DEFS                                    = 45
+  SCHEMAS_IN_INDEX_DEFS                                    = 46
+  SCHEMAS_IN_PRIVILEGE_DEFS                                = 47
+  AUTOCOMMIT_FAILURE_CLOSES_ALL_RESULTSETS                 = 48
+  CATALOGS_IN_DMLS                                         = 49
+  CATALOGS_IN_PROCEDURE_CALLS                              = 50
+  CATALOGS_IN_TABLE_DEFS                                   = 51
+  CATALOGS_IN_INDEX_DEFS                                   = 52
+  CATALOGS_IN_PRIVILEGE_DEFS                               = 53
+  POSITIONED_DELETE                                        = 54
+  POSITIONED_UPDATE                                        = 55
+  SELECT_FOR_UPDATE                                        = 56
+  STORED_PROCEDURES                                        = 57
+  SUBQUERIES_IN_COMPARISONS                                = 58
+  SUBQUERIES_IN_EXISTS                                     = 59
+  SUBQUERIES_IN_INS                                        = 60
+  SUBQUERIES_IN_QUANTIFIEDS                                = 61
+  SUBQUERIES_CORRELATED                                    = 62
+  UNION                                                    = 63
+  UNION_ALL                                                = 64
+  OPEN_CURSORS_ACROSS_COMMIT                               = 65
+  OPEN_CURSORS_ACROSS_ROLLBACK                             = 66
+  OPEN_STATEMENTS_ACROSS_COMMIT                            = 67
+  OPEN_STATEMENTS_ACROSS_ROLLBACK                          = 68
+  MAX_ROWSIZE_INCLUDES_BLOBSIZE                            = 69
+  TRANSACTIONS                                             = 70
+  TRANSACTIONS_BOTH_DMLS_AND_DDLS                          = 71
+  TRANSACTIONS_DMLS_ONLY                                   = 72
+  TRANSACTIONS_DDLS_IMPLICIT_COMMIT                        = 73
+  TRANSACTIONS_DDLS_IGNORED                                = 74
+  TRANSACTIONS_SAVEPOINTS                                  = 75
+  CALLABLE_NAMED_PARAMETERS                                = 76
+  CALLABLE_MULTIPLE_OPEN_RESULTSETS                        = 77
+  GENERATED_KEYS_RETRIEVAL                                 = 78
+  GENERATED_KEYS_ALWAYS_RETURNED                           = 79
+  BATCH_UPDATES                                            = 80
+  RESULTSET_FORWARD_ONLY                                   = 81
+  RESULTSET_SCROLL_INSENSITIVE                             = 82
+  RESULTSET_SCROLL_SENSITIVE                               = 83
+  RESULTSET_HOLDABILITY_CLOSE_CURSORS_AT_COMMIT            = 84
+  RESULTSET_HOLDABILITY_HOLD_CURSORS_OVER_COMMIT           = 85
+  LOB_UPDATES_COPY                                         = 86
+  STATEMENT_POOLING                                        = 87
+  STORED_FUNCTIONS_USING_CALL                              = 88
 }
 
 enum ServiceFeatureParameterized {
-  TRANSACTIONS_SUPPORT_ISOLATION = 1,
-  RESULTSET_TYPE = 2,
-  RESULTSET_CONCURRENCY_READ_ONLY = 3,
-  RESULTSET_CONCURRENCY_UPDATABLE = 4,
-  RESULTSET_OWN_UPDATES_VISIBLE = 5,
-  RESULTSET_OWN_DELETES_VISIBLE = 6,
-  RESULTSET_OWN_INSERTS_VISIBLE = 7,
-  RESULTSET_OTHERS_UPDATES_VISIBLE = 8,
-  RESULTSET_OTHERS_DELETES_VISIBLE = 9,
-  RESULTSET_OTHERS_INSERTS_VISIBLE = 10,
-  RESULTSET_UPDATES_DETECTED = 11,
-  RESULTSET_DELETES_DETECTED = 12,
-  RESULTSET_INSERTS_DETECTED = 13
+  TRANSACTIONS_SUPPORT_ISOLATION                           = 1
+  RESULTSET_TYPE                                           = 2
+  RESULTSET_CONCURRENCY_READ_ONLY                          = 3
+  RESULTSET_CONCURRENCY_UPDATABLE                          = 4
+  RESULTSET_OWN_UPDATES_VISIBLE                            = 5
+  RESULTSET_OWN_DELETES_VISIBLE                            = 6
+  RESULTSET_OWN_INSERTS_VISIBLE                            = 7
+  RESULTSET_OTHERS_UPDATES_VISIBLE                         = 8
+  RESULTSET_OTHERS_DELETES_VISIBLE                         = 9
+  RESULTSET_OTHERS_INSERTS_VISIBLE                         = 10
+  RESULTSET_UPDATES_DETECTED                               = 11
+  RESULTSET_DELETES_DETECTED                               = 12
+  RESULTSET_INSERTS_DETECTED                               = 13
 }
 
 struct ServiceMetaData {
-  1: required string productName,
-  2: required string productVersion,
-  3: required i32 productMajorVersion,
-  4: required i32 productMinorVersion,
-  5: required i32 jdbcMajorVersion,
-  6: required i32 jdbcMinorVersion,
-  7: required string identifierQuote,
-  8: required list<string> sqlKeywords,
-  9: required list<string> numericFunctions,
- 10: required list<string> stringFunctions,
- 11: required list<string> systemFunctions,
- 12: required list<string> dateTimeFunctions,
- 13: required string searchStringEscape,
+  1: required string                                       productName
+  2: required string                                       productVersion
+  3: required i32                                          productMajorVersion
+  4: required i32                                          productMinorVersion
+  5: required i32                                          jdbcMajorVersion
+  6: required i32                                          jdbcMinorVersion
+  7: required string                                       identifierQuote
+  8: required list<string>                                 sqlKeywords
+  9: required list<string>                                 numericFunctions
+ 10: required list<string>                                 stringFunctions
+ 11: required list<string>                                 systemFunctions
+ 12: required list<string>                                 dateTimeFunctions
+ 13: required string                                       searchStringEscape
  // none if not present
- 14: optional string extraNameCharacters,
+ 14: optional string                                       extraNameCharacters
  // map of "fromType" to "toType"s supported by CONVERT function
- 15: required map<SnappyType, set<SnappyType>> supportedCONVERT,
- 16: required string schemaTerm,
- 17: required string procedureTerm,
- 18: required string catalogTerm,
- 19: required string catalogSeparator,
- 20: required i32 maxBinaryLiteralLength,
- 21: required i32 maxCharLiteralLength,
- 22: required i32 maxColumnsInGroupBy,
- 23: required i32 maxColumnsInIndex,
- 24: required i32 maxColumnsInOrderBy,
- 25: required i32 maxColumnsInSelect,
- 26: required i32 maxColumnsInTable,
- 27: required i32 maxConnections,
- 28: required i32 maxIndexLength,
- 29: required i32 maxRowSize,
- 30: required i32 maxStatementLength,
- 31: required i32 maxOpenStatements,
- 32: required i32 maxTableNamesInSelect,
- 33: required i32 maxColumnNameLength,
- 34: required i32 maxCursorNameLength,
- 35: required i32 maxSchemaNameLength,
- 36: required i32 maxProcedureNameLength,
- 37: required i32 maxCatalogNameLength,
- 38: required i32 maxTableNameLength,
- 39: required i32 maxUserNameLength,
- 40: required i32 defaultTransactionIsolation,
- 41: required i8  defaultResultSetType,
- 42: required bool defaultResultSetHoldabilityHoldCursorsOverCommit,
+ 15: required map<SnappyType, set<SnappyType>>             supportedCONVERT
+ 16: required string                                       schemaTerm
+ 17: required string                                       procedureTerm
+ 18: required string                                       catalogTerm
+ 19: required string                                       catalogSeparator
+ 20: required i32                                          maxBinaryLiteralLength
+ 21: required i32                                          maxCharLiteralLength
+ 22: required i32                                          maxColumnsInGroupBy
+ 23: required i32                                          maxColumnsInIndex
+ 24: required i32                                          maxColumnsInOrderBy
+ 25: required i32                                          maxColumnsInSelect
+ 26: required i32                                          maxColumnsInTable
+ 27: required i32                                          maxConnections
+ 28: required i32                                          maxIndexLength
+ 29: required i32                                          maxRowSize
+ 30: required i32                                          maxStatementLength
+ 31: required i32                                          maxOpenStatements
+ 32: required i32                                          maxTableNamesInSelect
+ 33: required i32                                          maxColumnNameLength
+ 34: required i32                                          maxCursorNameLength
+ 35: required i32                                          maxSchemaNameLength
+ 36: required i32                                          maxProcedureNameLength
+ 37: required i32                                          maxCatalogNameLength
+ 38: required i32                                          maxTableNameLength
+ 39: required i32                                          maxUserNameLength
+ 40: required i32                                          defaultTransactionIsolation
+ 41: required byte                                         defaultResultSetType
+ 42: required bool defaultResultSetHoldabilityHoldCursorsOverCommit
  // if true then the SQLSTATEs returned by SnappyException are
  // X/Open (now known as Open Group) SQL CLI else they are SQL99
- 43: required bool sqlStateIsXOpen,
- 44: required bool catalogAtStart,
- 45: required map<TransactionAttribute, bool> transactionDefaults,
- 46: required RowIdLifetime rowIdLifeTime,
- 47: required set<ServiceFeature> supportedFeatures,
- 48: required map<ServiceFeatureParameterized, list<i32>> featuresWithParams
+ 43: required bool                                         sqlStateIsXOpen
+ 44: required bool                                         catalogAtStart
+ 45: required map<TransactionAttribute, bool> transactionDefaults
+ 46: required RowIdLifetime                                rowIdLifeTime
+ 47: required set<ServiceFeature>                          supportedFeatures
+ 48: required map<ServiceFeatureParameterized, list<i32>>  featuresWithParams
 }
 
 enum ServiceMetaDataCall {
-  CATALOGS          = 1,
-  SCHEMAS           = 2,
-  TABLES            = 3,
-  TABLETYPES        = 4,
-  COLUMNS           = 5,
-  TABLEPRIVILEGES   = 6,
-  COLUMNPRIVILEGES  = 7,
-  PRIMARYKEYS       = 8,
-  IMPORTEDKEYS      = 9,
-  EXPORTEDKEYS      = 10,
-  CROSSREFERENCE    = 11,
-  PROCEDURES        = 12,
-  FUNCTIONS         = 13,
-  PROCEDURECOLUMNS  = 14,
-  FUNCTIONCOLUMNS   = 15,
-  ATTRIBUTES        = 16,
-  TYPEINFO          = 17,
-  SUPERTYPES        = 18,
-  SUPERTABLES       = 19,
-  VERSIONCOLUMNS    = 20,
-  CLIENTINFOPROPS   = 21,
-  PSEUDOCOLUMNS     = 22
+  CATALOGS                                                 = 1
+  SCHEMAS                                                  = 2
+  TABLES                                                   = 3
+  TABLETYPES                                               = 4
+  COLUMNS                                                  = 5
+  TABLEPRIVILEGES                                          = 6
+  COLUMNPRIVILEGES                                         = 7
+  PRIMARYKEYS                                              = 8
+  IMPORTEDKEYS                                             = 9
+  EXPORTEDKEYS                                             = 10
+  CROSSREFERENCE                                           = 11
+  PROCEDURES                                               = 12
+  FUNCTIONS                                                = 13
+  PROCEDURECOLUMNS                                         = 14
+  FUNCTIONCOLUMNS                                          = 15
+  ATTRIBUTES                                               = 16
+  TYPEINFO                                                 = 17
+  SUPERTYPES                                               = 18
+  SUPERTABLES                                              = 19
+  VERSIONCOLUMNS                                           = 20
+  CLIENTINFOPROPS                                          = 21
+  PSEUDOCOLUMNS                                            = 22
 }
 
 // constants for driver type
-const i8 DRIVER_JDBC = 1;
-const i8 DRIVER_ODBC = 2;
+const byte DRIVER_JDBC                                     = 1;
+const byte DRIVER_ODBC                                     = 2;
 
 struct ServiceMetaDataArgs {
-  1: required i32            connId,
-  2: required i8             driverType,
-  3: optional binary         token,
-  4: optional string         schema,
-  5: optional string         table,
-  6: optional list<string>   tableTypes,
-  7: optional string         columnName,
-  8: optional string         foreignSchema,
-  9: optional string         foreignTable,
- 10: optional string         procedureName,
- 11: optional string         functionName,
- 12: optional string         attributeName,
- 13: optional string         typeName,
- 14: optional SnappyType     typeId
+  1: required i32                                          connId
+  2: required byte                                         driverType
+  3: optional binary                                       token
+  4: optional string                                       schema
+  5: optional string                                       table
+  6: optional list<string>                                 tableTypes
+  7: optional string                                       columnName
+  8: optional string                                       foreignSchema
+  9: optional string                                       foreignTable
+ 10: optional string                                       procedureName
+ 11: optional string                                       functionName
+ 12: optional string                                       attributeName
+ 13: optional string                                       typeName
+ 14: optional SnappyType                                   typeId
 }
 
 // constant for the default session token size used by security mechanisms
 // like PLAIN and DIFFIE_HELLMAN
-const i32 DEFAULT_SESSION_TOKEN_SIZE = 16;
+const i32 DEFAULT_SESSION_TOKEN_SIZE                       = 16;
 
 enum SecurityMechanism {
-  PLAIN = 1,
-  DIFFIE_HELLMAN = 2
+  PLAIN                                                    = 1
+  DIFFIE_HELLMAN                                           = 2
 }
 
 struct OpenConnectionArgs {
-  1: required string clientHostName,
-  2: required string clientID,
-  3: required SecurityMechanism security,
-  4: optional string userName,
-  5: optional string password,
+  1: required string                                       clientHostName
+  2: required string                                       clientID
+  3: required SecurityMechanism                            security
+  4: optional string                                       userName
+  5: optional string                                       password
   // number of bytes to use for connection ID token
   // default is DEFAULT_SESSION_TOKEN_SIZE;
   // in future will be used for encryption of token etc. with
   // policy like in GFE client-server to defeat MIM attacks;
   // addition of the token argument allows for that expansion in future
-  6: optional i32 tokenSize,
-  7: optional bool useStringForDecimal,
-  8: optional map<string, string> properties
+  6: optional i32                                          tokenSize
+  7: optional bool                                         useStringForDecimal
+  8: optional map<string, string>                          properties
 }
 
 struct ConnectionProperties {
-  1: required i32    connId,
-  2: required string clientHostName,
-  3: required string clientID,
-  4: optional string userName,
-  5: optional binary token
+  1: required i32                                          connId
+  2: required string                                       clientHostName
+  3: required string                                       clientID
+  4: optional string                                       userName
+  5: optional binary                                       token
 }
 
 // enumeration of the various types of network services running in the system
@@ -426,248 +421,267 @@ struct ConnectionProperties {
 // as per its own matching configuration
 enum ServerType {
   // old DRDA servers
-  DRDA = 1,
+  DRDA                                                     = 1
 
   // Thrift LocatorService using TCompactProtocol
-  THRIFT_LOCATOR_CP = 2,
+  THRIFT_LOCATOR_CP                                        = 2
   // Thrift LocatorService using TBinaryProtocol
-  THRIFT_LOCATOR_BP = 3,
+  THRIFT_LOCATOR_BP                                        = 3
   // Thrift LocatorService using TCompactProtocol over SSL
-  THRIFT_LOCATOR_CP_SSL = 4,
+  THRIFT_LOCATOR_CP_SSL                                    = 4
   // Thrift LocatorService using TBinaryProtocol over SSL
-  THRIFT_LOCATOR_BP_SSL = 5,
+  THRIFT_LOCATOR_BP_SSL                                    = 5
 
   // Thrift SnappyDataService using TCompactProtocol
-  THRIFT_SNAPPY_CP = 6,
+  THRIFT_SNAPPY_CP                                         = 6
   // Thrift SnappyDataService using TBinaryProtocol
-  THRIFT_SNAPPY_BP = 7,
+  THRIFT_SNAPPY_BP                                         = 7
   // Thrift SnappyDataService using TCompactProtocol over SSL
-  THRIFT_SNAPPY_CP_SSL = 8,
+  THRIFT_SNAPPY_CP_SSL                                     = 8
   // Thrift SnappyDataService using TBinaryProtocol over SSL
-  THRIFT_SNAPPY_BP_SSL = 9
+  THRIFT_SNAPPY_BP_SSL                                     = 9
 }
 
 struct HostAddress {
-  1: required string hostName,
-  2: required i32 port,
-  3: optional string ipAddress,
+  1: required string                                       hostName
+  2: required i32                                          port
+  3: optional string                                       ipAddress
   // optional since "failedServers" may not have this
-  4: optional ServerType serverType
+  4: optional ServerType                                   serverType
 }
 
 // exceptions
 struct SnappyExceptionData {
-  1: required string reason,
-  2: required string sqlState,
-  3: required i32 severity
+  1: required string                                       reason
+  2: required string                                       sqlState
+  3: required i32                                          severity
 }
 
 exception SnappyException {
-  1: required SnappyExceptionData exceptionData,
-  2: required string serverInfo,
-  3: optional list<SnappyExceptionData> nextExceptions
+  1: required SnappyExceptionData                          exceptionData
+  2: required string                                       serverInfo
+  3: optional list<SnappyExceptionData>                    nextExceptions
 }
 
 // default batch size
-const i32 DEFAULT_RESULTSET_BATCHSIZE = 1024;
+const i32 DEFAULT_RESULTSET_BATCHSIZE                      = 1024;
 // default LOB chunk size
-const i32 DEFAULT_LOB_CHUNKSIZE = 1048576; // 1MB
+const i32 DEFAULT_LOB_CHUNKSIZE                            = 1048576; // 1MB
 
 // constants for transaction isolation levels
-const i8 TRANSACTION_NONE = 0;
-const i8 TRANSACTION_READ_UNCOMMITTED = 1;
-const i8 TRANSACTION_READ_COMMITTED = 2;
-const i8 TRANSACTION_REPEATABLE_READ = 4;
-const i8 TRANSACTION_SERIALIZABLE = 8;
+const byte TRANSACTION_NONE                                = 0;
+const byte TRANSACTION_READ_UNCOMMITTED                    = 1;
+const byte TRANSACTION_READ_COMMITTED                      = 2;
+const byte TRANSACTION_REPEATABLE_READ                     = 4;
+const byte TRANSACTION_SERIALIZABLE                        = 8;
 // special flag to indicate no change to current isolation level
-const i8 TRANSACTION_NO_CHANGE = 64;
+const byte TRANSACTION_NO_CHANGE                           = 64;
 
 // constant for the default transaction isolation
-const i8 DEFAULT_TRANSACTION_ISOLATION = TRANSACTION_NONE;
+const byte DEFAULT_TRANSACTION_ISOLATION                   = TRANSACTION_NONE;
 
 struct StatementAttrs {
-  1: optional i8             resultSetType,
-  2: optional bool           updatable,
-  3: optional bool           holdCursorsOverCommit,
-  4: optional bool           requireAutoIncCols,
+  1: optional byte                                         resultSetType
+  2: optional bool                                         updatable
+  3: optional bool                                         holdCursorsOverCommit
+  4: optional bool                                         requireAutoIncCols
   // requireAutoIncCols should be true for this to take affect
-  5: optional list<i32>      autoIncColumns,
+  5: optional list<i32>                                    autoIncColumns
   // requireAutoIncCols should be true for this to take affect
-  6: optional list<string>   autoIncColumnNames,
-  7: optional i32            batchSize = DEFAULT_RESULTSET_BATCHSIZE,
+  6: optional list<string>                                 autoIncColumnNames
+  7: optional i32                                          batchSize = DEFAULT_RESULTSET_BATCHSIZE
   // absence means FETCH_UNKNOWN
-  8: optional bool           fetchReverse,
-  9: optional i32            lobChunkSize,
- 10: optional i32            maxRows,
- 11: optional i32            maxFieldSize,
- 12: optional i32            timeout,
- 13: optional string         cursorName,
- 14: optional bool           possibleDuplicate,
- 15: optional bool           poolable,
- 16: optional bool           doEscapeProcessing,
- 17: optional map<TransactionAttribute, bool> pendingTransactionAttrs
+  8: optional bool                                         fetchReverse
+  9: optional i32                                          lobChunkSize
+ 10: optional i32                                          maxRows
+ 11: optional i32                                          maxFieldSize
+ 12: optional i32                                          timeout
+ 13: optional string                                       cursorName
+ 14: optional bool                                         possibleDuplicate
+ 15: optional bool                                         poolable
+ 16: optional bool                                         doEscapeProcessing
+ 17: optional map<TransactionAttribute, bool>              pendingTransactionAttrs
 }
 
 struct DateTime {
-  1: required i64 secsSinceEpoch,
+  1: required i64                                          secsSinceEpoch
 }
 
-struct ColumnValue {
-  1: optional bool          bool_val      // BOOLEAN
-  2: optional i8            byte_val      // TINYINT
-  3: optional i16           i16_val       // SMALLINT
-  4: optional i32           i32_val       // INT
-  5: optional i64           i64_val       // BIGINT
-  // using 32-bit integer for FLOAT instead of double to avoid
-  // any changes in presicion; callers must encode float as 32-bit integer
-  6: optional i32           float_val     // FLOAT
-  7: optional double        double_val    // DOUBLE
-  8: optional string        string_val    // CHAR, VARCHAR, others
-  9: optional Decimal       decimal_val   // DECIMAL/NUMERIC
- 10: optional DateTime      date_val      // DATE (only the date portion is used)
- 11: optional DateTime      time_val      // TIME (only the time portion is used)
- 12: optional Timestamp     timestamp_val // TIMESTAMP
- 13: optional binary        binary_val    // BINARY, VARBINARY
- 14: optional BlobChunk     blob_val      // BLOB
- 15: optional ClobChunk     clob_val      // CLOB
- 16: optional bool          null_val      // NULL
- 17: optional JSONObject    json_val,     // JSON object
- 18: optional binary        java_val      // custom Java serialized object
+union ColumnValue {
+  1: bool                                                  bool_val      // BOOLEAN
+  2: byte                                                  byte_val      // TINYINT
+  3: i16                                                   i16_val       // SMALLINT
+  4: i32                                                   i32_val       // INTEGER
+  5: i64                                                   i64_val       // BIGINT
+  // using 32-bit integer for REAL instead of double to avoid
+  // any changes in precision; callers must encode float as 32-bit integer
+  // in a manner compatible with Java's Float.floatToIntBits, or like a C/C++
+  // union having two fields namely float & int for conversion between the two
+  6: i32                                                   float_val     // REAL
+  7: double                                                double_val    // DOUBLE/FLOAT
+  8: string                                                string_val    // CHAR, VARCHAR, LONGVARCHAR, SQLXML
+  9: Decimal                                               decimal_val   // DECIMAL
+ 10: DateTime                                              date_val      // DATE (only the date portion is used)
+ 11: DateTime                                              time_val      // TIME (only the time portion is used)
+ 12: Timestamp                                             timestamp_val // TIMESTAMP
+ 13: binary                                                binary_val    // BINARY, VARBINARY, LONGVARBINARY
+ 14: BlobChunk                                             blob_val      // BLOB
+ 15: ClobChunk                                             clob_val      // CLOB
+ 16: list<ColumnValue>                                     array_val     // ARRAY
+ 17: map<ColumnValue, ColumnValue>                         map_val       // MAP
+ 18: list<ColumnValue>                                     struct_val    // STRUCT
+ 19: bool                                                  null_val      // NULLTYPE
+ 20: JSONObject                                            json_val      // JSON
+ 21: binary                                                java_val      // JAVA_OBJECT (serialized)
 }
-
-// flags for ColumnDescriptor.descFlags field
-// Defaults are:
-//   READONLY, COLUMN_NULLABLE_UNKNOWN, NOT_AUTOINC, PARAMETER_MODE_UNKNOWN
-const i16 COLUMN_UPDATABLE = 0x1;
-const i16 COLUMN_DEFINITELY_UPDATABLE = 0x2;
-const i16 COLUMN_NONULLS = 0x4;
-const i16 COLUMN_NULLABLE = 0x8;
-const i16 COLUMN_AUTOINC = 0x10;
-const i16 PARAMETER_MODE_IN = 0x20;
-const i16 PARAMETER_MODE_INOUT = 0x40;
-const i16 PARAMETER_MODE_OUT = 0x80;
 
 // constants for unknown precision/scale
-const i16 COLUMN_PRECISION_UNKNOWN = 0;
-const i16 COLUMN_SCALE_UNKNOWN = 0;
+const i16 COLUMN_PRECISION_UNKNOWN                         = 0;
+const i16 COLUMN_SCALE_UNKNOWN                             = 0;
 // max decimal precision supported by server
-const i32 DECIMAL_MAX_PRECISION = 127;
+const i32 DECIMAL_MAX_PRECISION                            = 127;
 
 struct ColumnDescriptor {
-  1: required SnappyType   type,
-  2: required i16          descFlags,
-  3: required i16          precision,
-  4: optional i16          scale,
-  5: optional string       name,
-  6: optional string       fullTableName,
-  7: optional string       udtTypeAndClassName
+  1: required SnappyType                                   type
+  2: required i16                                          precision
+  3: optional i16                                          scale
+  4: optional string                                       name
+  5: optional string                                       fullTableName
+  // various flags
+  6: optional bool                                         updatable
+  7: optional bool                                         definitelyUpdatable
+  8: optional bool                                         nullable
+  9: optional bool                                         autoIncrement
+ 10: optional bool                                         parameterIn
+ 11: optional bool                                         parameterOut
+  // types of individual elements for complex types:
+  //   a) single for ARRAY element type
+  //   b) two for MAP with first being the key type and second the value type
+  //   c) multiple for STRUCT one for each field in the STRUCT
+ 12: optional list<SnappyType>                             elementTypes 
+ 13: optional string                                       udtTypeAndClassName
 }
 
-// constants for cursor update operation type
-const i8 CURSOR_UPDATE = 1;
-const i8 CURSOR_INSERT = 2;
-const i8 CURSOR_DELETE = 3;
+// cursor update operation type
+enum CursorUpdateOperation {
+  UPDATE_OP                                                = 1
+  INSERT_OP                                                = 2
+  DELETE_OP                                                = 3
+}
 
 struct Row {
-  1: required list<ColumnValue>      values
+  1: required list<ColumnValue> values
 }
 
 struct OutputParameter {
-  1: required SnappyType   type,
-  2: optional i32          scale,
-  3: optional string       typeName
+  1: required SnappyType                                   type
+  2: optional i32                                          scale
+  3: optional string                                       typeName
 }
 
 // If statementId returned is this value then the statement has already
 // been closed.
 // If cursorId for a RowSet is set this value, then it is already finished
 // and no further operations are possible
-const i32 INVALID_ID = 0;
+const i32 INVALID_ID                                       = 0;
 
 // values for otherResultSetBehaviour flag of getNextResultSet
-const i8 NEXTRS_CLOSE_ALL_RESULTS = 0;
-const i8 NEXTRS_KEEP_CURRENT_RESULT = 1;
-const i8 NEXTRS_CLOSE_CURRENT_RESULT = 2;
+const byte NEXTRS_CLOSE_ALL_RESULTS                        = 0;
+const byte NEXTRS_KEEP_CURRENT_RESULT                      = 1;
+const byte NEXTRS_CLOSE_CURRENT_RESULT                     = 2;
 
 // bitmasks for RowSet.flags
 // if this is the last batch of rows for current result set
-const i8 ROWSET_LAST_BATCH = 1;
+const byte ROWSET_LAST_BATCH                               = 1;
 // for multiple result sets with CALL PROCEDUREs
-const i8 ROWSET_HAS_MORE_ROWSETS = 2;
+const byte ROWSET_HAS_MORE_ROWSETS                         = 2;
 // if all data for BLOB and CLOB columns has been already fetched
 // and does not need to be obtained using LOB calls separately
-const i8 ROWSET_DONE_FOR_LOBS = 4;
+const byte ROWSET_DONE_FOR_LOBS                            = 4;
+// set if offset from scrollCursor operation resulted in cursor being placed
+// before first row (RowSet can contain rows after that as per fetch direction)
+const byte ROWSET_BEFORE_FIRST                             = 8;
+// set if offset from scrollCursor operation resulted in cursor being placed
+// after last row (RowSet can contain rows before that as per fetch direction)
+const byte ROWSET_AFTER_LAST                               = 16;
 
 struct RowSet {
-  1: required list<Row>              rows,
+  1: required list<Row>                                    rows
   // bitmask flags as a combination of constants defined above
-  2: required i8                     flags,
+  2: required byte                                         flags
   // ID associated with this RowSet
-  3: required i32                    cursorId,
+  3: required i32                                          cursorId
   // ID of the associated statement
-  4: required i32                    statementId,
+  4: required i32                                          statementId
   // three arguments below are used to fix the origin of this result
   // so client can detect failure cases easily when iterating over results
   // (token and address are optional and will not be set by server)
-  5: required i32                    connId,
-  6: optional binary                 token,
-  7: optional HostAddress            source,
+  5: required i32                                          connId
+  6: optional binary                                       token
+  7: optional HostAddress                                  source
   // the starting row number (0-based) in case of batched results
   // this is set only for scrollable resultsets
-  8: optional i32                    offset,
+  8: optional i32                                          offset
   // set in first call but not set in subsequent *scroll*() calls
-  9: optional list<ColumnDescriptor> metadata,
- 10: optional string                 cursorName,
- 11: optional SnappyExceptionData    warnings,
+  9: optional list<ColumnDescriptor>                       metadata
+ 10: optional string                                       cursorName
+ 11: optional SnappyExceptionData                          warnings
   // when using an updatable query, these row IDs (in current batch) are
   // returned for SELECT FOR UPDATE statements or when StatementAttributes
   // indicates UPDATE in case table has no primary key
   // the row ID needs to be sent back to the server for cursor update/delete
   // else it will fail on server for the case when table has no primary key
- 12: optional list<i64>              rowIdsForUpdateOrDelete
+ 12: optional list<i64>                                    rowIdsForUpdateOrDelete
 }
 
+// statement types
+const byte STATEMENT_TYPE_SELECT                           = 0;
+const byte STATEMENT_TYPE_INSERT                           = 1;
+const byte STATEMENT_TYPE_UPDATE                           = 2;
+const byte STATEMENT_TYPE_DELETE                           = 3;
+
 struct PrepareResult {
-  1: required i32                    statementId,
-  2: required list<ColumnDescriptor> parameterMetaData,
-  3: optional list<ColumnDescriptor> resultSetMetaData,
-  4: optional SnappyExceptionData    warnings
+  1: required i32                                          statementId
+  2: required byte                                         statementType
+  3: required list<ColumnDescriptor>                       parameterMetaData
+  4: optional list<ColumnDescriptor>                       resultSetMetaData
+  5: optional SnappyExceptionData                          warnings
 }
 
 struct UpdateResult {
   // for single row updates
-  1: optional i32                    updateCount,
+  1: optional i32                                          updateCount
   // for batch updates
-  2: optional list<i32>              batchUpdateCounts,
-  3: optional RowSet                 generatedKeys,
-  4: optional SnappyExceptionData    warnings
+  2: optional list<i32>                                    batchUpdateCounts
+  3: optional RowSet                                       generatedKeys
+  4: optional SnappyExceptionData                          warnings
 }
 
 struct StatementResult {
   // will be set to null in case there is no result set
-  1: optional RowSet                 resultSet,
+  1: optional RowSet                                       resultSet
   // update count for DMLs else -1 if not applicable or unknown
-  2: optional i32                    updateCount,
+  2: optional i32                                          updateCount
   // for batch updates in prepareAndExecute
-  3: optional list<i32>              batchUpdateCounts,
-  4: optional Row                    procedureOutParams,
-  5: optional RowSet                 generatedKeys,
-  6: optional SnappyExceptionData    warnings,
+  3: optional list<i32>                                    batchUpdateCounts
+  4: optional map<i32, ColumnValue>                        procedureOutParams
+  5: optional RowSet                                       generatedKeys
+  6: optional SnappyExceptionData                          warnings
   // for prepareAndExecute
-  7: optional PrepareResult          preparedResult
+  7: optional PrepareResult                                preparedResult
 }
 
 // type IDs for EntityId used by bulkClose API
-const i8 BULK_CLOSE_RESULTSET = 1;
-const i8 BULK_CLOSE_LOB = 2;
-const i8 BULK_CLOSE_STATEMENT = 3;
-const i8 BULK_CLOSE_CONNECTION = 4;
+const byte BULK_CLOSE_RESULTSET                            = 1;
+const byte BULK_CLOSE_LOB                                  = 2;
+const byte BULK_CLOSE_STATEMENT                            = 3;
+const byte BULK_CLOSE_CONNECTION                           = 4;
 
 struct EntityId {
-  1: required i32                    id,
-  2: required i8                     type,
-  3: required i32                    connId,
-  4: optional binary                 token
+  1: required i32                                          id
+  2: required byte                                         type
+  3: required i32                                          connId
+  4: optional binary                                       token
 }
 
 
@@ -782,7 +796,7 @@ service SnappyDataService {
       6: binary token) throws (1: SnappyException error)
 
   void beginTransaction(1: i32 connId,
-      2: i8 isolationLevel,
+      2: byte isolationLevel,
       // optional
       3: map<TransactionAttribute, bool> flags,
       // optional
@@ -820,7 +834,7 @@ service SnappyDataService {
       3: binary token) throws (1: SnappyException error)
 
   RowSet getNextResultSet(1: i32 cursorId,
-      2: i8 otherResultSetBehaviour,
+      2: byte otherResultSetBehaviour,
       // optional
       3: binary token) throws (1: SnappyException error)
 
@@ -866,7 +880,7 @@ service SnappyDataService {
       6: binary token) throws (1: SnappyException error)
 
   void executeCursorUpdate(1: i32 cursorId,
-      2: list<i8> operations,
+      2: list<CursorUpdateOperation> operations,
       3: list<Row> changedRows,
       4: list<list<i32>> changedColumnsList,
       // optional

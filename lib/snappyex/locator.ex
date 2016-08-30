@@ -2,7 +2,7 @@ defmodule Snappyex.Locator do
   use Riffed.Client,
   structs: Snappyex.Locator.Models,
   client_opts: [
-    host: "fire-elementary",
+    host: "192.168.55.4",
     port: 1530,
     retries: 3,
     framed: false

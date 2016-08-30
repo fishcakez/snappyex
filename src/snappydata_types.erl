@@ -8,7 +8,7 @@
 
 -include("snappydata_types.hrl").
 
--export([struct_info/1, struct_info_ext/1, enum_info/1, enum_names/0, struct_names/0]).
+-export([struct_info/1, struct_info_ext/1, enum_info/1, enum_names/0, struct_names/0, exception_names/0]).
 
 struct_info('Decimal') ->
   {struct, [{1, byte},
@@ -21,25 +21,20 @@ struct_info('Timestamp') ->
           {2, i32}]}
 ;
 
-struct_info('JSONField') ->
+struct_info('JSONValue') ->
   {struct, [{1, string},
           {2, bool},
           {3, i32},
           {4, i64},
           {5, double},
-          {6, bool},
-          {7, i32},
-          {8, {list, i32}}]}
-;
-
-struct_info('JSONNode') ->
-  {struct, [{1, {map, string, {struct, {'snappydata_types', 'JSONField'}}}},
-          {2, {struct, {'snappydata_types', 'JSONField'}}},
-          {3, i32}]}
+          {6, {map, string, {struct, {'snappydata_types', 'JSONValue'}}}},
+          {7, {list, {struct, {'snappydata_types', 'JSONValue'}}}},
+          {8, bool}]}
 ;
 
 struct_info('JSONObject') ->
-  {struct, [{1, {list, {struct, {'snappydata_types', 'JSONNode'}}}}]}
+  {struct, [{1, {map, string, {struct, {'snappydata_types', 'JSONValue'}}}},
+          {2, {list, {struct, {'snappydata_types', 'JSONValue'}}}}]}
 ;
 
 struct_info('BlobChunk') ->
@@ -204,19 +199,28 @@ struct_info('ColumnValue') ->
           {13, string},
           {14, {struct, {'snappydata_types', 'BlobChunk'}}},
           {15, {struct, {'snappydata_types', 'ClobChunk'}}},
-          {16, bool},
-          {17, {struct, {'snappydata_types', 'JSONObject'}}},
-          {18, string}]}
+          {16, {list, {struct, {'snappydata_types', 'ColumnValue'}}}},
+          {17, {map, {struct, {'snappydata_types', 'ColumnValue'}}, {struct, {'snappydata_types', 'ColumnValue'}}}},
+          {18, {list, {struct, {'snappydata_types', 'ColumnValue'}}}},
+          {19, bool},
+          {20, {struct, {'snappydata_types', 'JSONObject'}}},
+          {21, string}]}
 ;
 
 struct_info('ColumnDescriptor') ->
   {struct, [{1, i32},
           {2, i16},
           {3, i16},
-          {4, i16},
+          {4, string},
           {5, string},
-          {6, string},
-          {7, string}]}
+          {6, bool},
+          {7, bool},
+          {8, bool},
+          {9, bool},
+          {10, bool},
+          {11, bool},
+          {12, {list, i32}},
+          {13, string}]}
 ;
 
 struct_info('Row') ->
@@ -246,9 +250,10 @@ struct_info('RowSet') ->
 
 struct_info('PrepareResult') ->
   {struct, [{1, i32},
-          {2, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}},
+          {2, byte},
           {3, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}},
-          {4, {struct, {'snappydata_types', 'SnappyExceptionData'}}}]}
+          {4, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}},
+          {5, {struct, {'snappydata_types', 'SnappyExceptionData'}}}]}
 ;
 
 struct_info('UpdateResult') ->
@@ -262,7 +267,7 @@ struct_info('StatementResult') ->
   {struct, [{1, {struct, {'snappydata_types', 'RowSet'}}},
           {2, i32},
           {3, {list, i32}},
-          {4, {struct, {'snappydata_types', 'Row'}}},
+          {4, {map, i32, {struct, {'snappydata_types', 'ColumnValue'}}}},
           {5, {struct, {'snappydata_types', 'RowSet'}}},
           {6, {struct, {'snappydata_types', 'SnappyExceptionData'}}},
           {7, {struct, {'snappydata_types', 'PrepareResult'}}}]}
@@ -288,25 +293,20 @@ struct_info_ext('Timestamp') ->
           {2, optional, i32, 'nanos', undefined}]}
 ;
 
-struct_info_ext('JSONField') ->
+struct_info_ext('JSONValue') ->
   {struct, [{1, optional, string, 'string_val', undefined},
           {2, optional, bool, 'bool_val', undefined},
           {3, optional, i32, 'i32_val', undefined},
           {4, optional, i64, 'i64_val', undefined},
           {5, optional, double, 'double_val', undefined},
-          {6, optional, bool, 'null_val', undefined},
-          {7, optional, i32, 'ref_val', undefined},
-          {8, optional, {list, i32}, 'array_val', []}]}
-;
-
-struct_info_ext('JSONNode') ->
-  {struct, [{1, optional, {map, string, {struct, {'snappydata_types', 'JSONField'}}}, 'pairs', dict:new()},
-          {2, optional, {struct, {'snappydata_types', 'JSONField'}}, 'singleField', #'JSONField'{}},
-          {3, required, i32, 'refId', undefined}]}
+          {6, optional, {map, string, {struct, {'snappydata_types', 'JSONValue'}}}, 'object_val', dict:new()},
+          {7, optional, {list, {struct, {'snappydata_types', 'JSONValue'}}}, 'array_val', []},
+          {8, optional, bool, 'null_val', undefined}]}
 ;
 
 struct_info_ext('JSONObject') ->
-  {struct, [{1, required, {list, {struct, {'snappydata_types', 'JSONNode'}}}, 'nodes', []}]}
+  {struct, [{1, optional, {map, string, {struct, {'snappydata_types', 'JSONValue'}}}, 'pairs', dict:new()},
+          {2, optional, {list, {struct, {'snappydata_types', 'JSONValue'}}}, 'array', []}]}
 ;
 
 struct_info_ext('BlobChunk') ->
@@ -471,19 +471,28 @@ struct_info_ext('ColumnValue') ->
           {13, optional, string, 'binary_val', undefined},
           {14, optional, {struct, {'snappydata_types', 'BlobChunk'}}, 'blob_val', #'BlobChunk'{}},
           {15, optional, {struct, {'snappydata_types', 'ClobChunk'}}, 'clob_val', #'ClobChunk'{}},
-          {16, optional, bool, 'null_val', undefined},
-          {17, optional, {struct, {'snappydata_types', 'JSONObject'}}, 'json_val', #'JSONObject'{}},
-          {18, optional, string, 'java_val', undefined}]}
+          {16, optional, {list, {struct, {'snappydata_types', 'ColumnValue'}}}, 'array_val', []},
+          {17, optional, {map, {struct, {'snappydata_types', 'ColumnValue'}}, {struct, {'snappydata_types', 'ColumnValue'}}}, 'map_val', dict:new()},
+          {18, optional, {list, {struct, {'snappydata_types', 'ColumnValue'}}}, 'struct_val', []},
+          {19, optional, bool, 'null_val', undefined},
+          {20, optional, {struct, {'snappydata_types', 'JSONObject'}}, 'json_val', #'JSONObject'{}},
+          {21, optional, string, 'java_val', undefined}]}
 ;
 
 struct_info_ext('ColumnDescriptor') ->
   {struct, [{1, required, i32, 'type', undefined},
-          {2, required, i16, 'descFlags', undefined},
-          {3, required, i16, 'precision', undefined},
-          {4, optional, i16, 'scale', undefined},
-          {5, optional, string, 'name', undefined},
-          {6, optional, string, 'fullTableName', undefined},
-          {7, optional, string, 'udtTypeAndClassName', undefined}]}
+          {2, required, i16, 'precision', undefined},
+          {3, optional, i16, 'scale', undefined},
+          {4, optional, string, 'name', undefined},
+          {5, optional, string, 'fullTableName', undefined},
+          {6, optional, bool, 'updatable', undefined},
+          {7, optional, bool, 'definitelyUpdatable', undefined},
+          {8, optional, bool, 'nullable', undefined},
+          {9, optional, bool, 'autoIncrement', undefined},
+          {10, optional, bool, 'parameterIn', undefined},
+          {11, optional, bool, 'parameterOut', undefined},
+          {12, optional, {list, i32}, 'elementTypes', []},
+          {13, optional, string, 'udtTypeAndClassName', undefined}]}
 ;
 
 struct_info_ext('Row') ->
@@ -513,9 +522,10 @@ struct_info_ext('RowSet') ->
 
 struct_info_ext('PrepareResult') ->
   {struct, [{1, required, i32, 'statementId', undefined},
-          {2, required, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}, 'parameterMetaData', []},
-          {3, optional, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}, 'resultSetMetaData', []},
-          {4, optional, {struct, {'snappydata_types', 'SnappyExceptionData'}}, 'warnings', #'SnappyExceptionData'{}}]}
+          {2, required, byte, 'statementType', undefined},
+          {3, required, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}, 'parameterMetaData', []},
+          {4, optional, {list, {struct, {'snappydata_types', 'ColumnDescriptor'}}}, 'resultSetMetaData', []},
+          {5, optional, {struct, {'snappydata_types', 'SnappyExceptionData'}}, 'warnings', #'SnappyExceptionData'{}}]}
 ;
 
 struct_info_ext('UpdateResult') ->
@@ -529,7 +539,7 @@ struct_info_ext('StatementResult') ->
   {struct, [{1, optional, {struct, {'snappydata_types', 'RowSet'}}, 'resultSet', #'RowSet'{}},
           {2, optional, i32, 'updateCount', undefined},
           {3, optional, {list, i32}, 'batchUpdateCounts', []},
-          {4, optional, {struct, {'snappydata_types', 'Row'}}, 'procedureOutParams', #'Row'{}},
+          {4, optional, {map, i32, {struct, {'snappydata_types', 'ColumnValue'}}}, 'procedureOutParams', dict:new()},
           {5, optional, {struct, {'snappydata_types', 'RowSet'}}, 'generatedKeys', #'RowSet'{}},
           {6, optional, {struct, {'snappydata_types', 'SnappyExceptionData'}}, 'warnings', #'SnappyExceptionData'{}},
           {7, optional, {struct, {'snappydata_types', 'PrepareResult'}}, 'preparedResult', #'PrepareResult'{}}]}
@@ -545,7 +555,7 @@ struct_info_ext('EntityId') ->
 struct_info_ext(_) -> erlang:error(function_clause).
 
 struct_names() ->
-  ['Decimal', 'Timestamp', 'JSONField', 'JSONNode', 'JSONObject', 'BlobChunk', 'ClobChunk', 'ServiceMetaData', 'ServiceMetaDataArgs', 'OpenConnectionArgs', 'ConnectionProperties', 'HostAddress', 'SnappyExceptionData', 'StatementAttrs', 'DateTime', 'ColumnValue', 'ColumnDescriptor', 'Row', 'OutputParameter', 'RowSet', 'PrepareResult', 'UpdateResult', 'StatementResult', 'EntityId'].
+  ['Decimal', 'Timestamp', 'JSONValue', 'JSONObject', 'BlobChunk', 'ClobChunk', 'ServiceMetaData', 'ServiceMetaDataArgs', 'OpenConnectionArgs', 'ConnectionProperties', 'HostAddress', 'SnappyExceptionData', 'StatementAttrs', 'DateTime', 'ColumnValue', 'ColumnDescriptor', 'Row', 'OutputParameter', 'RowSet', 'PrepareResult', 'UpdateResult', 'StatementResult', 'EntityId'].
 
 enum_info('SnappyType') ->
   [
@@ -554,9 +564,9 @@ enum_info('SnappyType') ->
     {'SMALLINT', 3},
     {'INTEGER', 4},
     {'BIGINT', 5},
-    {'FLOAT', 6},
-    {'REAL', 7},
-    {'DOUBLE', 8},
+    {'REAL', 6},
+    {'DOUBLE', 7},
+    {'FLOAT', 8},
     {'DECIMAL', 9},
     {'CHAR', 10},
     {'VARCHAR', 11},
@@ -570,13 +580,13 @@ enum_info('SnappyType') ->
     {'BLOB', 19},
     {'CLOB', 20},
     {'SQLXML', 21},
-    {'NULLTYPE', 22},
-    {'ARRAY', 23},
-    {'MAP', 24},
-    {'STRUCT', 25},
-    {'OTHER', 26},
-    {'JSON_OBJECT', 27},
-    {'JAVA_OBJECT', 28}
+    {'ARRAY', 22},
+    {'MAP', 23},
+    {'STRUCT', 24},
+    {'NULLTYPE', 25},
+    {'JSON', 26},
+    {'JAVA_OBJECT', 27},
+    {'OTHER', 28}
   ];
 
 enum_info('TransactionAttribute') ->
@@ -751,8 +761,18 @@ enum_info('ServerType') ->
     {'THRIFT_SNAPPY_BP_SSL', 9}
   ];
 
+enum_info('CursorUpdateOperation') ->
+  [
+    {'UPDATE_OP', 1},
+    {'INSERT_OP', 2},
+    {'DELETE_OP', 3}
+  ];
+
 enum_info(_) -> erlang:error(function_clause).
 
 enum_names() ->
-  ['SnappyType', 'TransactionAttribute', 'RowIdLifetime', 'ServiceFeature', 'ServiceFeatureParameterized', 'ServiceMetaDataCall', 'SecurityMechanism', 'ServerType'].
+  ['SnappyType', 'TransactionAttribute', 'RowIdLifetime', 'ServiceFeature', 'ServiceFeatureParameterized', 'ServiceMetaDataCall', 'SecurityMechanism', 'ServerType', 'CursorUpdateOperation'].
+
+exception_names() ->
+  ['SnappyException'].
 

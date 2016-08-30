@@ -6,7 +6,7 @@ defmodule Snappyex.Protocol do
   
   def connect(opts) do
     state = Keyword.merge(Keyword.new(), opts)
-    host = Keyword.get(opts, :hostname, "snappydata")
+    host = Keyword.get(opts, :hostname, "192.168.55.4")
     host = String.to_char_list(host)
     port = Keyword.get(opts, :port, 1531)
     token_size = Keyword.get(opts, :token_size, 16)
@@ -16,11 +16,11 @@ defmodule Snappyex.Protocol do
     properties = Keyword.get(opts, :properties, HashDict.new)
     case :thrift_client_util.new(host, port, :snappy_data_service_thrift, []) do
       {:ok, client} -> Snappyex.Client.start_link(client)
-      {:ConnectionProperties, connection_id, client_hostname, client_id, _, token} = Snappyex.Client.openConnection( Snappyex.Model.OpenConnectionArgs.new(clientHostName: host, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
-      state = Keyword.put_new(state, :connection_id, connection_id)
-      state = Keyword.put_new(state, :client_host_name, client_hostname)
-      state = Keyword.put_new(state, :client_id, client_id)
-      state = Keyword.put_new(state, :token, token)
+      properties = Snappyex.Client.openConnection( Snappyex.Model.OpenConnectionArgs.new(clientHostName: host, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+      state = Keyword.put_new(state, :connection_id, properties.connId)
+      state = Keyword.put_new(state, :client_host_name, properties.clientHostName)
+      state = Keyword.put_new(state, :client_id, properties.clientID)
+      state = Keyword.put_new(state, :token, properties.token)
       {:ok, state}
       {:error, :nxdomain} -> {:error, :nxdomain}
     end

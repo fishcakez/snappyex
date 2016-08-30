@@ -20,7 +20,7 @@ defmodule Snappyex.Mixfile do
 
   defp deps do
     [{:db_connection, "~> 1.0.0-rc.5"},
-     {:riffed, github: "pinterest/riffed", tag: "rift_1_5_0", submodules: true}
+     {:riffed, github: "pinterest/riffed", tag: "v_1_5_0", submodules: true}
     ]
   end
 end
