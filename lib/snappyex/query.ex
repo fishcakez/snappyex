@@ -1,5 +1,5 @@
 defmodule Snappyex.Query do
-  defstruct [:name, :statement, :param_formats, :encoders, :columns,
+  defstruct [:name, :statement, :statement_id, :param_formats, :encoders, :columns,
              :result_formats, :decoders, :types]
 end
 

@@ -113,7 +113,7 @@ Snappyex.Protocol.handle_execute(prepared_query, params, [], state)
 args = [clientHostName: '192.168.55.4', clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
 {:ok, pid} = Snappyex.start_link(args)
 params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-{:ok, query, result} = Snappyex.prepare_execute(pid, 'SELECT * FROM USERTABLE', params, [])
+{:ok, query, result} = Snappyex.prepare_execute(pid, 'SELECT 1', params, [])
 Snappyex.execute(pid, query, params, [])
 ```
 
