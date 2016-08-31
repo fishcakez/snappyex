@@ -4,15 +4,19 @@ defmodule LoginTest do
 
   alias Snappyex, as: S
 
-  test "login cleartext password" do
-    Process.flag(:trap_exit, true)
+  setup context do
+    opts = [ hostName: "192.168.55.4", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+     tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
+    {:ok, pid} = S.start_link(opts)
+    {:ok, [pid: pid]}
+  end
 
-    opts = [ hostname: 'snappydata', port: 1531, username: 'APP',
-             password: 'APP',  security: Snappyex.Model.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new ]
+  test "login cleartext password", context do
+    Process.flag(:trap_exit, true)
     capture_log fn ->
-    assert {:ok, pid} = S.start_link(opts)
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-    assert {:ok, {_, _}} = S.prepare_execute(pid, 'SELECT 1', params, [])
+    assert [[1]] == prepare_execute('SELECT 1', params)
     end
   end
   #Tests where snappyex cannot connect will fail

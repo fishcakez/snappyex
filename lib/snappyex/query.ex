@@ -26,7 +26,9 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_row([], [], acc), do: Enum.reverse(acc)
   def decode_field(value, :boolean), do: value.bool_val
   def decode_field(value, :tinyint), do: value.i16_val
-  def decode_field(value, :integer), do: value.i32_val
+  def decode_field(value, :integer) do 
+    value.i32_val
+  end
   def decode_field(value, :bigint), do: value.i64_val
   def decode_field(value, :float), do: value.float_val
 #  def decode_field(column_value, :real), do: elem(column_value, @decimal_val)
@@ -55,7 +57,9 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :varbinary), do: value.binary_val
   def decode_field(value, :longvarbinary), do: value.binary_val
   def decode_field(value, :blob), do: value.blob_val
-  def decode_field(value, :clob), do: value.clob_val
+  def decode_field(value, :clob) do 
+    value.clob_val
+  end
 #  def decode_field(column_value, :sqlxml), do: elem(column_value, @string_val)
 #  def decode_field(column_value, :nulltype), do: elem(column_value, )
 #  def decode_field(column_value, :array), do: elem(column_value, )
