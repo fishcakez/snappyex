@@ -28,10 +28,10 @@ See [README-thrift.md](https://github.com/SnappyDataInc/snappydata/blob/master/s
 3. `Snappy.Client.getPreferredServer([Snappy.Models.ServerType.thrift_gfxd_bp], ["default"], [Snappy.Models.HostAddress.new(hostName: "example.com", port: 1, ipAddress: "127.0.0.1", serverType: Snappy.Models.ServerType.thrift_gfxd_bp)])`
 4.
 ```elixir
-args = [hostName: "192.168.55.4', clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
+args = [hostName: "192.168.55.4", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain,  tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
 {:ok, pid} = Snappyex.start_link(args)
 params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-{:ok, query, result} = Snappyex.prepare_execute(pid, 'SELECT 1', params, [])
+{:ok, query, result} = Snappyex.prepare_execute(pid, "SELECT CAST('ẽric' AS VARCHAR(10))", params, [])
 Snappyex.execute(pid, query, params, [])
 ```
 

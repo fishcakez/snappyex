@@ -56,10 +56,26 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :binary), do: value.binary_val
   def decode_field(value, :varbinary), do: value.binary_val
   def decode_field(value, :longvarbinary), do: value.binary_val
-  def decode_field(value, :blob), do: value.blob_val
-  def decode_field(value, :clob) do 
-    value.clob_val
+  def decode_field(value, :blob), do: decode_blob(value.blob_val)
+  def decode_blob(val) do
+    case val do
+      %Snappyex.Model.BlobChunk{chunk: chunk, last: true} -> val
+      %Snappyex.Model.BlobChunk{last: false} -> raise "Not Implemented"
+      nil -> nil
+    end
   end
+  def decode_field(value, :clob) do 
+    decode_clob(value.clob_val)
+  end
+
+  def decode_clob(val) do
+    case val do
+      %Snappyex.Model.ClobChunk{chunk: chunk, last: true} -> chunk
+      %Snappyex.Model.ClobChunk{last: false} -> raise "Not Implemented"
+      nil -> nil
+    end
+  end
+
 #  def decode_field(column_value, :sqlxml), do: elem(column_value, @string_val)
 #  def decode_field(column_value, :nulltype), do: elem(column_value, )
 #  def decode_field(column_value, :array), do: elem(column_value, )
