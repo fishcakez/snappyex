@@ -14,13 +14,15 @@ defmodule Snappyex.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :db_connection],
+    [applications: [:logger, :db_connection, :timex],
      mod: {Snappyex.App, []}]
   end
 
   defp deps do
     [{:db_connection, "~> 1.0.0-rc.5"},
-     {:riffed, github: "pinterest/riffed", tag: "v_1_5_0", submodules: true}
+     {:riffed, github: "pinterest/riffed", tag: "v_1_5_0", submodules: true},
+     {:decimal, "~> 1.1.0"},
+     {:timex, "~> 3.0"} # Downloads tzdata every day
     ]
   end
 end

@@ -16,7 +16,7 @@ defmodule LoginTest do
     Process.flag(:trap_exit, true)
     capture_log fn ->
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-    assert [[1]] == prepare_execute('SELECT 1', params)
+    assert [[1]] == query('SELECT 1', params)
     end
   end
   #Tests where snappyex cannot connect will fail

@@ -1,7 +1,7 @@
 ExUnit.start()
 
 defmodule Snappyex.TestHelper do
-  defmacro prepare_execute(stat, params, opts \\ []) do
+  defmacro query(stat, params, opts \\ []) do
     quote do
       case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
                           unquote(params), unquote(opts)) do
