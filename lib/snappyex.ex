@@ -15,23 +15,26 @@ defmodule Snappyex do
     end
   end
 
-  def query(conn, statement, params, opts \\ []) do
-    query = %Query{name: "", statement: statement}
-    case DBConnection.prepare_execute(conn, query, params, defaults(opts)) do
+  def execute(conn, query, params, opts \\ []) do
+    case DBConnection.execute(conn, query, params, defaults(opts)) do
       {:ok, result, state} -> {:ok, result}
       other ->
         other
-    end
+  end
   end
 
-  def query!(conn, statement, params, opts \\ []) do
-    query = %Query{name: "", statement: statement}
-    opts =
-      opts
-      |> defaults()
-      |> Keyword.put(:function, :prepare_execute)
-    {_, result} = DBConnection.prepare_execute!(conn, query, params, opts)
-    result
+  def prepare_execute(conn, statement, params, opts \\ []) do
+    query = %Query{statement: statement}
+    DBConnection.prepare_execute(conn, query, params, defaults(opts))
+  end
+
+  def prepare(conn, query, opts \\ []) do
+    case DBConnection.prepare(conn, query, defaults(opts)) do
+      {:error, %ArgumentError{} = err} ->
+        raise err
+      other ->
+        other
+    end
   end
 
   @doc """
