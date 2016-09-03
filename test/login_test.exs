@@ -5,7 +5,7 @@ defmodule LoginTest do
   alias Snappyex, as: S
 
   setup context do
-    opts = [ hostName: "192.168.55.4", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ host: "192.168.55.4", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
     {:ok, pid} = S.start_link(opts)
