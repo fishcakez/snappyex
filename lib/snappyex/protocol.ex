@@ -68,8 +68,8 @@ defmodule Snappyex.Protocol do
     statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
     result = Map.new
-    rowset = Snappyex.Client.executePreparedQuery(statement_id, Snappyex.Model.Row.new(values: []), token)
-    result = Map.put_new(result, :row_set, rowset)
+    statement = Snappyex.Client.executePrepared(statement_id, Snappyex.Model.Row.new(values: []), nil, token)
+    result = Map.put_new(result, :row_set, statement.resultSet)
     {:ok, result, state}
   end
 
