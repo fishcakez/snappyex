@@ -80,11 +80,14 @@ defmodule Snappyex.Protocol do
       :token)
     output_parameters = Map.get(query,
       :output_parameters,
-      %Snappyex.Model.OutputParameter{})
+      Map.new)
+    statement_attributes = Map.get(query,
+      :output_parameters,
+      %Snappyex.Model.StatementAttrs{})
     attributes = Map.get(query,
       :attributes, %Snappyex.Model.StatementAttrs{})
     prepared_result = Snappyex.Client.prepareStatement(connection_id,
-      query.statement, nil, nil, token)
+      query.statement, output_parameters, statement_attributes, token)
     query = %{query | statement_id: prepared_result.statementId}
     query = %{query | columns: prepared_result.resultSetMetaData}
     {:ok, query, state}

@@ -25,7 +25,13 @@ defmodule Snappyex do
 
   def prepare_execute(conn, statement, params, opts \\ []) do
     query = %Query{statement: statement}
-    DBConnection.prepare_execute(conn, query, params, defaults(opts))
+    case DBConnection.prepare_execute(conn, query, params, defaults(opts)) do
+      {:ok, query, result} -> {:ok, query, result}
+      {:error, %ArgumentError{} = err} ->
+          raise err
+      other ->
+          other
+    end    
   end
 
   def prepare(conn, query, opts \\ []) do
