@@ -64,11 +64,17 @@ defmodule Snappyex.Protocol do
   def handle_execute(query, params, opts, state) do
     {:ok, connection_id} = Keyword.fetch(state, :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    attrs = Keyword.get(state, :attrs, HashDict.new)
-    statement_attributes = Keyword.get(state, :statement_attributes, HashDict.new)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
     result = Map.new
-    statement = Snappyex.Client.executePrepared(statement_id, Snappyex.Model.Row.new(values: []), nil, token)
+    row = case params do
+            %{params: row} -> row
+            [] -> Snappyex.Model.Row.new
+          end
+    output_param = case params do
+                     %{output: output} -> output
+                     _ -> Map.new()
+                   end
+    statement = Snappyex.Client.executePrepared(statement_id, row, output_param, token)
     result = Map.put_new(result, :row_set, statement.resultSet)
     {:ok, result, state}
   end
@@ -82,7 +88,7 @@ defmodule Snappyex.Protocol do
       :output_parameters,
       Map.new)
     statement_attributes = Map.get(query,
-      :output_parameters,
+      :statement_attributes,
       %Snappyex.Model.StatementAttrs{})
     attributes = Map.get(query,
       :attributes, %Snappyex.Model.StatementAttrs{})
