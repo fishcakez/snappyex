@@ -102,13 +102,18 @@ defimpl DBConnection.Query, for: Snappyex.Query do
       %Snappyex.Model.ColumnDescriptor{type: ordinal} = descriptor
       ordinal      
     end)    
-    decode(rows, columns)
+    rows = decode(rows, columns)
   end
 
-  def decode(%Query{decoders: nil}, res, _) do
+  def decode(%Query{decoders: nil, columns: columns}, res, _) do
     mapper = fn x -> x end
-    {:ok, row_set} = Map.fetch(res, :row_set)
-    decode_row_set(row_set)
+    {:ok, rows} = Map.fetch(res, :rows)    
+    rows = decode_row_set(rows)
+    num_rows = case rows do 
+      nil -> 0
+      _ -> length(rows)
+    end
+    %Snappyex.Result{rows: rows, num_rows: num_rows}
   end
 
   def parse(query, _) do

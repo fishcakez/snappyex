@@ -65,7 +65,6 @@ defmodule Snappyex.Protocol do
     {:ok, connection_id} = Keyword.fetch(state, :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-    result = Map.new
     row = case params do
             %{params: row} -> row
             [] -> Snappyex.Model.Row.new
@@ -75,7 +74,8 @@ defmodule Snappyex.Protocol do
                      _ -> Map.new()
                    end
     statement = Snappyex.Client.executePrepared(statement_id, row, output_param, token)
-    result = Map.put_new(result, :row_set, statement.resultSet)
+    result = Map.new
+    result = Map.put_new(result, :rows, statement.resultSet)
     {:ok, result, state}
   end
 
