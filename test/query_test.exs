@@ -89,4 +89,10 @@ defmodule QueryTest do
            query("VALUES DATE('2013-09-23')", [])
   end
 
+  test "select from test table", context do
+    #query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
+    #query("SELECT t.Col1 from test_table_name as t", []) 
+    #query("DROP TABLE test_table_name", [])    
+  end
+
 end

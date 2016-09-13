@@ -93,17 +93,22 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :json_object), do: value.json_val
   def decode_field(value, :java_object), do: value.java_val
 
+  def decode_row_set(nil) do
+    nil
+  end
+
+  def decode_row_set(%Snappyex.Model.RowSet{rows: rows, metadata: metadata}) do    
+    columns = Enum.map(metadata, fn descriptor ->
+      %Snappyex.Model.ColumnDescriptor{type: ordinal} = descriptor
+      ordinal      
+    end)    
+    decode(rows, columns)
+  end
+
   def decode(%Query{decoders: nil}, res, _) do
     mapper = fn x -> x end
     {:ok, row_set} = Map.fetch(res, :row_set)
-    %Snappyex.Model.RowSet{rows: rows, metadata: metadata} = row_set
-
-    columns = Enum.map(metadata, fn descriptor ->
-      %Snappyex.Model.ColumnDescriptor{type: ordinal} = descriptor
-      ordinal
-    end)
-
-    decode(rows, columns)
+    decode_row_set(row_set)
   end
 
   def parse(query, _) do
