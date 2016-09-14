@@ -14,9 +14,10 @@ defmodule Snappyex.Protocol do
     username = Keyword.get(opts, :username, 'APP')
     password = Keyword.get(opts, :password, 'APP')
     properties = Keyword.get(opts, :properties, HashDict.new)
+     {:ok, local_hostname} = :inet.gethostname
     case :thrift_client_util.new(host, port, :snappy_data_service_thrift, []) do
       {:ok, client} -> Snappyex.Client.start_link(client)
-      properties = Snappyex.Client.openConnection( Snappyex.Model.OpenConnectionArgs.new(clientHostName: host, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+      properties = Snappyex.Client.openConnection( Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
       state = Keyword.put_new(state, :connection_id, properties.connId)
       state = Keyword.put_new(state, :client_host_name, properties.clientHostName)
       state = Keyword.put_new(state, :client_id, properties.clientID)
