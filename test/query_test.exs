@@ -20,7 +20,7 @@ defmodule QueryTest do
 
   test "iodata", context do
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-    assert [[123]] == query(["S", ?E, ["LEC"|"T"], " ", '123'], params)
+    assert %Snappyex.Result{rows: [[123]]} = query(["S", ?E, ["LEC"|"T"], " ", '123'], params)
   end
 
   test "decode basic types", context do
