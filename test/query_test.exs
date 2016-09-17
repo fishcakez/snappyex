@@ -78,14 +78,11 @@ defmodule QueryTest do
   end
 
   test "decode date", context do
-    date = Timex.to_datetime({{0,  12,  30}, {0, 0, 0}}, "Etc/UTC")
-    assert [[date]] ==
+    assert [[Timex.to_datetime({{0,  12,  30}, {0, 0, 0}}, "Etc/UTC")]] ==
            query("VALUES DATE('0001-01-01')", [])
-    date = Timex.to_datetime({{1,  2,  3}, {0, 0, 0}}, "Etc/UTC")
-    assert [[date]] ==
+    assert [[Timex.to_datetime({{1,  2,  3}, {0, 0, 0}}, "Etc/UTC")]] ==
            query("VALUES DATE('0001-02-03')", [])
-    date = Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")
-    assert [[date]] == 
+    assert [[Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")]] == 
            query("VALUES DATE('2013-09-23')", [])
   end
 
