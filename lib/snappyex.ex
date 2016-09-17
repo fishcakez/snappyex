@@ -6,40 +6,29 @@ defmodule Snappyex do
     DBConnection.start_link(Snappyex.Protocol, opts)
   end
 
-  def disconnect(err, state) do
-    case DBConnection.disconnect(err, state) do
-      {error, err} ->
-        raise err
-      other ->
-        other
-    end
-  end
-
   def execute(conn, query, params, opts \\ []) do
     case DBConnection.execute(conn, query, params, defaults(opts)) do
       {:ok, result, state} -> {:ok, result}
-      other ->
-        other
-  end
+      {:error, err} ->
+        raise err
+    end
   end
 
   def prepare_execute(conn, statement, params, opts \\ []) do
     query = %Query{statement: statement}
     case DBConnection.prepare_execute(conn, query, params, defaults(opts)) do
       {:ok, query, result} -> {:ok, query, result}
-      {:error, %ArgumentError{} = err} ->
+      {:error, err} ->
           raise err
-      other ->
-          other
     end    
   end
 
   def prepare(conn, query, opts \\ []) do
     case DBConnection.prepare(conn, query, defaults(opts)) do
-      {:error, %ArgumentError{} = err} ->
+      {:ok, query} ->
+        {:ok, query}
+      {:error, err} ->
         raise err
-      other ->
-        other
     end
   end
 

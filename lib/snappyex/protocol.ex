@@ -57,8 +57,8 @@ defmodule Snappyex.Protocol do
     case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
       {:ok, _, state} ->
         {:ok, state}
-      true -> 
-        {:disconnect, Exception.t, state}
+      {:disconnect, err, state} -> 
+        {:disconnect, err, state}
     end
   end
 
@@ -75,7 +75,7 @@ defmodule Snappyex.Protocol do
                      %{output: output} -> output
                      _ -> Map.new()
                    end
-    statement = Snappyex.Client.executePrepared(process_id, statement_id, row, output_param, token)
+    statement = Snappyex.Client.executePrepared(process_id, statement_id, row, output_param, token)    
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
     {:ok, result, state}
