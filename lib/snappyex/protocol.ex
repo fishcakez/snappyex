@@ -5,16 +5,20 @@ defmodule Snappyex.Protocol do
   alias Snappyex.Query
   
   def connect(opts) do
-    state = Keyword.merge(Keyword.new(), opts)
     host = Keyword.get(opts, :host, "localhost")
     port = Keyword.get(opts, :port, 1531)
+    status = Snappyex.Client.start_link(host, port)
+    connect_start_link(status, opts)
+  end
+
+  def connect_start_link({:ok, pid}, opts) do
+    state = Keyword.merge(Keyword.new(), opts)
     token_size = Keyword.get(opts, :token_size, 16)
     use_string_for_decimal = Keyword.get(opts, :use_string_for_decimal, false)
     username = Keyword.get(opts, :username, 'APP')
     password = Keyword.get(opts, :password, 'APP')
     properties = Keyword.get(opts, :properties, HashDict.new)
     {:ok, local_hostname} = :inet.gethostname
-    {:ok, pid} = Snappyex.Client.start_link(host, port)
     properties = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
     state = Keyword.put_new(state, :process_id, pid)
     state = Keyword.put_new(state, :connection_id, properties.connId)
@@ -22,6 +26,10 @@ defmodule Snappyex.Protocol do
     state = Keyword.put_new(state, :client_id, properties.clientID)
     state = Keyword.put_new(state, :token, properties.token)
     {:ok, state}
+  end
+
+  def connect_start_link({:error, error}) do
+    {:error, error}
   end
 
   def checkout(s) do
