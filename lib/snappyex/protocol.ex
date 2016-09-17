@@ -28,10 +28,6 @@ defmodule Snappyex.Protocol do
     {:ok, state}
   end
 
-  def connect_start_link({:error, error}) do
-    {:error, error}
-  end
-
   def checkout(s) do
     {:ok, s}
   end
@@ -59,17 +55,16 @@ defmodule Snappyex.Protocol do
     {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
     case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
-      {:ok, result, state} ->
+      {:ok, _, state} ->
         {:ok, state}
       true -> 
         {:disconnect, Exception.t, state}
     end
   end
 
-  def handle_execute(query, params, opts, state) do
+  def handle_execute(query, params, _, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
-    {:ok, connection_id} = Keyword.fetch(state, :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
     row = case params do
