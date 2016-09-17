@@ -5,7 +5,7 @@ defmodule Snappyex.TestHelper do
     quote do
       case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
                           unquote(params), unquote(opts)) do
-        {:ok, _, rows} -> rows
+        {:ok, _, result} -> result.rows
         #{:error, %Snappyex.Error{} = err} -> err
       end
     end

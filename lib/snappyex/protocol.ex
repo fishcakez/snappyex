@@ -7,7 +7,6 @@ defmodule Snappyex.Protocol do
   def connect(opts) do
     state = Keyword.merge(Keyword.new(), opts)
     host = Keyword.get(opts, :host, "localhost")
-    host = String.to_char_list(host)
     port = Keyword.get(opts, :port, 1531)
     token_size = Keyword.get(opts, :token_size, 16)
     use_string_for_decimal = Keyword.get(opts, :use_string_for_decimal, false)
