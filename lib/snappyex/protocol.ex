@@ -12,7 +12,7 @@ defmodule Snappyex.Protocol do
     connect_start_link(status, opts)
   end
   
-   def connect_start_link({:error, err}, opts) do
+   def connect_start_link({:error, err}, _opts) do
     {:error, err}
   end
 
@@ -67,23 +67,27 @@ defmodule Snappyex.Protocol do
     end
   end
 
-  def handle_execute(query, params, _, state) do
+  def handle_execute(query, params, _opts, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-    unless params == [] do
-      Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
+    #Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
+    rows = case params do
+      [] -> Snappyex.Model.Row.new
+      row ->
+         #Logger.debug "#{inspect self()} handle_execute received other " <> inspect row
+         %{params: %Snappyex.Model.Row{values: values}} = row 
+         #Logger.debug "#{inspect self()} handle_execute received values " <> inspect values
+         Snappyex.Model.Row.new(values)
     end
-    row = case params do
-            %{params: row} -> row
-            [] -> Snappyex.Model.Row.new
-          end
     output_param = case params do
                      %{output: output} -> output
                      _ -> Map.new()
                    end
-    statement = Snappyex.Client.executePrepared(process_id, statement_id, row, output_param, token)    
+    statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, output_param, token)    
+    #Logger.debug "#{inspect self()} handle_execute received statement " <> inspect statement.resultSet
+    # Todo decode resultSet
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
     {:ok, result, state}
@@ -102,8 +106,6 @@ defmodule Snappyex.Protocol do
     statement_attributes = Map.get(query,
       :statement_attributes,
       %Snappyex.Model.StatementAttrs{})
-    attributes = Map.get(query,
-      :attributes, %Snappyex.Model.StatementAttrs{})
     prepared_result = Snappyex.Client.prepareStatement(process_id, connection_id,
       query.statement, output_parameters, statement_attributes, token)
     query = %{query | statement_id: prepared_result.statementId}

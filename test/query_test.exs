@@ -10,7 +10,7 @@ defmodule QueryTest do
   require Decimal
   alias Snappyex, as: S
 
-  setup context do
+  setup do
     opts = [ host: "snappydata.192.168.55.4.nip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
@@ -39,7 +39,7 @@ defmodule QueryTest do
     #assert [[<<1, 2, 3>>]] == query("SELECT CAST('\\001\\002\\003' AS BINARY)", params)
   end
  
-  test "decode decimal", context do
+  #test "decode decimal", context do
    # assert [[Decimal.new("42")]] == query("SELECT CAST(42 AS DECIMAL)", [])
    # assert [[Decimal.new("42.0000000000")]] == query("SELECT CAST(42.0 AS DECIMAL(100, 10))", [])
    # assert [[Decimal.new("1.001")]] == query("SELECT CAST(1.001 AS DECIMAL)", [])
@@ -53,7 +53,7 @@ defmodule QueryTest do
    # assert [[Decimal.new("123456789123456789123456789.123456789")]] == query("SELECT CAST(123456789123456789123456789.123456789 AS DECIMAL)", [])
    # assert [[Decimal.new("1.1234500000")]] == query("SELECT CAST(1.1234500000 AS DECIMAL)", [])
    # assert [[Decimal.new("NaN")]] == query("SELECT CAST('NaN' AS DECIMAL)", [])
-  end
+  #end
 
   test "decode time", context do
     assert [[{0, 0, 0, 0}]] ==
@@ -86,10 +86,18 @@ defmodule QueryTest do
            query("VALUES DATE('2013-09-23')", [])
   end
 
-  test "select from test table", context do
+  #test "select from test table", context do
     #query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
     #query("SELECT t.Col1 from test_table_name as t", []) 
     #query("DROP TABLE test_table_name", [])    
+  #end
+
+  test "insert", context do
+    nil = query("CREATE TABLE test (id int, text string)", [])
+    [] = query("SELECT * FROM test", [])
+    [] = query("INSERT INTO test VALUES ($1, $2)", [42, "fortytwo"], [])
+    [[42, "fortytwo"]] = query("SELECT * FROM test", [])
+    :ok = query("DROP TABLE test", [])
   end
 
 end
