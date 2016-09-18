@@ -3,6 +3,7 @@ defmodule Snappyex.Protocol do
   @behaviour DBConnection
 
   alias Snappyex.Query
+  require Logger
   
   def connect(opts) do
     host = Keyword.get(opts, :host, "localhost")
@@ -71,6 +72,9 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
+    unless params == [] do
+      Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
+    end
     row = case params do
             %{params: row} -> row
             [] -> Snappyex.Model.Row.new
