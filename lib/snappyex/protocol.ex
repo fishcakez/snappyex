@@ -10,6 +10,10 @@ defmodule Snappyex.Protocol do
     status = Snappyex.Client.start_link(host, port)
     connect_start_link(status, opts)
   end
+  
+   def connect_start_link({:error, err}, opts) do
+    {:error, err}
+  end
 
   def connect_start_link({:ok, pid}, opts) do
     state = Keyword.merge(Keyword.new(), opts)
