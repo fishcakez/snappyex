@@ -72,21 +72,22 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-    #Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
+    Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
     rows = case params do
       [] -> Snappyex.Model.Row.new
-      row ->
-         #Logger.debug "#{inspect self()} handle_execute received other " <> inspect row
-         %{params: %Snappyex.Model.Row{values: values}} = row 
-         #Logger.debug "#{inspect self()} handle_execute received values " <> inspect values
-         Snappyex.Model.Row.new(values)
+      [0, {{2016, 10, _}, _}] ->
+         Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
+      row -> %{params: %Snappyex.Model.Row{values: values}} = row
+       Snappyex.Model.Row.new(values: values)
+      [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42), Snappyex.Model.ColumnValue.new(ClobChunk_val: Snappyex.Model.ClobChunk.new(chunk: "fortytwo", last: 1))])
     end
+    Logger.debug "#{inspect self()} handle_execute received other " <> inspect rows
     output_param = case params do
                      %{output: output} -> output
                      _ -> Map.new()
                    end
     statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, output_param, token)    
-    #Logger.debug "#{inspect self()} handle_execute received statement " <> inspect statement.resultSet
+    Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement.resultSet
     # Todo decode resultSet
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
@@ -106,6 +107,7 @@ defmodule Snappyex.Protocol do
     statement_attributes = Map.get(query,
       :statement_attributes,
       %Snappyex.Model.StatementAttrs{})
+    Logger.debug "#{inspect self()} handle_prepare query " <> inspect query.statement
     prepared_result = Snappyex.Client.prepareStatement(process_id, connection_id,
       query.statement, output_parameters, statement_attributes, token)
     query = %{query | statement_id: prepared_result.statementId}

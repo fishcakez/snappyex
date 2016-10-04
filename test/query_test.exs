@@ -11,7 +11,7 @@ defmodule QueryTest do
   alias Snappyex, as: S
 
   setup do
-    opts = [ host: "snappydata.192.168.55.4.nip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ host: "snappydata.192.168.1.80.nip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
     {:ok, pid} = S.start_link(opts)
@@ -79,7 +79,7 @@ defmodule QueryTest do
 
   test "decode date", context do
     assert [[Timex.to_datetime({{0,  12,  30}, {0, 0, 0}}, "Etc/UTC")]] ==
-           query("VALUES DATE('0001-01-01')", [])
+           query("VALUES DATE('0000-01-01')", [])
     assert [[Timex.to_datetime({{1,  2,  3}, {0, 0, 0}}, "Etc/UTC")]] ==
            query("VALUES DATE('0001-02-03')", [])
     assert [[Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")]] == 
