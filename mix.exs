@@ -22,7 +22,7 @@ defmodule Snappyex.Mixfile do
     [{:db_connection, "~> 1.0.0-rc.5"},
      {:riffed, github: "pinterest/riffed", tag: "v_1_5_0", submodules: true},
      {:decimal, "~> 1.1.0"},
-     {:timex, "~> 3.0"} # Downloads tzdata every day
+     {:timex, "~> 3.0.8"} # Downloads tzdata every day
     ]
   end
 end
