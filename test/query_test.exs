@@ -78,8 +78,8 @@ defmodule QueryTest do
   end
 
   test "decode date", context do
-    assert [[Timex.to_datetime({{0,  12,  30}, {0, 0, 0}}, "Etc/UTC")]] ==
-           query("VALUES DATE('0000-01-01')", [])
+    assert [[Timex.to_datetime({{1,  1,  1}, {0, 0, 0}}, "Etc/UTC")]] ==
+           query("VALUES DATE('0001-01-01')", [])
     assert [[Timex.to_datetime({{1,  2,  3}, {0, 0, 0}}, "Etc/UTC")]] ==
            query("VALUES DATE('0001-02-03')", [])
     assert [[Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")]] == 
@@ -96,7 +96,7 @@ defmodule QueryTest do
     nil = query("CREATE TABLE test (id int, text string)", [])
     [] = query("SELECT * FROM test", [])
     [] = query("INSERT INTO test VALUES ($1, $2)", [42, "fortytwo"], [])
-    [[42, "fortytwo"]] = query("SELECT * FROM test", [])
+    assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])
     :ok = query("DROP TABLE test", [])
   end
 
