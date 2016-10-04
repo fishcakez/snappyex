@@ -15,8 +15,6 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     params
   end
 
-  @gs_epoch :calendar.datetime_to_gregorian_seconds({{1970,1, 1}, {0, 0, 0}})
-
   def decode(rows, columns), do: decode(rows, columns, [])
   def decode([row | rows], columns, acc) do
     decode(rows, columns, [decode_row(row.values, columns, []) | acc])
@@ -46,8 +44,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
 #  def decode_field(column_value, :longvarchar), do: elem(column_value, @string_val)
   def decode_field(value, :date) do
     %Snappyex.Model.DateTime{secsSinceEpoch: secsSinceEpoch} = value.date_val
-    {:ok, date} = Timex.to_datetime(:calendar.gregorian_seconds_to_datetime(secsSinceEpoch + @gs_epoch), "Etc/UTC")
-    date
+    {:ok, time} = DateTime.from_unix(secsSinceEpoch)
+    time
   end
   def decode_field(value, :time) do
     %Snappyex.Model.DateTime{secsSinceEpoch: secsSinceEpoch} = value.time_val
