@@ -95,9 +95,9 @@ defmodule QueryTest do
   test "insert", context do
     nil = query("CREATE TABLE test (id int, text string)", [])
     [] = query("SELECT * FROM test", [])
-    [] = query("INSERT INTO test VALUES ($1, $2)", [42, "fortytwo"], [])
+    assert nil == query("INSERT INTO test (id, text) VALUES (42, 'fortytwo')", [])
     assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])
-    :ok = query("DROP TABLE test", [])
+    query("DROP TABLE test", [])
   end
 
 end

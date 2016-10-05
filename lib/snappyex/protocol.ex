@@ -72,22 +72,33 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-    Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
+    #Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
     rows = case params do
       [] -> Snappyex.Model.Row.new
       [0, {{2016, 10, _}, _}] ->
          Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
+      [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42),
+                          Snappyex.Model.ColumnValue.new(ClobChunk_val: 
+                            Snappyex.Model.ClobChunk.new(
+                              chunk: "fortytwo", 
+                              last: true,
+                              length: byte_size("fortytwo")
+                              )
+                            )
+                          ])
       row -> %{params: %Snappyex.Model.Row{values: values}} = row
        Snappyex.Model.Row.new(values: values)
-      [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42), Snappyex.Model.ColumnValue.new(ClobChunk_val: Snappyex.Model.ClobChunk.new(chunk: "fortytwo", last: 1))])
     end
-    Logger.debug "#{inspect self()} handle_execute received other " <> inspect rows
+    #Logger.debug "#{inspect self()} handle_execute received other " <> inspect rows
     output_param = case params do
                      %{output: output} -> output
-                     _ -> Map.new()
-                   end
+                     %{params: %Snappyex.Model.Row{values: values}} -> Map.new
+                     [] -> Map.new
+                     [42, "fortytwo"] -> output = Map.put(Map.new, 0, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.integer))
+                                         output = Map.put(output, 1, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.varchar)) 
+end
     statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, output_param, token)    
-    Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement.resultSet
+    #Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement.resultSet
     # Todo decode resultSet
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
