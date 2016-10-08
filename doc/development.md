@@ -74,6 +74,23 @@ Snappyex.prepare_execute(pid, "CREATE TABLE SCHEMA_MIGRATIONS(HOTEL_ID INT NOT N
 #Snappyex.execute(pid, query, params, [])
 ```
 
+```elixir
+{:ok, pid} = Snappyex.start_link([clientHostName: "127.0.0.1", host: "192.168.1.80", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+     tokenSize: 16, useStringForDecimal: false, properties: :dict.new])
+Snappyex.prepare_execute(pid, "SELECT * FROM SCHEMA\_MIGRATIONS", [])  
+#Snappyex.prepare_execute(pid, "SELECT * FROM TRANSACTIONS", [])  
+#Snappyex.prepare_execute(pid,"INSERT INTO SCHEMA\_MIGRATIONS (\"version\", \"inserted\_at\") VALUES (1, CURRENT\_TIMESTAMP)", [])
+Snappyex.prepare_execute(pid,"INSERT INTO test (\"id\", \"text\") VALUES ($1, $2)", [42, "fortytwo"])
+```
+
+```elixir
+{:ok, pid} = Snappyex.start_link([clientHostName: "127.0.0.1", host: "192.168.1.80", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+     tokenSize: 16, useStringForDecimal: false, properties: :dict.new])
+Snappyex.prepare(pid, %Snappyex.Query{statement: "SELECT * FROM TEST"}) 
+```
+
 Project is based on code in db_connection and postgrex.
 
 ```
