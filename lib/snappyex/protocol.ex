@@ -4,7 +4,7 @@ defmodule Snappyex.Protocol do
 
   alias Snappyex.Query
   require Logger
-  
+
   def connect(opts) do
     host = Keyword.get(opts, :host, "localhost")
     port = Keyword.get(opts, :port, 1531)
@@ -25,19 +25,35 @@ defmodule Snappyex.Protocol do
     properties = Keyword.get(opts, :properties, HashDict.new)
     {:ok, local_hostname} = :inet.gethostname
     properties = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+    #Logger.debug "#{inspect self()} connect_start_link " <> inspect properties
     state = Keyword.put_new(state, :process_id, pid)
     state = Keyword.put_new(state, :connection_id, properties.connId)
     state = Keyword.put_new(state, :client_host_name, properties.clientHostName)
     state = Keyword.put_new(state, :client_id, properties.clientID)
     state = Keyword.put_new(state, :token, properties.token)
+    
+    queries_new
+
+    # experimental
+    #state = Keyword.put_new(state, :connection, []) 
+    #{:ok, connection} = Keyword.fetch(state, :connection)
+    #state = Keyword.put(state, :connection,  connection ++ [%{connection_id: properties.connId, token: properties.token}])
+    #Logger.debug "#{inspect self()} connect_start_link" <> inspect state
+    # end experimental
     {:ok, state}
   end
 
   def checkout(s) do
+    #{:ok, connection} = Keyword.fetch(s, :connection)
+    #{:ok, [%{connection_id: connection_id}]} = Keyword.fetch(s, :connection)
+    #{:ok, [%{token: token}]} = Keyword.fetch(s, :connection)
+    #s = Keyword.put(s, :connection,  connection ++ [%{connection_id: connection_id, token: token}])
+    #Logger.debug "#{inspect self()} checkout" <> inspect s
     {:ok, s}
   end
 
   def checkin(s) do
+    #Logger.debug "#{inspect self()} checkin" <> inspect s
     {:ok, s}
   end
 
@@ -68,26 +84,32 @@ defmodule Snappyex.Protocol do
   end
 
   def handle_execute(query, params, _opts, state) do
+    #Logger.debug "#{inspect self()} handle_execute" <> inspect state
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
+    {:ok, connection_id} = Keyword.fetch(state,
+      :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
+    #Logger.debug "#{inspect self()} handle_execute token" <> token
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-    #Logger.debug "#{inspect self()} handle_execute received params " <> inspect params
+    #Logger.debug "#{inspect self()} handle_execute received params " <> inspect params    
+    #Logger.debug "#{inspect self()} handle_execute query_prepare" <> inspect query_prepare(state, query)
+
     rows = case params do
       [] -> Snappyex.Model.Row.new
       [0, {{2016, 10, _}, _}] ->
          Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
       [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42),
-                          Snappyex.Model.ColumnValue.new(ClobChunk_val: 
-                            Snappyex.Model.ClobChunk.new(
-                              chunk: "fortytwo", 
-                              last: true,
-                              length: byte_size("fortytwo")
-                              )
-                            )
+                          Snappyex.Model.ColumnValue.new(ClobChunk_val:  
+                            Snappyex.Model.ClobChunk.new( 
+                              chunk: "fortytwo",  
+                              last: true, 
+                              length: byte_size("fortytwo") 
+                              ) 
+                            ) 
                           ])
       row -> %{params: %Snappyex.Model.Row{values: values}} = row
-       Snappyex.Model.Row.new(values: values)
+      Snappyex.Model.Row.new(values: values)
     end
     #Logger.debug "#{inspect self()} handle_execute received other " <> inspect rows
     output_param = case params do
@@ -95,10 +117,12 @@ defmodule Snappyex.Protocol do
                      %{params: %Snappyex.Model.Row{values: values}} -> Map.new
                      [] -> Map.new
                      [42, "fortytwo"] -> output = Map.put(Map.new, 0, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.integer))
-                                         output = Map.put(output, 1, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.varchar)) 
-end
-    statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, output_param, token)    
+                                         Map.put(output, 1, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.clob)) 
+                   end
+    #Logger.debug "#{inspect self()} handle_execute output_param" <> inspect output_param          
+    statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token)    
     #Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement.resultSet
+    #Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement
     # Todo decode resultSet
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
@@ -118,11 +142,28 @@ end
     statement_attributes = Map.get(query,
       :statement_attributes,
       %Snappyex.Model.StatementAttrs{})
-    Logger.debug "#{inspect self()} handle_prepare query " <> inspect query.statement
+    #Logger.debug "#{inspect self()} handle_prepare query " <> inspect query.statement
     prepared_result = Snappyex.Client.prepareStatement(process_id, connection_id,
       query.statement, output_parameters, statement_attributes, token)
     query = %{query | statement_id: prepared_result.statementId}
     query = %{query | columns: prepared_result.resultSetMetaData}
     {:ok, query, state}
+  end
+
+  defp queries_new(), do: :ets.new(__MODULE__, [:set, :public])
+
+  defp query_prepare(%{queries: queries}, query) when queries != nil do
+    %Query{name: name, ref: ref} = query
+    try do
+      :ets.lookup_element(queries, name, 2)
+    rescue
+      ArgumentError ->
+        {:parse_describe, query}
+    else
+      ^ref ->
+        {:ready, query}
+      _ ->
+        {:close_parse_describe, query}
+    end
   end
 end
