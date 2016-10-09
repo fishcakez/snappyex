@@ -4,7 +4,7 @@ end
 
 defmodule Snappyex.Client do
   use Riffed.Client,
-  auto_import_structs: false,
+  auto_import_structs: true,
   structs: Snappyex.Model,
     client_opts: [
       retries: 3,
