@@ -19,7 +19,8 @@ defmodule Snappyex.Mixfile do
   end
 
   defp deps do
-    [{:poolboy, "~> 1.5"},
+    [{:dialyxir, "~> 0.3.5", only: [:dev]},
+     {:poolboy, "~> 1.5"},
      {:db_connection, "~> 1.0.0-rc.5"},
      {:riffed, github: "pinterest/riffed", tag: "v_1_5_0", submodules: true},
      {:decimal, "~> 1.1.0"},
