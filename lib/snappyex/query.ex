@@ -1,7 +1,7 @@
 # Portions from https://github.com/elixir-ecto/postgrex/blob/af1b62ae06121f02f2d63f1446eb99b962884edb/lib/postgrex/extensions/numeric.ex
 
 defmodule Snappyex.Query do
-  defstruct [:name, :statement, :statement_id, :param_formats, :encoders, :columns,
+  defstruct [:ref, :name, :statement, :statement_id, :param_formats, :encoders, :columns,
              :result_formats, :decoders, :types]
 end
 
