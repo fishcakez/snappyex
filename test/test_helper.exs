@@ -4,7 +4,7 @@ defmodule Snappyex.TestHelper do
   defmacro query(stat, params, opts \\ []) do
     quote do
       case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
-                          unquote(params), unquote(opts)) do
+                          unquote(params), unquote(defaults(opts))) do
         {:ok, _, result} -> result.rows
         #{:error, %Snappyex.Error{} = err} -> err
       end
@@ -53,5 +53,9 @@ defmodule Snappyex.TestHelper do
     Logger.remove_backend(:console)
     fun.()
     Logger.add_backend(:console, flush: true)
+  end
+
+  defp defaults(opts) do
+    Keyword.put_new(opts, :pool_timeout, :infinity)
   end
 end
