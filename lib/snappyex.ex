@@ -8,7 +8,7 @@ defmodule Snappyex do
 
   def execute(conn, query, params, opts \\ []) do
     case DBConnection.execute(conn, query, params, defaults(opts)) do
-      {:ok, result, state} -> {:ok, result}
+      {:ok, result, _} -> {:ok, result}
       {:error, err} ->
         raise err
     end
@@ -41,7 +41,6 @@ defmodule Snappyex do
   end
 
   defp defaults(opts) do
-    opts =
     opts
     |> Keyword.put_new(:timeout, @timeout)
     |> Keyword.put_new(:host, "localhost")
