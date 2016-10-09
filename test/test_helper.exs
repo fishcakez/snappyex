@@ -13,38 +13,38 @@ defmodule Snappyex.TestHelper do
 
   defmacro prepare(name, stat, opts \\ []) do
     quote do
-      case Postgrex.prepare(var!(context)[:pid], unquote(name),
+      case Snappyex.prepare(var!(context)[:pid], unquote(name),
                                      unquote(stat), unquote(opts)) do
-        {:ok, %Postgrex.Query{} = query} -> query
-        {:error, %Postgrex.Error{} = err} -> err
+        {:ok, %Snappyex.Query{} = query} -> query
+        {:error, %Snappyex.Error{} = err} -> err
       end
     end
   end
 
   defmacro execute(query, params, opts \\ []) do
     quote do
-      case Postgrex.execute(var!(context)[:pid], unquote(query),
+      case Snappyex.execute(var!(context)[:pid], unquote(query),
                                        unquote(params), unquote(opts)) do
-        {:ok, %Postgrex.Result{rows: nil}} -> :ok
-        {:ok, %Postgrex.Result{rows: rows}} -> rows
-        {:error, %Postgrex.Error{} = err} -> err
+        {:ok, %Snappyex.Result{rows: nil}} -> :ok
+        {:ok, %Snappyex.Result{rows: rows}} -> rows
+        {:error, %Snappyex.Error{} = err} -> err
       end
     end
   end
 
   defmacro close(query, opts \\ []) do
     quote do
-      case Postgrex.close(var!(context)[:pid], unquote(query),
+      case Snappyex.close(var!(context)[:pid], unquote(query),
                                      unquote(opts)) do
         :ok -> :ok
-        {:error, %Postgrex.Error{} = err} -> err
+        {:error, %Snappyex.Error{} = err} -> err
       end
     end
   end
 
   defmacro transaction(fun, opts \\ []) do
     quote do
-      Postgrex.transaction(var!(context)[:pid], unquote(fun),
+      Snappyex.transaction(var!(context)[:pid], unquote(fun),
                                       unquote(opts))
     end
   end
@@ -56,6 +56,8 @@ defmodule Snappyex.TestHelper do
   end
 
   defp defaults(opts) do
-    Keyword.put_new(opts, :pool_timeout, :infinity)
+    opt = Keyword.put_new(opts, :pool_timeout, :infinity)
+    opt = Keyword.put_new(opts, :ownership_timeout, :infinity)
+    opt = Keyword.put_new(opts, :timeout, :infinity)
   end
 end
