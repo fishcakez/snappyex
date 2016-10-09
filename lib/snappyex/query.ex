@@ -56,7 +56,6 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :timestamp) do
     # TODO Extract nanoseconds and add it to time
     # https://github.com/elixir-ecto/postgrex/blob/master/lib/postgrex/extensions/timestamp.ex#L24
-    # Handle < epoch case
     value.timestamp_val
   end
   def decode_field(value, :binary), do: value.binary_val

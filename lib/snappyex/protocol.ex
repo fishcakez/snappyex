@@ -6,8 +6,8 @@ defmodule Snappyex.Protocol do
   require Logger
 
   def connect(opts) do
-    host = Keyword.get(opts, :host, "localhost")
-    port = Keyword.get(opts, :port, 1531)
+    {:ok, host} = Keyword.fetch(opts, :host)
+    {:ok, port} = Keyword.fetch(opts, :port)
     status = Snappyex.Client.start_link(host, port)
     connect_start_link(status, opts)
   end
@@ -17,44 +17,24 @@ defmodule Snappyex.Protocol do
   end
 
   def connect_start_link({:ok, pid}, opts) do
-    state = Keyword.merge(Keyword.new(), opts)
-    token_size = Keyword.get(opts, :token_size, 16)
+    {:ok, token_size} = Keyword.fetch(opts, :token_size)
     use_string_for_decimal = Keyword.get(opts, :use_string_for_decimal, false)
-    username = Keyword.get(opts, :username, 'APP')
-    password = Keyword.get(opts, :password, 'APP')
-    properties = Keyword.get(opts, :properties, HashDict.new)
+    {:ok, username} = Keyword.fetch(opts, :username)
+    {:ok, password} = Keyword.fetch(opts, :password)
+    {:ok, properties} = Keyword.fetch(opts, :properties)
     {:ok, local_hostname} = :inet.gethostname
     properties = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
-    #Logger.debug "#{inspect self()} connect_start_link " <> inspect properties
-    state = Keyword.put_new(state, :process_id, pid)
-    state = Keyword.put_new(state, :connection_id, properties.connId)
-    state = Keyword.put_new(state, :client_host_name, properties.clientHostName)
-    state = Keyword.put_new(state, :client_id, properties.clientID)
-    state = Keyword.put_new(state, :token, properties.token)
-    
+    state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, token: properties.token]    
     queries_new
-
-    # experimental
-    #state = Keyword.put_new(state, :connection, []) 
-    #{:ok, connection} = Keyword.fetch(state, :connection)
-    #state = Keyword.put(state, :connection,  connection ++ [%{connection_id: properties.connId, token: properties.token}])
-    #Logger.debug "#{inspect self()} connect_start_link" <> inspect state
-    # end experimental
     {:ok, state}
   end
 
   def checkout(s) do
-    #{:ok, connection} = Keyword.fetch(s, :connection)
-    #{:ok, [%{connection_id: connection_id}]} = Keyword.fetch(s, :connection)
-    #{:ok, [%{token: token}]} = Keyword.fetch(s, :connection)
-    #s = Keyword.put(s, :connection,  connection ++ [%{connection_id: connection_id, token: token}])
-    #Logger.debug "#{inspect self()} checkout" <> inspect s
     {:ok, s}
   end
 
   def checkin(s) do
-    #Logger.debug "#{inspect self()} checkin" <> inspect s
-    {:ok, s}
+   {:ok, s}
   end
 
   def disconnect(err, %{types: ref}) when is_reference(ref) do
@@ -86,17 +66,12 @@ defmodule Snappyex.Protocol do
   end
 
   def handle_execute(query, params, _opts, state) do
-    #Logger.debug "#{inspect self()} handle_execute" <> inspect state
-    {:ok, process_id} = Keyword.fetch(state,
+   {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, connection_id} = Keyword.fetch(state,
       :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    #Logger.debug "#{inspect self()} handle_execute token" <> token
     {:ok, statement_id} = Map.fetch(query, :statement_id)
-    #Logger.debug "#{inspect self()} handle_execute received params " <> inspect params    
-    #Logger.debug "#{inspect self()} handle_execute query_prepare" <> inspect query_prepare(state, query)
-
     rows = case params do
       [] -> Snappyex.Model.Row.new
       [0, {{2016, 10, _}, _}] ->
@@ -113,7 +88,6 @@ defmodule Snappyex.Protocol do
       row -> %{params: %Snappyex.Model.Row{values: values}} = row
       Snappyex.Model.Row.new(values: values)
     end
-    #Logger.debug "#{inspect self()} handle_execute received other " <> inspect rows
     output_param = case params do
                      %{output: output} -> output
                      %{params: %Snappyex.Model.Row{values: values}} -> Map.new
@@ -121,11 +95,7 @@ defmodule Snappyex.Protocol do
                      [42, "fortytwo"] -> output = Map.put(Map.new, 0, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.integer))
                                          Map.put(output, 1, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.clob)) 
                    end
-    #Logger.debug "#{inspect self()} handle_execute output_param" <> inspect output_param          
     statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token)    
-    #Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement.resultSet
-    #Logger.debug "#{inspect self()} handle_execute received result " <> inspect statement
-    # Todo decode resultSet
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
     {:ok, result, state}
@@ -144,7 +114,6 @@ defmodule Snappyex.Protocol do
     statement_attributes = Map.get(query,
       :statement_attributes,
       %Snappyex.Model.StatementAttrs{})
-    #Logger.debug "#{inspect self()} handle_prepare query " <> inspect query.statement
     prepared_result = Snappyex.Client.prepareStatement(process_id, connection_id,
       query.statement, output_parameters, statement_attributes, token)
     query = %{query | statement_id: prepared_result.statementId}

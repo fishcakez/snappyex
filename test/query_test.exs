@@ -11,7 +11,7 @@ defmodule QueryTest do
   alias Snappyex, as: S
 
   setup do
-    opts = [ host: "snappydata.192.168.1.80.xip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ host: "snappydata.192.168.55.4.nip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      tokenSize: 16, useStringForDecimal: false, properties: :dict.new(), timeout: :infinity]
     {:ok, pid} = S.start_link(opts)
@@ -36,7 +36,9 @@ defmodule QueryTest do
     #assert [[:"-inf"]] == query("SELECT '-inf'::float", params)
     assert [["ẽric"]] == query("SELECT 'ẽric'", params)    
     assert [["ẽric"]] == query("SELECT CAST('ẽric' AS VARCHAR(10))", params)
-    #assert [[<<1, 2, 3>>]] == query("SELECT CAST('\\001\\002\\003' AS BINARY)", params)
+    assert  [[%Snappyex.Model.BlobChunk{chunk: "\\001\\002\\003", last: true,
+              lobId: nil, offset: 0, totalLength: 12}]] 
+              == query("SELECT CAST('\\001\\002\\003' AS BINARY)", params)
   end
  
   #test "decode decimal", context do
@@ -86,11 +88,11 @@ defmodule QueryTest do
            query("VALUES DATE('2013-09-23')", [])
   end
 
-  #test "select from test table", context do
-    #query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
-    #query("SELECT t.Col1 from test_table_name as t", []) 
-    #query("DROP TABLE test_table_name", [])    
-  #end
+  test "select from test table", context do
+    query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
+    query("SELECT t.Col1 from test_table_name as t", []) 
+    query("DROP TABLE test_table_name", [])    
+ end
 
   test "insert", context do
     nil = query("CREATE TABLE test (id int, text string)", [])
