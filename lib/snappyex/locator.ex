@@ -3,7 +3,8 @@ defmodule Snappyex.Locator do
   structs: Snappyex.Locator.Models,
   client_opts: [
     retries: 3,
-    framed: false
+    framed: false,
+    recv_timeout: 15_000
   ],
   service: :locator_service_thrift,
   auto_import_structs: false
