@@ -13,7 +13,9 @@ before_script:
   - echo "localhost -client-bind-address=localhost -J-Duser.timezone=UTC -J-Djava.net.preferIPv4Stack=true  -thrift-server-address=localhost -heap-size=4096m -thrift-server-port=1531 -thrift-binary-protocol=true" | tee -a ./snappydata-0.6-bin/conf/servers
   - echo "localhost -J-Duser.timezone=UTC -J-Djava.net.preferIPv4Stack=true -thrift-server-address=localhost -heap-size=1024m -thrift-server-port=1530 -thrift-binary-protocol=true" | tee -a ./snappydata-0.6-bin/conf/locators
   - echo "localhost -J-Duser.timezone=UTC -J-Djava.net.preferIPv4Stack=true -spray.can.server.parsing.max-content-length=400m -heap-size=4096m" | tee -a ./snappydata-0.6-bin/conf/leads
-  - ./snappydata-0.6-bin/sbin/snappy-start-all.sh 
+  - ./snappydata-0.6-bin/sbin/snappy-start-all.sh
+  - hadoop fs -rm -r /tmp/hive;  
+  - rm -rf /tmp/hive
 env:
   global:
     - MIX_ENV=snappydata
