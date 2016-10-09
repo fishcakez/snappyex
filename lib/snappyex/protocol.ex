@@ -54,15 +54,14 @@ defmodule Snappyex.Protocol do
   {:ok, new_state :: any} |
   {:disconnect, Exception.t, new_state :: any}
   def ping(state) do
-    query  = %Snappyex.Query{statement: 'SELECT 1'}
-    {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
-    params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-    case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
-      {:ok, _, state} ->
-        {:ok, state}
-      {:disconnect, err, state} -> 
-        {:disconnect, err, state}
-    end
+    {:ok, process_id} = Keyword.fetch(state,
+      :process_id)
+    {:ok, connection_id} = Keyword.fetch(state,
+      :connection_id)
+    {:ok, token} = Keyword.fetch(state, :token)
+    statement = Snappyex.Client.prepareAndExecute(process_id, connection_id, "SELECT 1", nil, nil, nil, token)
+    result = Map.put_new(Map.new, :rows, statement.resultSet)
+    {:ok, result, state}
   end
 
   def handle_execute(query, params, _opts, state) do
