@@ -21,11 +21,10 @@ defmodule LoginTest do
   end
   #Tests where snappyex cannot connect will fail
 
- test "infinity timeout", context do
-     opts = [ host: "snappydata.192.168.55.4.nip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
-     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: :dict.new(), timeout: :infinity]
-
+  test "infinity timeout", context do
+    opts = [ host: "snappydata.192.168.55.4.nip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+    tokenSize: 16, useStringForDecimal: false, properties: :dict.new(), timeout: :infinity]
     assert {:ok, pid} = S.start_link(opts)
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
     assert [[123]] == query("SELECT 123", params, [pool_timeout: 15_000])
