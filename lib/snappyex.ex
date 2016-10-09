@@ -41,12 +41,15 @@ defmodule Snappyex do
   end
 
   defp defaults(opts) do
-    opts = Keyword.put_new(opts, :timeout, @timeout)
-    opts = Keyword.put_new(opts, :host, "localhost")
-    opts = Keyword.put_new(opts, :port, 1531)
-    opts = Keyword.put_new(opts, :username, 'APP')
-    opts = Keyword.put_new(opts, :password, 'APP')
-    opts = Keyword.put_new(opts, :properties, HashDict.new)
-    opts = Keyword.put_new(opts, :token_size, 16)
+    opts =
+    opts
+    |> Keyword.put_new(:timeout, @timeout)
+    |> Keyword.put_new(:host, "localhost")
+    |> Keyword.put_new(:port, 1531)
+    |> Keyword.put_new(:username, 'APP')
+    |> Keyword.put_new(:password, 'APP')
+    |> Keyword.put_new(:properties, HashDict.new)
+    |> Keyword.put_new(:token_size, 16)
+    |> Keyword.put_new(:pool, DBConnection.Poolboy)
   end
 end

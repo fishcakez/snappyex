@@ -89,17 +89,25 @@ defmodule QueryTest do
   end
 
   test "select from test table", context do
-    query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
-    query("SELECT t.Col1 from test_table_name as t", []) 
-    query("DROP TABLE test_table_name", [])    
+    case query(
+      "SELECT tablename " <> 
+      "FROM sys.systables " <> 
+      "WHERE TABLESCHEMANAME = 'APP' AND TABLENAME = 'TEST_TABLE_NAME'", []) do
+      [] -> nil
+      _ -> query("DROP TABLE APP.TEST_TABLE_NAME", [])
+    end
+    query("CREATE TABLE APP.TEST_TABLE_NAME (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
+    query("SELECT t.Col1 from TEST_TABLE_NAME as t", []) 
+    query("DROP TABLE APP.TEST_TABLE_NAME", [])    
   end
 
   test "insert", context do
-    unless query(
+    case query(
       "SELECT tablename " <> 
       "FROM sys.systables " <> 
       "WHERE TABLESCHEMANAME = 'APP' AND TABLENAME = 'TEST'", []) do
-      query("DROP TABLE APP.TEST", [])
+      [] -> nil
+      _ -> query("DROP TABLE APP.TEST", [])
     end
     nil = query("CREATE TABLE APP.TEST (id int, text string)", [])
     [] = query("SELECT * FROM APP.TEST", [])
