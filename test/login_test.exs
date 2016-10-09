@@ -7,7 +7,7 @@ defmodule LoginTest do
   setup do
     opts = [ host: "localhost", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
+     tokenSize: 16, useStringForDecimal: false, properties: :dict.new(), timeout: :infinity]
     {:ok, pid} = S.start_link(opts)
     {:ok, [pid: pid]}
   end
