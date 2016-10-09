@@ -1,5 +1,5 @@
 defmodule Snappyex do
-  @timeout 5000
+  @timeout 15_000
 
   alias Snappyex.Query
   def start_link(opts) do
