@@ -92,12 +92,21 @@ defmodule QueryTest do
     query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
     query("SELECT t.Col1 from test_table_name as t", []) 
     query("DROP TABLE test_table_name", [])    
- end
+  end
+
+  test "drop table test if exists", context do
+    unless query(
+      "SELECT tablename " <> 
+      "FROM sys.systables " <> 
+      "WHERE TABLESCHEMANAME = 'APP' AND TABLENAME = 'TEST'", []) do
+      query("DROP TABLE APP.TEST", [])
+    end
+  end
 
   test "insert", context do
     nil = query("CREATE TABLE test (id int, text string)", [])
     [] = query("SELECT * FROM test", [])
-    assert nil == query("INSERT INTO test (id, text) VALUES (42, 'fortytwo')", [])
+    assert nil == query("INSERT INTO test (id, text) VALUES ($1, $2)", [42, 'fortytwo'])
     assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])
     query("DROP TABLE test", [])
   end
