@@ -42,6 +42,7 @@ defmodule Snappyex do
 
   defp defaults(opts) do
     opts = Keyword.put_new(opts, :timeout, @timeout)
+    opts = Keyword.put_new(opts, :pool_timeout, :infinite)
     opts = Keyword.put_new(opts, :host, "localhost")
     opts = Keyword.put_new(opts, :port, 1531)
     opts = Keyword.put_new(opts, :username, 'APP')
