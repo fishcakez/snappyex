@@ -75,7 +75,7 @@ defmodule Snappyex.Protocol do
     rows = case params do
       [] -> Snappyex.Model.Row.new
       [0, {{2016, 10, _}, _}] ->
-         Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
+        Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
       [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42),
                           Snappyex.Model.ColumnValue.new(ClobChunk_val:  
                             Snappyex.Model.ClobChunk.new( 

@@ -11,7 +11,7 @@ defmodule QueryTest do
   alias Snappyex, as: S
 
   setup do
-    opts = [ host: "127.0.0.1", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ host: "snappydata.192.168.55.4.xip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
     {:ok, pid} = S.start_link(opts)
@@ -89,31 +89,17 @@ defmodule QueryTest do
   end
 
   test "select from test table", context do
-    case query(
-      "SELECT tablename " <> 
-      "FROM sys.systables " <> 
-      "WHERE TABLESCHEMANAME = 'APP' AND TABLENAME = 'TEST_TABLE_NAME'", []) do
-      [] -> nil
-      _ -> query("DROP TABLE APP.TEST_TABLE_NAME", [])
-    end
-    query("CREATE TABLE APP.TEST_TABLE_NAME (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
-    query("SELECT t.Col1 from TEST_TABLE_NAME as t", []) 
-    query("DROP TABLE APP.TEST_TABLE_NAME", [])    
+   # query("CREATE TABLE APP.TEST_TABLE_NAME (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
+    query("SELECT t.Col1 from APP.TEST_TABLE_NAME as t", []) 
+   # query("DROP TABLE APP.TEST_TABLE_NAME", [])    
   end
 
   test "insert", context do
-    case query(
-      "SELECT tablename " <> 
-      "FROM sys.systables " <> 
-      "WHERE TABLESCHEMANAME = 'APP' AND TABLENAME = 'TEST'", []) do
-      [] -> nil
-      _ -> query("DROP TABLE APP.TEST", [])
-    end
-    nil = query("CREATE TABLE APP.TEST (id int, text string)", [])
+   #nil = query("CREATE TABLE APP.TEST (id int, text string)", [])
     [] = query("SELECT * FROM APP.TEST", [])
-    #assert nil == query("INSERT INTO test (id, text) VALUES ($1, $2)", [42, 'fortytwo'])
-    #assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])
-    query("DROP TABLE test", [])
+    assert [42, "fortytwo"] == query("INSERT INTO test (id, text) VALUES ($1, $2)", [42, "fortytwo"])
+    assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])
+    #query("DROP TABLE APP.TEST", [])
   end
 
 end
