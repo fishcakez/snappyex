@@ -2,7 +2,6 @@ defmodule Snappyex.Protocol do
   @moduledoc false
   @behaviour DBConnection
 
-  alias Snappyex.Query
   require Logger
 
   def connect(opts) do
@@ -68,8 +67,6 @@ defmodule Snappyex.Protocol do
   def handle_execute(query, params, _opts, state) do
    {:ok, process_id} = Keyword.fetch(state,
       :process_id)
-    {:ok, connection_id} = Keyword.fetch(state,
-      :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, statement_id} = Map.fetch(query, :statement_id)
     rows = case params do
@@ -88,20 +85,13 @@ defmodule Snappyex.Protocol do
       row -> %{params: %Snappyex.Model.Row{values: values}} = row
       Snappyex.Model.Row.new(values: values)
     end
-    output_param = case params do
-                     %{output: output} -> output
-                     %{params: %Snappyex.Model.Row{values: values}} -> Map.new
-                     [] -> Map.new
-                     [42, "fortytwo"] -> output = Map.put(Map.new, 0, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.integer))
-                                         Map.put(output, 1, Snappyex.Model.OutputParameter.new(type: Snappyex.Model.SnappyType.clob)) 
-                   end
     statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token)    
     result = Map.new
     result = Map.put_new(result, :rows, statement.resultSet)
     {:ok, result, state}
   end
 
-  def handle_prepare(query, opts, state) do
+  def handle_prepare(query, _opts, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, connection_id} = Keyword.fetch(state,
@@ -122,19 +112,4 @@ defmodule Snappyex.Protocol do
   end
 
   defp queries_new(), do: :ets.new(__MODULE__, [:set, :public])
-
-  defp query_prepare(%{queries: queries}, query) when queries != nil do
-    %Query{name: name, ref: ref} = query
-    try do
-      :ets.lookup_element(queries, name, 2)
-    rescue
-      ArgumentError ->
-        {:parse_describe, query}
-    else
-      ^ref ->
-        {:ready, query}
-      _ ->
-        {:close_parse_describe, query}
-    end
-  end
 end

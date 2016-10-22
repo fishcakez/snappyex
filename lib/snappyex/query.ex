@@ -8,10 +8,10 @@ end
 defimpl DBConnection.Query, for: Snappyex.Query do
   alias Snappyex.Query
   use Timex
-  def describe(query, opts) do
+  def describe(query, _opts) do
     query
   end
-  def encode(%Query{}, params, opts) do  
+  def encode(%Query{}, params, _opts) do  
     params
   end
 
@@ -20,6 +20,16 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     decode(rows, columns, [decode_row(row.values, columns, []) | acc])
   end
   def decode([], _, acc), do: Enum.reverse(acc)
+  def decode(%Query{decoders: nil, columns: _columns}, res, _) do
+    _mapper = fn x -> x end
+    {:ok, rows} = Map.fetch(res, :rows)    
+    rows = decode_row_set(rows)
+    num_rows = case rows do 
+      nil -> 0
+      _ -> length(rows)
+    end
+    %Snappyex.Result{rows: rows, num_rows: num_rows}
+  end
   def decode_row([field | rows], [decoder | cols], acc) do 
     type = Snappyex.Model.SnappyType.value(decoder)
     decode_row(rows, cols, [decode_field(field, type.ordinal) | acc])
@@ -35,7 +45,7 @@ defimpl DBConnection.Query, for: Snappyex.Query do
 #  def decode_field(column_value, :real), do: elem(column_value, @decimal_val)
   def decode_field(value, :double), do: value.double_val
   def decode_field(value, :decimal) do 
-    %Snappyex.Model.Decimal{magnitude: magnitude, scale: scale, signum: signum} = value.decimal_val
+    %Snappyex.Model.Decimal{magnitude: _magnitude, scale: _scale, signum: _signum} = value.decimal_val
     #decode_numeric(signum, magnitude)
   end  
 
@@ -62,25 +72,9 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :varbinary), do: value.binary_val
   def decode_field(value, :longvarbinary), do: value.binary_val
   def decode_field(value, :blob), do: decode_blob(value.blob_val)
-  def decode_blob(val) do
-    case val do
-      %Snappyex.Model.BlobChunk{chunk: chunk, last: true} -> val
-      %Snappyex.Model.BlobChunk{last: false} -> raise "Not Implemented"
-      nil -> nil
-    end
-  end
   def decode_field(value, :clob) do 
     decode_clob(value.clob_val)
   end
-
-  def decode_clob(val) do
-    case val do
-      %Snappyex.Model.ClobChunk{chunk: chunk, last: true} -> chunk
-      %Snappyex.Model.ClobChunk{last: false} -> raise "Not Implemented"
-      nil -> nil
-    end
-  end
-
 #  def decode_field(column_value, :sqlxml), do: elem(column_value, @string_val)
 #  def decode_field(column_value, :nulltype), do: elem(column_value, )
 #  def decode_field(column_value, :array), do: elem(column_value, )
@@ -90,6 +84,23 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :json_object), do: value.json_val
   def decode_field(value, :java_object), do: value.java_val
 
+
+  def decode_blob(val) do
+    case val do
+      %Snappyex.Model.BlobChunk{chunk: _chunk, last: true} -> val
+      %Snappyex.Model.BlobChunk{last: false} -> raise "Not Implemented"
+      nil -> nil
+    end
+  end
+
+
+  def decode_clob(val) do
+    case val do
+      %Snappyex.Model.ClobChunk{chunk: chunk, last: true} -> chunk
+      %Snappyex.Model.ClobChunk{last: false} -> raise "Not Implemented"
+      nil -> nil
+    end
+  end
   def decode_row_set(nil) do
     nil
   end
@@ -99,20 +110,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
       %Snappyex.Model.ColumnDescriptor{type: ordinal} = descriptor
       ordinal      
     end)    
-    rows = decode(rows, columns)
+    decode(rows, columns)
   end
-
-  def decode(%Query{decoders: nil, columns: columns}, res, _) do
-    mapper = fn x -> x end
-    {:ok, rows} = Map.fetch(res, :rows)    
-    rows = decode_row_set(rows)
-    num_rows = case rows do 
-      nil -> 0
-      _ -> length(rows)
-    end
-    %Snappyex.Result{rows: rows, num_rows: num_rows}
-  end
-
   def parse(query, _) do
     query
   end

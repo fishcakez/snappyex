@@ -56,8 +56,9 @@ defmodule Snappyex.TestHelper do
   end
 
   defp defaults(opts) do
-    opt = Keyword.put_new(opts, :pool_timeout, :infinity)
-    opt = Keyword.put_new(opts, :ownership_timeout, :infinity)
-    opt = Keyword.put_new(opts, :timeout, :infinity)
+    opts 
+    |> Keyword.put_new(:pool_timeout, :infinity)
+    |> Keyword.put_new(:ownership_timeout, :infinity)
+    |> Keyword.put_new(:timeout, :infinity)
   end
 end

@@ -1,6 +1,6 @@
 defmodule Snappyex.Locator do
   use Riffed.Client,
-  structs: Snappyex.Locator.Model,
+  structs: Snappyex.Model,
   client_opts: [
     retries: 3,
     framed: false,
