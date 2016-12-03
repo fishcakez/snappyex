@@ -1,6 +1,7 @@
 defmodule Snappyex.Protocol do
   @moduledoc false
-  @behaviour DBConnection
+  @behaviour DBConnection 
+  @repeatable_read 3
 
   require Logger
 
@@ -61,6 +62,43 @@ defmodule Snappyex.Protocol do
         {:ok, state}
       {:disconnect, err, state} -> 
         {:disconnect, err, state}
+    end
+  end
+
+  def handle_commit(_opts, state) do
+    query  = %Snappyex.Query{statement: 'COMMIT'}
+    {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
+    params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
+    case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
+      {:ok, result, state} ->
+        {:ok, result, state}
+      {:disconnect, err, state} -> 
+        {:disconnect, err, state}
+    end
+  end
+  def handle_begin(opts, state) do
+    {:ok, process_id} = Keyword.fetch(state,
+      :process_id)
+    {:ok, token} = Keyword.fetch(state, :token)
+    {:ok, flags} = Map.fetch(opts, :flags)    
+    case Snappyex.Client.beginTransaction(process_id, @repeatable_read, flags, token) do
+      {:ok, result} ->
+        {:ok, result, state}
+      {:error, error} ->
+        {:error, error.exceptionData.reason, state}
+    end
+  end
+  
+  def handle_close(query, _opts, state) do
+    {:ok, process_id} = Keyword.fetch(state,
+      :process_id)
+    {:ok, token} = Keyword.fetch(state, :token)
+    {:ok, statement_id} = Map.fetch(query, :statement_id)
+    case Snappyex.Client.closeStatement(process_id, statement_id, token) do
+      {:ok, result} ->
+        {:ok, result, state}
+      {:error, error} ->
+        {:error, error.exceptionData.reason, state}
     end
   end
 

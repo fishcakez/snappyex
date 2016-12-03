@@ -89,10 +89,21 @@ defmodule QueryTest do
   end
 
   test "insert", context do
-    nil = query("CREATE TABLE APP.TEST (id int, text string)", [])
+    case query("SELECT * FROM APP.TEST", []) do
+      "The exception 'Table 'APP.TEST' not found;' was thrown while evaluating an expression." ->
+        nil = query("CREATE TABLE APP.TEST (id int, text string)", [])
+      [] -> nil
+    end
     [] = query("SELECT * FROM APP.TEST", [])
     assert [42, "fortytwo"] == query("INSERT INTO test (id, text) VALUES ($1, $2)", [42, "fortytwo"])
-    assert [[42, "fortytwo"]] == query("SELECT * FROM test", []) 
-    query("DROP TABLE APP.TEST", [])
+    assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])   
+  end
+
+  test "prepare, execute and close", context do
+    query = prepare("42", "SELECT 42")
+    assert [[42]] = execute(query, [])
+    assert [[42]] = execute(query, [])
+    assert :ok = close(query)
+    assert [[42]] = query("SELECT 42", [])
   end
 end
