@@ -22,7 +22,7 @@ defmodule Snappyex.Protocol do
     {:ok, password} = Keyword.fetch(opts, :password)
     {:ok, properties} = Keyword.fetch(opts, :properties)
     {:ok, local_hostname} = :inet.gethostname
-    properties = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+    {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
     state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, token: properties.token]    
     queries_new
     {:ok, state}
@@ -85,10 +85,14 @@ defmodule Snappyex.Protocol do
       row -> %{params: %Snappyex.Model.Row{values: values}} = row
       Snappyex.Model.Row.new(values: values)
     end
-    statement = Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token)    
-    result = Map.new
-    result = Map.put_new(result, :rows, statement.resultSet)
-    {:ok, result, state}
+    case Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token) do
+      {:ok, statement} ->
+        result = Map.new
+        result = Map.put_new(result, :rows, statement.resultSet)
+        {:ok, result, state}
+      {:error, error} ->
+        {:error, error.exceptionData.reason, state}
+    end
   end
 
   def handle_prepare(query, _opts, state) do
@@ -104,11 +108,15 @@ defmodule Snappyex.Protocol do
     statement_attributes = Map.get(query,
       :statement_attributes,
       %Snappyex.Model.StatementAttrs{})
-    prepared_result = Snappyex.Client.prepareStatement(process_id, connection_id,
-      query.statement, output_parameters, statement_attributes, token)
-    query = %{query | statement_id: prepared_result.statementId}
-    query = %{query | columns: prepared_result.resultSetMetaData}
-    {:ok, query, state}
+    case  Snappyex.Client.prepareStatement(process_id, connection_id,
+      query.statement, output_parameters, statement_attributes, token) do
+        {:ok, prepared_result} -> 
+          query = %{query | statement_id: prepared_result.statementId}
+          query = %{query | columns: prepared_result.resultSetMetaData}
+          {:ok, query, state}
+        {:error, error} ->
+          {:error, error.exceptionData.reason, state}
+    end
   end
 
   defp queries_new(), do: :ets.new(__MODULE__, [:set, :public])

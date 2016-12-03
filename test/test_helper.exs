@@ -1,6 +1,7 @@
 ExUnit.start()
 
 defmodule Snappyex.TestHelper do
+
   defmacro query(stat, params, opts \\ []) do
     quote do
       case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
@@ -49,6 +50,14 @@ defmodule Snappyex.TestHelper do
     end
   end
 
+  def snappydata_address() do
+     "104.198.103.128" 
+  end 
+
+  def snappydata_properties() do
+     HashDict.put(HashDict.new(), "load-balance", "false")
+  end
+  
   def capture_log(fun) do
     Logger.remove_backend(:console)
     fun.()

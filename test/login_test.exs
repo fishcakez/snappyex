@@ -5,9 +5,9 @@ defmodule LoginTest do
   alias Snappyex, as: S
 
   setup do
-    opts = [ host: "snappydata.192.168.55.4.xip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
+     tokenSize: 16, useStringForDecimal: false, properties: snappydata_properties()]
     {:ok, pid} = S.start_link(opts)
     {:ok, [pid: pid]}
   end
@@ -22,9 +22,9 @@ defmodule LoginTest do
   #Tests where snappyex cannot connect will fail
 
   test "infinity timeout", context do
-    opts = [ host: "snappydata.192.168.55.4.xip.io", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-    tokenSize: 16, useStringForDecimal: false, properties: :dict.new(), timeout: :infinity]
+    tokenSize: 16, useStringForDecimal: false, properties: snappydata_properties(), timeout: :infinity]
     assert {:ok, _pid} = S.start_link(opts)
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
     assert [[123]] == query("SELECT 123", params)
