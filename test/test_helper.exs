@@ -55,7 +55,8 @@ defmodule Snappyex.TestHelper do
   end 
 
   def snappydata_properties() do
-     HashDict.put(HashDict.new(), "load-balance", "false")
+     dict = HashDict.put(HashDict.new(), "load-balance", "false")
+     dict = HashDict.put(dict, "sync-commits", "true")
   end
   
   def capture_log(fun) do
