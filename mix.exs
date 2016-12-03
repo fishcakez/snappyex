@@ -21,7 +21,7 @@ defmodule Snappyex.Mixfile do
   defp deps do
     [{:dialyxir, "~> 0.3.5", only: [:dev]},
      {:poolboy, "~> 1.5"},
-     {:db_connection, "~> 1.0.0"},
+     {:db_connection, "~> 1.1.0"},
      {:riffed, github: "scohen/riffed", ref: "66fc71df86d13ee04d37ad46063e839e0f76018c", submodules: true},
      {:decimal, "~> 1.1.0"},
      {:timex, "~> 3.0.8"} # Downloads tzdata every day
