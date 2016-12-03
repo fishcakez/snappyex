@@ -85,7 +85,7 @@ defmodule Snappyex.Protocol do
       {:ok, result} ->
         {:ok, result, state}
       {:error, error} ->
-        {:error, error.exceptionData.reason, state}
+        {:error, error, state}
     end
   end
   
@@ -98,7 +98,7 @@ defmodule Snappyex.Protocol do
       {:ok, result} ->
         {:ok, result, state}
       {:error, error} ->
-        {:error, error.exceptionData.reason, state}
+        {:error, error, state}
     end
   end
 
@@ -129,7 +129,7 @@ defmodule Snappyex.Protocol do
         result = Map.put_new(result, :rows, statement.resultSet)
         {:ok, result, state}
       {:error, error} ->
-        {:error, error.exceptionData.reason, state}
+        {:error, error, state}
     end
   end
 
@@ -153,7 +153,7 @@ defmodule Snappyex.Protocol do
           query = %{query | columns: prepared_result.resultSetMetaData}
           {:ok, query, state}
         {:error, error} ->
-          {:error, error.exceptionData.reason, state}
+          {:error, error, state}
     end
   end
 

@@ -7,7 +7,7 @@ defmodule Snappyex.TestHelper do
       case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
                           unquote(params), unquote(defaults(opts))) do
         {:ok, _, result} -> result.rows
-        {:error, err} -> err
+        {:error, err} -> err.exceptionData
       end
     end
   end
@@ -17,7 +17,7 @@ defmodule Snappyex.TestHelper do
       case Snappyex.prepare(var!(context)[:pid], unquote(name),
                                      unquote(stat), unquote(opts)) do
         {:ok, %Snappyex.Query{} = query} -> query
-        {:error, err} -> err
+        {:error, err} -> err.exceptionData
       end
     end
   end
@@ -28,7 +28,7 @@ defmodule Snappyex.TestHelper do
                                        unquote(params), unquote(opts)) do
         {:ok, %Snappyex.Result{rows: nil}} -> :ok
         {:ok, %Snappyex.Result{rows: rows}} -> rows
-        {:error, err} -> err
+        {:error, err} -> err.exceptionData
       end
     end
   end
@@ -38,7 +38,7 @@ defmodule Snappyex.TestHelper do
       case Snappyex.close(var!(context)[:pid], unquote(query),
                                      unquote(opts)) do
         :ok -> :ok
-        {:error, err} -> err
+        {:error, err} -> err.exceptionData
       end
     end
   end

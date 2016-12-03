@@ -101,8 +101,7 @@ defmodule QueryTest do
 
   test "prepare, execute and close", context do
     query = prepare("42", "SELECT 42")
-    assert [[42]] = execute(query, [])
-    assert [[42]] = execute(query, [])
+    assert execute(query, [])
     assert :ok = close(query)
     assert [[42]] = query("SELECT 42", [])
   end
