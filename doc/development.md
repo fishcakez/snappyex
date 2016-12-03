@@ -85,7 +85,7 @@ Snappyex.prepare_execute(pid,"INSERT INTO test (\"id\", \"text\") VALUES ($1, $2
 ```
 
 ```elixir
-{:ok, pid} = Snappyex.start_link([clientHostName: "localhost", host: "192.168.1.80", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+{:ok, pid} = Snappyex.start_link([clientHostName: "localhost", host: "192.168.55.4", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      tokenSize: 16, useStringForDecimal: false, properties: :dict.new])
 Snappyex.prepare(pid, %Snappyex.Query{statement: "SELECT * FROM TEST"}) 
