@@ -25,16 +25,15 @@ defmodule Snappyex.Protocol do
     {:ok, local_hostname} = :inet.gethostname
     {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password, security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
     state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token]    
-    queries_new
     {:ok, state}
   end
 
-  def checkout(s) do
-    {:ok, s}
+  def checkout(state) do
+    {:ok, state}
   end
 
-  def checkin(s) do
-    {:ok, s}
+  def checkin(state) do
+    {:ok, state}
   end
 
   def disconnect(err, %{types: ref}) when is_reference(ref) do
@@ -122,9 +121,6 @@ defmodule Snappyex.Protocol do
   end
 
   def handle_execute(query, params, _opts, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
-    {:ok, token} = Keyword.fetch(state, :token)
     case execute_lookup(query, state) do
       {:execute, id, query} ->
         execute(id, query, params, state)
@@ -136,8 +132,6 @@ defmodule Snappyex.Protocol do
   end
 
   defp prepare_execute(prepare, params, state) do
-
-    
     case prepare.(state) do
       {:ok, query, state} ->
         id = prepare_execute_lookup(query, state)
@@ -147,7 +141,7 @@ defmodule Snappyex.Protocol do
     end
   end
 
-  def execute(id, query, params, state) do
+  def execute(id, _query, params, state) do
      {:ok, process_id} = Keyword.fetch(state,
       :process_id)
      {:ok, token} = Keyword.fetch(state,
@@ -262,6 +256,4 @@ defmodule Snappyex.Protocol do
         {:prepare, query}
     end
   end
-
-  defp queries_new(), do: :ets.new(__MODULE__, [:set, :public])
 end
