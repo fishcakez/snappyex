@@ -1,5 +1,4 @@
 defmodule Snappyex do
-  @timeout 15_000
 
   alias Snappyex.Query
   def start_link(opts) do
@@ -34,7 +33,6 @@ defmodule Snappyex do
 
   defp defaults(opts) do
     opts
-    |> Keyword.put_new(:timeout, @timeout)
     |> Keyword.put_new(:host, "localhost")
     |> Keyword.put_new(:port, 1531)
     |> Keyword.put_new(:username, 'APP')

@@ -4,7 +4,6 @@ defmodule Snappyex.Locator do
   client_opts: [
     retries: 3,
     framed: false,
-    recv_timeout: 15_000
   ],
   service: :locator_service_thrift,
   auto_import_structs: false
