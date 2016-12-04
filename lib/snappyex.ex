@@ -41,6 +41,5 @@ defmodule Snappyex do
     |> Keyword.put_new(:password, 'APP')
     |> Keyword.put_new(:properties, HashDict.new)
     |> Keyword.put_new(:token_size, 16)
-    |> Keyword.put_new(:pool, DBConnection.Poolboy)
   end
 end

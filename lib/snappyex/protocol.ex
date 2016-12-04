@@ -176,8 +176,7 @@ defmodule Snappyex.Protocol do
     {:ok, cache} = Keyword.fetch(state,
       :cache)
     Snappyex.Cache.id(cache, name)
-  end
-  
+  end  
 
   defp execute_lookup(%Snappyex.Query{name: name, ref: ref} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
