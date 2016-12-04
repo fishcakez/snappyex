@@ -34,7 +34,7 @@ defmodule Snappyex.Protocol do
   end
 
   def checkin(s) do
-   {:ok, s}
+    {:ok, s}
   end
 
   def disconnect(err, %{types: ref}) when is_reference(ref) do
@@ -236,16 +236,20 @@ defmodule Snappyex.Protocol do
       case  Snappyex.Client.prepareStatement(process_id, connection_id,
         query.statement, output_parameters, statement_attributes, token) do
           {:ok, prepared_result} -> 
-            query = %{query | columns: prepared_result.resultSetMetaData}         
-            num_params = case prepared_result.resultSetMetaData do
-              nil -> 0
-              result -> Enum.count(result)
-            end
-            query = prepare_insert(prepared_result.statementId, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
-            {:ok, query, state}
+            prepare_result(query, prepared_result, state)   
           {:error, error} ->
             {:error, error, state}
       end
+  end
+
+  defp prepare_result(query, prepared_result, state) do
+    query = %{query | columns: prepared_result.resultSetMetaData}         
+    num_params = case prepared_result.resultSetMetaData do
+      nil -> 0
+      result -> Enum.count(result)
+    end
+    query = prepare_insert(prepared_result.statementId, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
+    {:ok, query, state}
   end
 
   defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do

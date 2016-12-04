@@ -51,7 +51,7 @@ defmodule Snappyex.TestHelper do
   end
 
   def snappydata_address() do
-     "104.198.103.128" 
+     "104.196.243.201" 
   end 
 
   def snappydata_properties() do
