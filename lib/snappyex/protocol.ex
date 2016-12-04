@@ -97,16 +97,27 @@ defmodule Snappyex.Protocol do
     end
   end
   
-  def handle_close(query, _opts, state) do
+  def handle_close(query, _opts, state) do    
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    {:ok, statement_id} = Map.fetch(query, :statement_id)
-    case Snappyex.Client.closeStatement(process_id, statement_id, token) do
-      {:ok, result} ->
-        {:ok, result, state}
-      {:error, error} ->
-        {:error, error, state}
+    case close_lookup(query, state) do
+      {:close, id} ->
+        Snappyex.Client.closeStatement(process_id, id, token)
+        {:ok, nil, state}
+      :closed ->
+        {:ok, nil, state}
+    end
+  end
+
+  defp close_lookup(%Snappyex.Query{name: name}, state) do
+    {:ok, cache} = Keyword.fetch(state,
+      :cache)
+    case Snappyex.Cache.take(cache, name) do
+      id when is_integer(id) ->
+        {:close, id}
+      nil ->
+        :closed
     end
   end
 
@@ -115,8 +126,33 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     case execute_lookup(query, state) do
-      {:execute, statement_id, query} -> 
-        rows = case params do
+      {:execute, id, query} ->
+        execute(id, query, params, state)
+      {:prepare_execute, query} ->
+        prepare_execute(&prepare(query, &1), params, state)
+      {:close_prepare_execute, id, query} ->
+        prepare_execute(&close_prepare(id, query, &1), params, state)
+    end
+  end
+
+  defp prepare_execute(prepare, params, state) do
+
+    
+    case prepare.(state) do
+      {:ok, query, state} ->
+        id = prepare_execute_lookup(query, state)
+        execute(id, query, params, state)
+      {err, _, _} = error when err in [:error, :disconnect] ->
+        error
+    end
+  end
+
+  def execute(id, query, params, state) do
+     {:ok, process_id} = Keyword.fetch(state,
+      :process_id)
+     {:ok, token} = Keyword.fetch(state,
+      :token)
+     rows = case params do
           [] -> Snappyex.Model.Row.new
           [0, {{2016, 10, _}, _}] ->
             Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
@@ -130,20 +166,24 @@ defmodule Snappyex.Protocol do
                                 ) 
                               ])
           row -> %{params: %Snappyex.Model.Row{values: values}} = row
-          Snappyex.Model.Row.new(values: values)
-        end
-        case Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token) do
-          {:ok, statement} ->
-            result = Map.new
-            result = Map.put_new(result, :rows, statement.resultSet)
-            {:ok, result, state}
-          {:error, error} ->
-            {:error, error, state}
-        end
-      {:prepare_execute, query} ->
-        Snappyex.prepare_execute(process_id, query, nil)
+          Snappyex.Model.Row.new(values: values) 
+    end
+    case Snappyex.Client.executePrepared(process_id, id, rows, nil, token) do
+      {:ok, statement} ->
+        result = Map.new
+        result = Map.put_new(result, :rows, statement.resultSet)
+        {:ok, result, state}
+      {:error, error} ->
+        {:error, error, state}
     end
   end
+  
+ defp prepare_execute_lookup(%Snappyex.Query{name: name}, state) do
+    {:ok, cache} = Keyword.fetch(state,
+      :cache)
+    Snappyex.Cache.id(cache, name)
+  end
+  
 
   defp execute_lookup(%Snappyex.Query{name: name, ref: ref} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
@@ -170,10 +210,14 @@ defmodule Snappyex.Protocol do
         close_prepare(id, query, state)
     end
   end
-
-  defp close_prepare(id, %Snappyex.Query{statement: statement} = query, state) do
-    Snappyex.close(id, query)
-    Snappyex.prepare(id, "", statement, state)
+  
+  defp close_prepare(id, %Snappyex.Query{statement: statement} = _query, state) do
+    {:ok, process_id} = Keyword.fetch(state,
+      :process_id)
+    {:ok, token} = Keyword.fetch(state,
+      :token)
+    Snappyex.Client.closeStatement(process_id, id, token)
+    Snappyex.prepare(process_id, statement, nil, state)
   end
 
   def prepare(query, state) do
@@ -202,7 +246,7 @@ defmodule Snappyex.Protocol do
           {:error, error} ->
             {:error, error, state}
       end
-    end
+  end
 
   defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
@@ -214,6 +258,6 @@ defmodule Snappyex.Protocol do
         {:prepare, query}
     end
   end
-  
+
   defp queries_new(), do: :ets.new(__MODULE__, [:set, :public])
 end
