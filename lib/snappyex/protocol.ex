@@ -74,7 +74,7 @@ defmodule Snappyex.Protocol do
   end
 
   def handle_commit(_opts, state) do
-    query  = %Snappyex.Query{statement: 'COMMIT'}
+    query = %Snappyex.Query{statement: 'COMMIT'}
     {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
     params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
     case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
@@ -114,7 +114,7 @@ defmodule Snappyex.Protocol do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    case prepare_execute_lookup(query, state) do
+    case execute_lookup(query, state) do
       {:execute, statement_id, query} -> 
         rows = case params do
           [] -> Snappyex.Model.Row.new
@@ -145,7 +145,7 @@ defmodule Snappyex.Protocol do
     end
   end
 
-  defp prepare_execute_lookup(%Snappyex.Query{name: name, ref: ref} = query, state) do
+  defp execute_lookup(%Snappyex.Query{name: name, ref: ref} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
       :cache)
     case Snappyex.Cache.lookup(cache, name) do
@@ -159,33 +159,61 @@ defmodule Snappyex.Protocol do
     end
   end
 
-  def handle_prepare(query, _opts, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
-    {:ok, connection_id} = Keyword.fetch(state,
-      :connection_id)
-    {:ok, token} = Keyword.fetch(state,
-      :token)
-    output_parameters = Map.get(query,
-      :output_parameters,
-      Map.new)
-    statement_attributes = Map.get(query,
-      :statement_attributes,
-      %Snappyex.Model.StatementAttrs{})    
-    case  Snappyex.Client.prepareStatement(process_id, connection_id,
-      query.statement, output_parameters, statement_attributes, token) do
-        {:ok, prepared_result} -> 
-          query = %{query | columns: prepared_result.resultSetMetaData}         
-          num_params = case prepared_result.resultSetMetaData do
-            nil -> 0
-            result -> Enum.count(result)
-          end
-          query = prepare_insert(prepared_result.statementId, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
-          {:ok, query, state}
-        {:error, error} ->
-          {:error, error, state}
+  def handle_prepare(query, _opts, state) do 
+    query = Map.put_new(query, :name, "")
+    case prepare_lookup(query, state) do
+      {:prepared, query} ->
+        {:ok, query, state}       
+      {:prepare, query} ->
+        prepare(query, state)        
+      {:close_prepare, id, query} ->
+        close_prepare(id, query, state)
     end
   end
 
+  defp close_prepare(id, %Snappyex.Query{statement: statement} = query, state) do
+    Snappyex.close(id, query)
+    Snappyex.prepare(id, "", statement, state)
+  end
+
+  def prepare(query, state) do
+      {:ok, process_id} = Keyword.fetch(state,
+        :process_id)
+      {:ok, connection_id} = Keyword.fetch(state,
+        :connection_id)
+      {:ok, token} = Keyword.fetch(state,
+        :token)
+      output_parameters = Map.get(query,
+        :output_parameters,
+        Map.new)
+      statement_attributes = Map.get(query,
+        :statement_attributes,
+        %Snappyex.Model.StatementAttrs{})    
+      case  Snappyex.Client.prepareStatement(process_id, connection_id,
+        query.statement, output_parameters, statement_attributes, token) do
+          {:ok, prepared_result} -> 
+            query = %{query | columns: prepared_result.resultSetMetaData}         
+            num_params = case prepared_result.resultSetMetaData do
+              nil -> 0
+              result -> Enum.count(result)
+            end
+            query = prepare_insert(prepared_result.statementId, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
+            {:ok, query, state}
+          {:error, error} ->
+            {:error, error, state}
+      end
+    end
+
+  defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do
+    {:ok, cache} = Keyword.fetch(state,
+      :cache)
+    case Snappyex.Cache.take(cache, name) do
+      id when is_integer(id) ->
+        {:close_prepare, id, query}
+      nil ->
+        {:prepare, query}
+    end
+  end
+  
   defp queries_new(), do: :ets.new(__MODULE__, [:set, :public])
 end
