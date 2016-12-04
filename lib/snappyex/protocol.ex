@@ -23,8 +23,8 @@ defmodule Snappyex.Protocol do
     {:ok, password} = Keyword.fetch(opts, :password)
     {:ok, properties} = Keyword.fetch(opts, :properties)
     {:ok, local_hostname} = :inet.gethostname
-    {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password,  security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
-    state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, token: properties.token]    
+    {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password, security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+    state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token]    
     queries_new
     {:ok, state}
   end
@@ -38,7 +38,7 @@ defmodule Snappyex.Protocol do
   end
 
   def disconnect(err, %{types: ref}) when is_reference(ref) do
-    raise err
+    err
   end
 
   def disconnect(_, state) do
@@ -63,6 +63,14 @@ defmodule Snappyex.Protocol do
       {:disconnect, err, state} -> 
         {:disconnect, err, state}
     end
+  end
+
+  defp prepare_insert(id, num_params, %Snappyex.Query{name: name, ref: ref} = query, state) do
+    {:ok, cache} = Keyword.fetch(state,
+      :cache)
+    ref = ref || make_ref()
+    true = Snappyex.Cache.insert_new(cache, name, id, ref)
+    %{query | ref: ref, num_params: num_params}
   end
 
   def handle_commit(_opts, state) do
@@ -103,33 +111,51 @@ defmodule Snappyex.Protocol do
   end
 
   def handle_execute(query, params, _opts, state) do
-   {:ok, process_id} = Keyword.fetch(state,
+    {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    {:ok, statement_id} = Map.fetch(query, :statement_id)
-    rows = case params do
-      [] -> Snappyex.Model.Row.new
-      [0, {{2016, 10, _}, _}] ->
-        Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
-      [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42),
-                          Snappyex.Model.ColumnValue.new(ClobChunk_val:  
-                            Snappyex.Model.ClobChunk.new( 
-                              chunk: "fortytwo",  
-                              last: true, 
-                              length: byte_size("fortytwo") 
-                              ) 
-                            ) 
-                          ])
-      row -> %{params: %Snappyex.Model.Row{values: values}} = row
-      Snappyex.Model.Row.new(values: values)
+    case prepare_execute_lookup(query, state) do
+      {:execute, statement_id, query} -> 
+        rows = case params do
+          [] -> Snappyex.Model.Row.new
+          [0, {{2016, 10, _}, _}] ->
+            Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
+          [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42),
+                              Snappyex.Model.ColumnValue.new(ClobChunk_val:  
+                                Snappyex.Model.ClobChunk.new( 
+                                  chunk: "fortytwo",  
+                                  last: true, 
+                                  length: byte_size("fortytwo") 
+                                  ) 
+                                ) 
+                              ])
+          row -> %{params: %Snappyex.Model.Row{values: values}} = row
+          Snappyex.Model.Row.new(values: values)
+        end
+        case Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token) do
+          {:ok, statement} ->
+            result = Map.new
+            result = Map.put_new(result, :rows, statement.resultSet)
+            {:ok, result, state}
+          {:error, error} ->
+            {:error, error, state}
+        end
+      {:prepare_execute, query} ->
+        Snappyex.prepare_execute(process_id, query, nil)
     end
-    case Snappyex.Client.executePrepared(process_id, statement_id, rows, nil, token) do
-      {:ok, statement} ->
-        result = Map.new
-        result = Map.put_new(result, :rows, statement.resultSet)
-        {:ok, result, state}
-      {:error, error} ->
-        {:error, error, state}
+  end
+
+  defp prepare_execute_lookup(%Snappyex.Query{name: name, ref: ref} = query, state) do
+    {:ok, cache} = Keyword.fetch(state,
+      :cache)
+    case Snappyex.Cache.lookup(cache, name) do
+      {id, ^ref} ->
+        {:execute, id, query}
+      {id, _} ->
+        Snappyex.Cache.delete(cache, name)
+        {:close_prepare_execute, id, query}
+      nil ->
+        {:prepare_execute, query}
     end
   end
 
@@ -145,12 +171,16 @@ defmodule Snappyex.Protocol do
       Map.new)
     statement_attributes = Map.get(query,
       :statement_attributes,
-      %Snappyex.Model.StatementAttrs{})
+      %Snappyex.Model.StatementAttrs{})    
     case  Snappyex.Client.prepareStatement(process_id, connection_id,
       query.statement, output_parameters, statement_attributes, token) do
         {:ok, prepared_result} -> 
-          query = %{query | statement_id: prepared_result.statementId}
-          query = %{query | columns: prepared_result.resultSetMetaData}
+          query = %{query | columns: prepared_result.resultSetMetaData}         
+          num_params = case prepared_result.resultSetMetaData do
+            nil -> 0
+            result -> Enum.count(result)
+          end
+          query = prepare_insert(prepared_result.statementId, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
           {:ok, query, state}
         {:error, error} ->
           {:error, error, state}
