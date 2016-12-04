@@ -6,6 +6,7 @@ defmodule Snappyex.Protocol do
   require Logger
 
   def connect(opts) do
+    Process.flag(:trap_exit, true)
     {:ok, host} = Keyword.fetch(opts, :host)
     {:ok, port} = Keyword.fetch(opts, :port)
     status = Snappyex.Client.start_link(host, port)
