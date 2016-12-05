@@ -114,7 +114,7 @@ defmodule Snappyex.Protocol do
     {:ok, cache} = Keyword.fetch(state,
       :cache)
     case Snappyex.Cache.take(cache, name) do
-      id when is_integer(id) ->
+      {id, ref} when is_integer(id) ->
         {:close, id}
       nil ->
         :closed
@@ -249,8 +249,10 @@ defmodule Snappyex.Protocol do
 
   defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
-      :cache)        
+      :cache)
     case Snappyex.Cache.take(cache, name) do
+      {_id, ref} ->
+        {:prepared, %{query | ref: ref}}
       id when is_integer(id) ->
         {:close_prepare, id, query}
       nil ->

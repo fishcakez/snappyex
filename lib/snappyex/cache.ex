@@ -27,7 +27,7 @@ defmodule Snappyex.Cache do
 
   def take(cache, name) do
     case :ets.take(cache, name) do
-      [{_, id, _}] -> id
+      [{_, id, ref}] -> {id, ref}
       []           -> nil
     end
   end
