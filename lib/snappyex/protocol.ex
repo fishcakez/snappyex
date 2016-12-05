@@ -205,13 +205,13 @@ defmodule Snappyex.Protocol do
     end
   end
   
-  defp close_prepare(id, %Snappyex.Query{statement: statement} = _query, state) do
+  defp close_prepare(id, %Snappyex.Query{statement: statement} = query, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
     Snappyex.Client.closeStatement(process_id, id, token)
-    Snappyex.prepare(process_id, statement, nil, state)
+    prepare(query, state)
   end
 
   def prepare(query, state) do
@@ -248,7 +248,7 @@ defmodule Snappyex.Protocol do
 
   defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
-      :cache)
+      :cache)        
     case Snappyex.Cache.take(cache, name) do
       id when is_integer(id) ->
         {:close_prepare, id, query}
