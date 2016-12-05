@@ -89,16 +89,12 @@ defmodule QueryTest do
   end
 
   test "insert", context do
-    case query("SELECT * FROM APP.TEST", []) do
-      "The exception 'Table 'APP.TEST' not found;' was thrown while evaluating an expression." ->
-        nil = query("CREATE TABLE APP.TEST (id int primary key, text string)", [])   
-      [] -> query("DROP TABLE APP.TEST", [])   
-        nil = query("CREATE TABLE APP.TEST (id int primary key, text string)", [])  
-    end
-    query = prepare("Insert", "INSERT INTO test (id, name) VALUES (?, ?)", [])
+    query("DROP TABLE IF EXISTS APP.TEST_INSERT", [])   
+    nil = query("CREATE TABLE APP.TEST_INSERT (id int primary key, text varchar(10))", [])  
+    query = prepare("Insert", "INSERT INTO APP.TEST_INSERT (id, text) VALUES (?, ?)", [])
     assert [42, "fortytwo"] == execute(query, [42, "fortytwo"])
     assert [42, "fortytwo"] == query("SELECT * FROM test", [])
-    query("DROP TABLE APP.TEST", [])
+    query("DROP TABLE APP.TEST_INSERT", [])
   end
 
   test "prepare, execute and close", context do
