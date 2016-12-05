@@ -227,8 +227,9 @@ defmodule Snappyex.Protocol do
       statement_attributes = Map.get(query,
         :statement_attributes,
         %Snappyex.Model.StatementAttrs{})    
-      case  Snappyex.Client.prepareStatement(process_id, connection_id,
-        query.statement, output_parameters, statement_attributes, token) do
+      case Snappyex.Client.prepareStatement(
+        process_id, connection_id, query.statement, output_parameters, 
+        nil, token) do
           {:ok, prepared_result} -> 
             prepare_result(query, prepared_result, state)   
           {:error, error} ->
