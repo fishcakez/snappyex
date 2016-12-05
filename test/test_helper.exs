@@ -28,7 +28,7 @@ defmodule Snappyex.TestHelper do
                                        unquote(params), unquote(opts)) do
         {:ok, %Snappyex.Result{rows: nil}} -> :ok
         {:ok, %Snappyex.Result{rows: rows}} -> rows
-        {:error, err} -> err.exceptionData.reason
+        {:error, err} -> err
       end
     end
   end
