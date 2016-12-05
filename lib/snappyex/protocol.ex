@@ -230,7 +230,8 @@ defmodule Snappyex.Protocol do
       case Snappyex.Client.prepareStatement(
         process_id, connection_id, query.statement, output_parameters, 
         nil, token) do
-          {:ok, prepared_result} -> 
+          {:ok, prepared_result} ->             
+            query = %{query | columns: prepared_result.resultSetMetaData}            
             prepare_result(query, prepared_result, state)   
           {:error, error} ->
             {:error, error, state}
