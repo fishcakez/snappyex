@@ -4,7 +4,7 @@ defmodule Snappyex.TestHelper do
 
   defmacro query(stat, params, opts \\ []) do
     quote do
-      case Snappyex.prepare_execute(var!(context)[:pid], unquote(stat),
+      case Snappyex.prepare_execute(var!(context)[:pid], "", unquote(stat),
                           unquote(params), unquote(defaults(opts))) do
         {:ok, _, result} -> result.rows
         {:error, err} -> err.exceptionData.reason
@@ -12,9 +12,9 @@ defmodule Snappyex.TestHelper do
     end
   end
 
-  defmacro prepare(stat, params, opts \\ []) do
+  defmacro prepare(name, stat, params, opts \\ []) do
     quote do
-      case Snappyex.prepare(var!(context)[:pid], unquote(stat),
+      case Snappyex.prepare(var!(context)[:pid], unquote(name), unquote(stat),
                                      unquote(params), unquote(opts)) do
         {:ok, %Snappyex.Query{} = query} -> query
         {:error, err} -> err.exceptionData.reason
@@ -37,7 +37,7 @@ defmodule Snappyex.TestHelper do
     quote do
       case Snappyex.close(var!(context)[:pid], unquote(query),
                                      unquote(opts)) do
-        :ok -> :ok
+        {:ok, nil} -> :ok
         {:error, err} -> err.exceptionData.reason
       end
     end

@@ -13,13 +13,15 @@ defmodule Snappyex do
     DBConnection.close(conn, query, defaults(opts))
   end
 
-  def prepare_execute(conn, statement, params, opts \\ []) do
+  def prepare_execute(conn, name, statement, params, opts \\ []) do
     query = %Query{statement: statement}    
+    query = Map.put_new(query, :name, "") 
     DBConnection.prepare_execute(conn, query, params, defaults(opts))
   end
 
-  def prepare(conn, statement, params, opts \\ []) do
+  def prepare(conn, name, statement, params, opts \\ []) do
     query = %Query{statement: statement}
+    query = Map.put_new(query, :name, "")
     DBConnection.prepare(conn, query, defaults(opts))
   end
 
