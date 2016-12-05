@@ -114,7 +114,7 @@ defmodule Snappyex.Protocol do
     {:ok, cache} = Keyword.fetch(state,
       :cache)
     case Snappyex.Cache.take(cache, name) do
-      {id, ref} when is_integer(id) ->
+      {id, _ref} when is_integer(id) ->
         {:close, id}
       nil ->
         :closed
@@ -205,7 +205,7 @@ defmodule Snappyex.Protocol do
     end
   end
   
-  defp close_prepare(id, %Snappyex.Query{statement: statement} = query, state) do
+  defp close_prepare(id, %Snappyex.Query{statement: _statement} = query, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state,
@@ -224,7 +224,7 @@ defmodule Snappyex.Protocol do
       output_parameters = Map.get(query,
         :output_parameters,
         Map.new)
-      statement_attributes = Map.get(query,
+      _statement_attributes = Map.get(query,
         :statement_attributes,
         %Snappyex.Model.StatementAttrs{})    
       case Snappyex.Client.prepareStatement(
