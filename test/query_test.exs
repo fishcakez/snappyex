@@ -12,9 +12,10 @@ defmodule QueryTest do
 
   setup do
     opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
-     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: snappydata_properties()]
-    {:ok, pid} = S.start_link(opts)
+     port: 1531, username: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+     token_size: 16, use_string_for_decimal: false, properties: snappydata_properties()]
+    {:ok, pid} = S.start_link(opts)    
+    Process.flag(:trap_exit, true)
     {:ok, [pid: pid]}
   end
 
@@ -88,13 +89,21 @@ defmodule QueryTest do
            query("VALUES DATE('2013-09-23')", [])
   end
 
-  test "insert", context do
+  test "insert query", context do
     query("DROP TABLE IF EXISTS APP.TEST_INSERT", [])   
     nil = query("CREATE TABLE APP.TEST_INSERT (id int primary key, text varchar(10))", [])  
-    query = prepare("Insert", "INSERT INTO APP.TEST_INSERT (id, text) VALUES (?, ?)", [])
-    assert [42, "fortytwo"] == execute(query, [42, "fortytwo"])
-    assert [42, "fortytwo"] == query("SELECT * FROM test", [])
+    assert [42, "fortytwo"] == query("INSERT INTO APP.TEST_INSERT (id, text) VALUES (?, ?)", [42, "fortytwo"])
+    assert [42, "fortytwo"] == query("SELECT * FROM APP.TEST_INSERT", [])
     query("DROP TABLE APP.TEST_INSERT", [])
+  end
+
+  test "insert prepared query", context do
+    query("DROP TABLE IF EXISTS APP.TEST_INSERT_PREPARED", [])   
+    nil = query("CREATE TABLE APP.TEST_INSERT_PREPARED (id int primary key, text varchar(10))", [])  
+    query = prepare("Insert", "INSERT INTO APP.TEST_INSERT_PREPARED (id, text) VALUES (?, ?)", [])
+    assert [42, "fortytwo"] == execute(query, [42, "fortytwo"])
+    assert [42, "fortytwo"] == query("SELECT * FROM APP.TEST_INSERT_PREPARED", [])
+    query("DROP TABLE APP.TEST_INSERT_PREPARED", [])
   end
 
   test "prepare, execute and close", context do

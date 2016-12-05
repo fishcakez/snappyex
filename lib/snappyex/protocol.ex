@@ -22,9 +22,10 @@ defmodule Snappyex.Protocol do
     use_string_for_decimal = Keyword.get(opts, :use_string_for_decimal, false)
     {:ok, username} = Keyword.fetch(opts, :username)
     {:ok, password} = Keyword.fetch(opts, :password)
-    {:ok, properties} = Keyword.fetch(opts, :properties)
+    {:ok, security} = Keyword.fetch(opts, :security)
+    {:ok, conn_properties} = Keyword.fetch(opts, :properties)
     {:ok, local_hostname} = :inet.gethostname
-    {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password, security: Snappyex.Model.SecurityMechanism.plain, properties: properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+    {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password, security: security, properties: conn_properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
     state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token]    
     {:ok, state}
   end
@@ -37,16 +38,10 @@ defmodule Snappyex.Protocol do
     {:ok, state}
   end
 
-  def disconnect(err, %{types: ref}) when is_reference(ref) do
-    err
-  end
-
   def disconnect(_, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
-    {:ok, connection_id} = Keyword.fetch(state, :connection_id)
-    {:ok, token} = Keyword.fetch(state, :token)
-    Snappyex.Client.closeConnection(process_id, connection_id, token)
+    Snappyex.Client.close(process_id)    
     :ok
   end
 
@@ -61,7 +56,7 @@ defmodule Snappyex.Protocol do
       {:ok, _, state} ->
         {:ok, state}
       {:disconnect, err, state} -> 
-        {:disconnect, err, state}
+        {:disconnect, err.exceptionData, state}
     end
   end
 
@@ -169,7 +164,7 @@ defmodule Snappyex.Protocol do
         result = Map.put_new(result, :rows, statement.resultSet)
         {:ok, result, state}
       {:error, error} ->
-        {:error, error, state}
+        {:disconnect, error.exceptionData, state}
     end
   end
   
@@ -234,7 +229,7 @@ defmodule Snappyex.Protocol do
             query = %{query | columns: prepared_result.resultSetMetaData}            
             prepare_result(query, prepared_result, state)   
           {:error, error} ->
-            {:error, error, state}
+            {:disconnect, error.exceptionData.reason, state}
       end
   end
 

@@ -35,11 +35,11 @@ defmodule Snappyex do
 
   defp defaults(opts) do
     opts
-    |> Keyword.put_new(:host, "localhost")
-    |> Keyword.put_new(:port, 1531)
-    |> Keyword.put_new(:username, 'APP')
-    |> Keyword.put_new(:password, 'APP')
-    |> Keyword.put_new(:properties, HashDict.new)
-    |> Keyword.put_new(:token_size, 16)
+    #|> Keyword.put_new(:host, "localhost")
+    #|> Keyword.put_new(:port, 1531)
+    #|> Keyword.put_new(:username, 'APP')
+    #|> Keyword.put_new(:password, 'APP')
+    #|> Keyword.put_new(:properties, HashDict.new)
+    #|> Keyword.put_new(:token_size, 16)
   end
 end
