@@ -51,8 +51,12 @@ defmodule Snappyex.TestHelper do
   end
 
   def snappydata_address() do
-     "104.196.243.201" 
-  end 
+     "192.168.1.78" 
+  end
+
+  def snappydata_port() do
+    31397
+  end
 
   def snappydata_properties() do
      dict = HashDict.put(HashDict.new(), "load-balance", "false")

@@ -75,9 +75,9 @@ Snappyex.prepare_execute(pid, "CREATE TABLE SCHEMA_MIGRATIONS(HOTEL_ID INT NOT N
 ```
 
 ```elixir
-{:ok, pid} = Snappyex.start_link([clientHostName: "localhost", host: "localhost", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+{:ok, pid} = Snappyex.start_link([clientHostName: "104.196.243.201", host: "localhost", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: :dict.new])
+     tokenSize: 16, use_string_for_decimal: false, properties: :dict.new])
 Snappyex.prepare_execute(pid, "SELECT * FROM SCHEMA\_MIGRATIONS", [])  
 #Snappyex.prepare_execute(pid, "SELECT * FROM TRANSACTIONS", [])  
 #Snappyex.prepare_execute(pid,"INSERT INTO SCHEMA\_MIGRATIONS (\"version\", \"inserted\_at\") VALUES (1, CURRENT\_TIMESTAMP)", [])
@@ -85,11 +85,19 @@ Snappyex.prepare_execute(pid,"INSERT INTO test (\"id\", \"text\") VALUES ($1, $2
 ```
 
 ```elixir
-{:ok, pid} = Snappyex.start_link([clientHostName: "localhost", host: "192.168.55.4", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+{:ok, pid} = Snappyex.start_link([clientHostName: "localhost", host: "104.196.243.201" , clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
      port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: :dict.new])
+     tokenSize: 16, useStringForDecimal: false, properties: HashDict.put(HashDict.new(), "load-balance", "false")])
 Snappyex.prepare(pid, %Snappyex.Query{statement: "SELECT * FROM TEST"}) 
 ```
+
+```
+{:ok, pid} = Snappyex.start_link([clientHostName: "localhost", host: "104.196.243.201" , clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+     tokenSize: 16, useStringForDecimal: false, properties: HashDict.put(HashDict.new(), "load-balance", "false")])
+Snappyex.prepare_execute(pid, "name", %Snappyex.Query{statement: "SELECT 123"}, [])
+```
+
 
 Project is based on code in db_connection and postgrex.
 

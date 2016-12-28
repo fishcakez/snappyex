@@ -12,7 +12,7 @@ defmodule QueryTest do
 
   setup do
     opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
-     port: 1531, username: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+             port: snappydata_port(), username: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
      token_size: 16, use_string_for_decimal: false, properties: snappydata_properties()]
     {:ok, pid} = S.start_link(opts)    
     Process.flag(:trap_exit, true)
