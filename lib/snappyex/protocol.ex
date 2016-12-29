@@ -141,12 +141,10 @@ defmodule Snappyex.Protocol do
   end
 
   def execute(id, query, params, state) do
-
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
-    IO.inspect token
     params = case params do
              [] -> Snappyex.Model.Row.new
              [0, {{2016, 10, _}, _}] ->
