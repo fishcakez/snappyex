@@ -1,35 +1,28 @@
 defmodule Snappyex do
-  @timeout 5000
 
   alias Snappyex.Query
   def start_link(opts) do
-    DBConnection.start_link(Snappyex.Protocol, opts)
+    DBConnection.start_link(Snappyex.Protocol, defaults(opts))
   end
 
   def execute(conn, query, params, opts \\ []) do
-    case DBConnection.execute(conn, query, params, defaults(opts)) do
-      {:ok, result, state} -> {:ok, result}
-      {:error, err} ->
-        raise err
-    end
+    DBConnection.execute(conn, query, params, defaults(opts))
   end
 
-  def prepare_execute(conn, statement, params, opts \\ []) do
+  def close(conn, query, opts \\ []) do
+    DBConnection.close(conn, query, defaults(opts))
+  end
+
+  def prepare_execute(conn, name, statement, params, opts \\ []) do
+    query = %Query{statement: statement}    
+    query = %Query{query | name: name}  
+    DBConnection.prepare_execute(conn, query, params, defaults(opts))
+  end
+
+  def prepare(conn, name, statement, params, opts \\ []) do
     query = %Query{statement: statement}
-    case DBConnection.prepare_execute(conn, query, params, defaults(opts)) do
-      {:ok, query, result} -> {:ok, query, result}
-      {:error, err} ->
-          raise err
-    end    
-  end
-
-  def prepare(conn, query, opts \\ []) do
-    case DBConnection.prepare(conn, query, defaults(opts)) do
-      {:ok, query} ->
-        {:ok, query}
-      {:error, err} ->
-        raise err
-    end
+    query = %Query{query | name: name}  
+    DBConnection.prepare(conn, query, defaults(opts))
   end
 
   @doc """
@@ -41,6 +34,12 @@ defmodule Snappyex do
   end
 
   defp defaults(opts) do
-    Keyword.put_new(opts, :timeout, @timeout)
+    opts
+    #|> Keyword.put_new(:host, "localhost")
+    #|> Keyword.put_new(:port, 1531)
+    #|> Keyword.put_new(:username, 'APP')
+    #|> Keyword.put_new(:password, 'APP')
+    #|> Keyword.put_new(:properties, HashDict.new)
+    #|> Keyword.put_new(:token_size, 16)
   end
 end

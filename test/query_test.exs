@@ -11,10 +11,11 @@ defmodule QueryTest do
   alias Snappyex, as: S
 
   setup do
-    opts = [ host: "localhost", clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
-     port: 1531, userName: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
-     tokenSize: 16, useStringForDecimal: false, properties: :dict.new()]
-    {:ok, pid} = S.start_link(opts)
+    opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+             port: snappydata_port(), username: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+     token_size: 16, use_string_for_decimal: false, properties: snappydata_properties()]
+    {:ok, pid} = S.start_link(opts)    
+    Process.flag(:trap_exit, true)
     {:ok, [pid: pid]}
   end
 
@@ -36,7 +37,9 @@ defmodule QueryTest do
     #assert [[:"-inf"]] == query("SELECT '-inf'::float", params)
     assert [["ẽric"]] == query("SELECT 'ẽric'", params)    
     assert [["ẽric"]] == query("SELECT CAST('ẽric' AS VARCHAR(10))", params)
-    #assert [[<<1, 2, 3>>]] == query("SELECT CAST('\\001\\002\\003' AS BINARY)", params)
+    assert  [[%Snappyex.Model.BlobChunk{chunk: "\\001\\002\\003", last: true,
+              lobId: nil, offset: 0, totalLength: 12}]] 
+              == query("SELECT CAST('\\001\\002\\003' AS BINARY)", params)
   end
  
   #test "decode decimal", context do
@@ -86,18 +89,28 @@ defmodule QueryTest do
            query("VALUES DATE('2013-09-23')", [])
   end
 
-  #test "select from test table", context do
-    #query("CREATE TABLE test_table_name (Col1 INT NOT NULL PRIMARY KEY, Col2 INT, Col3 INT)", [])
-    #query("SELECT t.Col1 from test_table_name as t", []) 
-    #query("DROP TABLE test_table_name", [])    
-  #end
-
-  test "insert", context do
-    nil = query("CREATE TABLE test (id int, text string)", [])
-    [] = query("SELECT * FROM test", [])
-    assert nil == query("INSERT INTO test (id, text) VALUES (42, 'fortytwo')", [])
-    assert [[42, "fortytwo"]] == query("SELECT * FROM test", [])
-    query("DROP TABLE test", [])
+  test "insert query", context do
+    query("DROP TABLE IF EXISTS APP.TEST_INSERT", [])   
+    nil = query("CREATE TABLE APP.TEST_INSERT (id int primary key, text varchar(10))", [])  
+    assert [42, "fortytwo"] == query("INSERT INTO APP.TEST_INSERT (id, text) VALUES (?, ?)", [42, "fortytwo"])
+    assert [42, "fortytwo"] == query("SELECT * FROM APP.TEST_INSERT", [])
+    query("DROP TABLE APP.TEST_INSERT", [])
   end
 
+  test "insert prepared query", context do
+    query("DROP TABLE IF EXISTS APP.TEST_INSERT_PREPARED", [])   
+    nil = query("CREATE TABLE APP.TEST_INSERT_PREPARED (id int primary key, text varchar(10))", [])  
+    query = prepare("Insert", "INSERT INTO APP.TEST_INSERT_PREPARED (id, text) VALUES (?, ?)", [])
+    assert [42, "fortytwo"] == execute(query, [42, "fortytwo"])
+    assert [42, "fortytwo"] == query("SELECT * FROM APP.TEST_INSERT_PREPARED", [])
+    query("DROP TABLE APP.TEST_INSERT_PREPARED", [])
+  end
+
+  test "prepare, execute and close", context do
+    query = prepare("42", "SELECT 42", [])
+    assert [[42]] == execute(query, [])
+    assert [[42]] == execute(query, [])
+    assert :ok == close(query)
+    assert [[42]] == query("SELECT 42", [])
+  end
 end

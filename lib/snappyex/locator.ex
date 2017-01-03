@@ -1,10 +1,10 @@
 defmodule Snappyex.Locator do
   use Riffed.Client,
-  structs: Snappyex.Locator.Models,
+  structs: Snappyex.Model,
   client_opts: [
     retries: 3,
-    framed: false
+    framed: false,
   ],
   service: :locator_service_thrift,
-  auto_import_structs: true
+  auto_import_structs: false
 end
