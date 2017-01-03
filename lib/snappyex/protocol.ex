@@ -158,8 +158,8 @@ defmodule Snappyex.Protocol do
                                                                   )
                                                                 )
                                                                 ])
-             row -> %{params: %Snappyex.Model.Row{values: values}} = row
-             Snappyex.Model.Row.new(values: values)
+             %{params: %Snappyex.Model.Row{values: []}} ->
+               Snappyex.Model.Row.new(values: [])
            end
     case execute_lookup(query, state) do
       {:execute, id, query} ->
@@ -168,6 +168,9 @@ defmodule Snappyex.Protocol do
             result = Map.new
             result = Map.put_new(result, :rows, statement.resultSet)
             {:ok, result, state}
+          {:error, error} ->
+            {:disconnect, error, state}
+            execute(id, query, params, state)
         end
        {:error, error} ->
          {:disconnect, error.exceptionData, state}
