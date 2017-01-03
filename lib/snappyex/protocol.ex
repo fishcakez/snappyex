@@ -170,7 +170,6 @@ defmodule Snappyex.Protocol do
             {:ok, result, state}
           {:error, error} ->
             {:disconnect, error, state}
-            execute(id, query, params, state)
         end
        {:error, error} ->
          {:disconnect, error.exceptionData, state}
