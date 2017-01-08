@@ -7,7 +7,7 @@ defmodule Snappyex.Client do
   auto_import_structs: false,
   structs: Snappyex.Model,
     client_opts: [
-    retries: 0,
+	retries: 1,
     framed: false,
   ],
   service: :snappy_data_service_thrift
