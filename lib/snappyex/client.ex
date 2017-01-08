@@ -6,8 +6,8 @@ defmodule Snappyex.Client do
   use Riffed.Client,
   auto_import_structs: false,
   structs: Snappyex.Model,
-  client_opts: [
-    retries: 3,
+    client_opts: [
+    retries: 0,
     framed: false,
   ],
   service: :snappy_data_service_thrift
