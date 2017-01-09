@@ -39,7 +39,7 @@ defmodule Snappyex.Protocol do
       :retries_exceeded ->
 	    {:error, DBConnection.ConnectionError}
        _ ->
-        state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token]
+        state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
         {:ok, state}
     end
   end
