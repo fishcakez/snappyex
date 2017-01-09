@@ -37,7 +37,7 @@ defmodule Snappyex.Protocol do
     {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password, security: security, properties: conn_properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
     case properties do
       :retries_exceeded ->
-	    {:error, DBConnection.ConnectionError}
+        {:error, %DBConnection.ConnectionError{message: "Retries exceeded"}}
        _ ->
         state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
         {:ok, state}
@@ -157,6 +157,8 @@ defmodule Snappyex.Protocol do
   def execute(_statement_id, query, params, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
+    {:ok, connection_id} = Keyword.fetch(state,
+      :connection_id)  
     {:ok, token} = Keyword.fetch(state,
       :token)
     params = case params do
@@ -177,7 +179,7 @@ defmodule Snappyex.Protocol do
            end
     case execute_lookup(query, state) do
       {:execute, statement_id, query} ->
-        out = case Snappyex.Client.executePrepared(process_id, statement_id, params, nil, token) do
+        case Snappyex.Client.executePrepared(process_id, statement_id, params, Map.new, token) do
           {:ok, statement} ->
             result = Map.new
             result = Map.put_new(result, :rows, statement.resultSet)
@@ -221,9 +223,7 @@ defmodule Snappyex.Protocol do
       {:prepared, query} ->
         {:ok, query, state}
       {:prepare, query} ->
-        out = prepare(query, state)
-        #IO.inspect out
-        out
+        prepare(query, state)
       {:close_prepare, statement_id, query} ->
         close_prepare(statement_id, query, state)
     end
