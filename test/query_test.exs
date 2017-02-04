@@ -82,14 +82,15 @@ defmodule QueryTest do
     #       query("SELECT timetz '23:05:06-02'", [])
   end
 
-  test "decode date", _context do
+  test "decode date", context do
     #assert [[Timex.to_datetime({{0000,  12,  30}, {0, 0, 0}}, "Etc/UTC")]] ==
     #       query("VALUES DATE('0001-01-01')", [])
     #assert [[Timex.to_datetime({{0001,  2,  1}, {0, 0, 0}}, "Etc/UTC")]] ==
     #       query("VALUES DATE('0001-02-03')", [])
-    #assert [[Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")]] == 
-    #       query("VALUES DATE('2013-09-23')", [])
+    assert [[Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")]] == 
+           query("VALUES DATE('2013-09-23')", [])
   end
+  
 
   test "insert query", context do
     query("DROP TABLE IF EXISTS SNAPPYEX_TEST.TEST_INSERT", [])   
