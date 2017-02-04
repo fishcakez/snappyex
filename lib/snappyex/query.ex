@@ -41,7 +41,42 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     value.i32_val
   end
   def decode_field(value, :bigint), do: value.i64_val
-  def decode_field(value, :float), do: value.float_val
+  def float_to_int_bits(float) do
+  
+  end
+  def decode_field(value, :float) do 
+  # http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b27/java/lang/Float.java#Float.floatToIntBits%28float%29
+  #  public static int floatToIntBits(float value) {
+  #       int result = floatToRawIntBits(value);
+  #       // Check for NaN based on values of bit fields, maximum
+  #       // exponent and nonzero significand.
+  #       if ( ((result & FloatConsts.EXP_BIT_MASK) ==
+  #             FloatConsts.EXP_BIT_MASK) &&
+  #            (result & FloatConsts.SIGNIF_BIT_MASK) != 0)
+  #           result = 0x7fc00000;
+  #       return result;
+  #      }
+  #  int s = ((bits >> 31) == 0) ? 1 : -1;
+  #  int e = ((bits >> 23) & 0xff);
+  #  int m = (e == 0) ?
+  #                  (bits & 0x7fffff) << 1 :
+  #                  (bits & 0x7fffff) | 0x800000;
+  # Then the floating-point result equals the value of the mathematical expression s·m·2^e-150.
+    use Bitwise
+    bits = value.float_val
+    s = if (bits >>> 31) == 0 do
+      1
+    else 
+      -1
+    end 
+    e = (bits >>> 23) &&& 0xff
+    m = if e == 0 do
+      (bits &&& 0x7fffff) <<< 1
+    else
+      (bits &&& 0x7fffff) ||| 0x800000
+    end
+    s*m*:math.pow(2,e-150)
+  end  
 #  def decode_field(column_value, :real), do: elem(column_value, @decimal_val)
   def decode_field(value, :double), do: value.double_val
   def decode_field(value, :decimal) do 

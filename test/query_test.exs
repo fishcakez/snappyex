@@ -32,7 +32,7 @@ defmodule QueryTest do
     assert [["e"]] == query("SELECT 'e'", params)
     assert [["ẽ"]] == query("SELECT 'ẽ'", params)
     assert [[42]] == query("SELECT 42", params)
-    #assert [[42.0]] == query("SELECT CAST(42 AS FLOAT)", params)
+    assert [[42.0]] == query("SELECT CAST(42 AS FLOAT)", params)
     #assert [[:NaN]] == query("SELECT CAST('NaN' AS FLOAT)", params)
     #assert [[:inf]] == query("SELECT CAST('inf' AS FLOAT)", params)
     #assert [[:"-inf"]] == query("SELECT '-inf'::float", params)
