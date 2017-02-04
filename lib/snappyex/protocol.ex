@@ -29,13 +29,8 @@ defmodule Snappyex.Protocol do
     {:ok, local_hostname} = :inet.gethostname
     local_hostname = to_string(local_hostname)
     {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: local_hostname, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: username, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
-    case properties do
-      :retries_exceeded ->
-        {:error, %DBConnection.ConnectionError{message: "Retries exceeded"}}
-       _ ->
-        state = [process_id: pid, connection_id: properties.conn_id, client_host_name: properties.client_host_name, client_id: properties.client_id, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
-        {:ok, state}
-    end
+    state = [process_id: pid, connection_id: properties.conn_id, client_host_name: properties.client_host_name, client_id: properties.client_id, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
+    {:ok, state}
   end
 
   def checkout(state) do
