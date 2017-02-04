@@ -9,7 +9,6 @@ defmodule QueryTest do
   import Snappyex.TestHelper
   require Decimal
   alias Snappyex, as: S
-  alias SnappyData.Thrift.SnappyDataService.Binary.Framed.Client
   require SnappyData.Thrift.SecurityMechanism
 
   setup do
@@ -82,7 +81,7 @@ defmodule QueryTest do
     #       query("SELECT timetz '23:05:06-02'", [])
   end
 
-  test "decode date", context do
+  test "decode date", _context do
     #assert [[Timex.to_datetime({{0000,  12,  30}, {0, 0, 0}}, "Etc/UTC")]] ==
     #       query("VALUES DATE('0001-01-01')", [])
     #assert [[Timex.to_datetime({{0001,  2,  1}, {0, 0, 0}}, "Etc/UTC")]] ==

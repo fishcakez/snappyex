@@ -165,8 +165,6 @@ defmodule Snappyex.Protocol do
       :token)
     params = case params do
              [] -> nil
-#             [0, {{2016, 10, _}, _}] ->
-#               SnappyData.Thrift.Row.new(values: [%SnappyData.Thrift.ColumnValue{i64_val: 0}, SnappyData.Thrift.ColumnValue{timestamp_val: SnappyData.Thrift.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479)}])
              [42, "fortytwo"] -> %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 42},
                                                                 %SnappyData.Thrift.ColumnValue{clob_val:
                                                                   %SnappyData.Thrift.ClobChunk{
@@ -176,17 +174,9 @@ defmodule Snappyex.Protocol do
                                                                   }
                                                                 }
                                                                 ]}
-#             %{params: %SnappyData.Thrift.Row{values: []}} ->
-#               SnappyData.Thrift.Row.new(values: [])
-
-             _ -> %SnappyData.Thrift.Row{}
            end
     case execute_lookup(query, state) do
       {:execute, statement_id, query} ->
-#        IO.inspect process_id
-#        IO.inspect statement_id
-#        IO.inspect token
-        # TODO StatementAttrs
         case Client.execute_prepared(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token) do
           {:ok, statement} ->
             result = Map.new
