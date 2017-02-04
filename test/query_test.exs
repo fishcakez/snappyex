@@ -35,7 +35,8 @@ defmodule QueryTest do
     assert [[42.0]] == query("SELECT CAST(42 AS FLOAT)", params)
     #assert [[:NaN]] == query("SELECT CAST('NaN' AS FLOAT)", params)
     #assert [[:inf]] == query("SELECT CAST('inf' AS FLOAT)", params)
-    #assert [[:"-inf"]] == query("SELECT '-inf'::float", params)
+    #assert [[:"-inf"]] == query("SELECT CAST('-inf'::float)", params)    
+    assert [[42.0]] == query("SELECT CAST(42 AS DOUBLE)", params)
     assert [["ẽric"]] == query("SELECT 'ẽric'", params)    
     assert [["ẽric"]] == query("SELECT CAST('ẽric' AS VARCHAR(10))", params)
     assert  [[%SnappyData.Thrift.BlobChunk{chunk: "\\001\\002\\003", last: true,
