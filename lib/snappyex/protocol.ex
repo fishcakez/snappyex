@@ -58,8 +58,6 @@ defmodule Snappyex.Protocol do
   def disconnect(_, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
-    {:ok, connection_id} = Keyword.fetch(state, :connection_id)
-    {:ok, token} = Keyword.fetch(state, :token)
     Client.close(process_id)
     :ok
   end
@@ -102,8 +100,9 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, flags} = Map.fetch(opts, :flags)
-    # TODO FIX TransactionAttribute
-    case Client.begin_transaction(process_id, @repeatable_read, %{}, token) do
+    {:ok, connection_id} = Keyword.fetch(state,
+      :connection_id)  
+    case Client.begin_transaction(process_id, connection_id, @repeatable_read, flags, token) do
       {:ok, result} ->
         {:ok, result, state}
       {:error, error} ->
@@ -159,8 +158,6 @@ defmodule Snappyex.Protocol do
   def execute(_statement_id, query, params, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
-    {:ok, connection_id} = Keyword.fetch(state,
-      :connection_id)  
     {:ok, token} = Keyword.fetch(state,
       :token)
     params = case params do
@@ -176,7 +173,7 @@ defmodule Snappyex.Protocol do
                                                                 ]}
            end
     case execute_lookup(query, state) do
-      {:execute, statement_id, query} ->
+      {:execute, statement_id, _query} ->
         case Client.execute_prepared(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token) do
           {:ok, statement} ->
             result = Map.new
