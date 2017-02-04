@@ -13,7 +13,7 @@ defmodule QueryTest do
   require SnappyData.Thrift.SecurityMechanism
 
   setup do
-    opts = [ backoff_type: :stop, sync_connect: true, host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
+    opts = [ backoff_type: :stop, sync_connect: true, host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self()), 
              port: snappydata_port(), username: "APP", password: "APP",  security: SnappyData.Thrift.SecurityMechanism.plain, 
      token_size: 16, use_string_for_decimal: false, properties: snappydata_properties()]
     {:ok, pid} = S.start_link(opts)    
@@ -89,8 +89,6 @@ defmodule QueryTest do
     #       query("VALUES DATE('0001-02-03')", [])
     #assert [[Timex.to_datetime({{2013, 9, 23}, {0, 0, 0}}, "Etc/UTC")]] == 
     #       query("VALUES DATE('2013-09-23')", [])
-    # TODO Convert date
-    assert [[18446744011573782016]] == query("VALUES DATE('0001-01-01')", [])
   end
 
   test "insert query", context do

@@ -154,4 +154,20 @@ Client.execute_prepared(client, statement_id,
       [],
       %SnappyData.Thrift.StatementAttrs{}, 
       token)
+
+Client.execute(client, conn_id, "CREATE TABLE APP.TEST_DATE (id int primary key, date date)", nil, nil, token)
+
+{:ok,
+ %SnappyData.Thrift.PrepareResult{parameter_meta_data: parameter_meta_data,
+  result_set_meta_data: result_set_meta_data, statement_id: statement_id, statement_type: statement_type, warnings: warnings}} = Client.prepare_statement(client, conn_id, "INSERT INTO APP.TEST (id, text) VALUES (?, ?)", nil, nil, token)
+
+Client.execute_prepared(client, statement_id,
+ %SnappyData.Thrift.Row{
+      values: [%SnappyData.Thrift.ColumnValue{i32_val: 42}, 
+               %SnappyData.Thrift.ColumnValue{date_val: 0}
+      ]}, 
+      [],
+      %SnappyData.Thrift.StatementAttrs{}, 
+      token)
+Client.execute(client, conn_id, "SELECT * from APP.TEST_DATE", nil, nil, token)
 ```

@@ -71,7 +71,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :varchar), do: value.string_val
 #  def decode_field(column_value, :longvarchar), do: elem(column_value, @string_val)
   def decode_field(value, :date) do 
-    value.date_val
+    {:ok, date} = DateTime.from_unix(value.date_val)
+    date
   end
   def decode_field(value, :time) do
     {:ok, time} = DateTime.from_unix(value.time_val)
@@ -81,7 +82,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :timestamp) do
     # TODO Extract nanoseconds and add it to time
     # https://github.com/elixir-ecto/postgrex/blob/master/lib/postgrex/extensions/timestamp.ex#L24
-    value.timestamp_val
+    {:ok, timestamp} = DateTime.from_unix(value.timestamp_val)
+    timestamp
   end
   def decode_field(value, :binary), do: value.binary_val
   def decode_field(value, :varbinary), do: value.binary_val
@@ -98,7 +100,6 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :other), do: raise ArgumentError, "can not be decoded: " <> IO.inspect(value)
   def decode_field(value, :json_object), do: value.json_val
   def decode_field(value, :java_object), do: value.java_val
-
 
   def decode_blob(val) do
     case val do
