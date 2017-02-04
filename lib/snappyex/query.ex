@@ -5,24 +5,6 @@ defmodule Snappyex.Query do
              :result_formats, :num_params, :decoders, :types]
 end
 
-# http://michal.muskala.eu/2015/07/30/unix-timestamps-in-elixir.html
-defmodule Convert do
-  epoch = {{1, 1, 1}, {0, 0, 0}}
-  @epoch :calendar.datetime_to_gregorian_seconds(epoch)
-
-  def from_timestamp(timestamp) do
-    timestamp
-    |> +(@epoch)
-    |> :calendar.gregorian_seconds_to_datetime
-  end
-
-  def to_timestamp(datetime) do
-    datetime
-    |> :calendar.datetime_to_gregorian_seconds
-    |> -(@epoch)
-  end
-end
-
 defimpl DBConnection.Query, for: Snappyex.Query do
   alias Snappyex.Query
   use Timex
@@ -109,7 +91,6 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     end
   end
 
-
   def decode_clob(val) do
     case val do
       %SnappyData.Thrift.ClobChunk{chunk: chunk, last: true} -> chunk
@@ -117,6 +98,7 @@ defimpl DBConnection.Query, for: Snappyex.Query do
       nil -> nil
     end
   end
+
   def decode_row_set(nil) do
     nil
   end

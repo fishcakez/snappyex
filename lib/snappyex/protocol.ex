@@ -7,15 +7,6 @@ defmodule Snappyex.Protocol do
 
   alias SnappyData.Thrift.SnappyDataService.Binary.Framed.Client
 
-#  defmodule Error do
-#     defexception [:message]
-
-#     def exception(value) do
-#       msg = "did not get what was expected, got: #{inspect value}"
-#       %Error{message: msg}
-#     end
-#  end
-
   def connect(opts) do
     Process.flag(:trap_exit, true)
     {:ok, host} = Keyword.fetch(opts, :host)
@@ -37,7 +28,7 @@ defmodule Snappyex.Protocol do
     {:ok, conn_properties} = Keyword.fetch(opts, :properties)
     {:ok, local_hostname} = :inet.gethostname
     local_hostname = to_string(local_hostname)
-    {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: local_hostname, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self), user_name: username, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
+    {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: local_hostname, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: username, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
     case properties do
       :retries_exceeded ->
         {:error, %DBConnection.ConnectionError{message: "Retries exceeded"}}
@@ -270,7 +261,6 @@ defmodule Snappyex.Protocol do
   defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do
     {:ok, cache} = Keyword.fetch(state,
       :cache)
-    #IO.inspect Snappyex.Cache.take(cache, name)
     case Snappyex.Cache.take(cache, name) do
       {statement_id, ref} when is_integer(statement_id) ->
         {:prepared,  %{query | ref: ref}}
