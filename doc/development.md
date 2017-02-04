@@ -105,3 +105,53 @@ Project is based on code in db_connection and postgrex.
 # Find listening ports
 ss -l -p -n
 ```
+
+```
+# Use new framed transport
+alias SnappyData.Thrift.SnappyDataService.Binary.Framed.Client
+{:ok, client} = Client.start_link("192.168.0.21", 1531, tcp_opts: [timeout: 5_000], gen_server_opts: [timeout: 20_000])
+#Todo change hostname.
+require SnappyData.Thrift.SecurityMechanism
+ {:ok, %SnappyData.Thrift.ConnectionProperties{client_host_name: client_host_name,
+  client_id: client_id, conn_id: conn_id,
+  token: token, user_name: user_name}} = Client.open_connection(client, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: "localhost", client_id: "ElixirClient1|0x" <> Base.encode16(inspect self),
+                                                                        password: "APP", properties: %{"load-balance" => "false"}, for_xa: false, security:  SnappyData.Thrift.SecurityMechanism.plain, token_size: 16,
+                                                                        use_string_for_decimal: false, user_name: "APP"})
+
+Client.execute(client, conn_id, "CREATE TABLE APP.TEST (id int primary key, text varchar(10))", nil, nil, token)
+{:ok,
+ %SnappyData.Thrift.PrepareResult{parameter_meta_data: parameter_meta_data,
+  result_set_meta_data: result_set_meta_data, statement_id: statement_id, statement_type: statement_type, warnings: warnings}} = Client.prepare_statement(client, conn_id, "INSERT INTO APP.TEST (id, text) VALUES (?, ?)", nil, nil, token)
+
+Client.execute_prepared(client, statement_id,
+ %SnappyData.Thrift.Row{
+      values: [%SnappyData.Thrift.ColumnValue{i32_val: 42}, 
+               %SnappyData.Thrift.ColumnValue{string_val: "fortytwo"}
+      ]}, 
+      [],
+      %SnappyData.Thrift.StatementAttrs{}, 
+      token)
+
+Client.execute_prepared_update(client, statement_id,
+ %SnappyData.Thrift.Row{
+      values: [%SnappyData.Thrift.ColumnValue{i32_val: 42}, 
+               %SnappyData.Thrift.ColumnValue{string_val: "fortytwo"}
+      ]}, 
+      %SnappyData.Thrift.StatementAttrs{}, 
+      token)
+
+Client.prepare_and_execute(client, conn_id, "SELECT * from APP.TEST", [], [], SnappyData.Thrift.StatementAttrs.new, token)
+
+Client.execute(client, conn_id, "SELECT * from APP.TEST", nil, nil, token)
+
+{:ok,
+ %SnappyData.Thrift.PrepareResult{parameter_meta_data: parameter_meta_data,
+  result_set_meta_data: result_set_meta_data, statement_id: statement_id, statement_type: statement_type, warnings: warnings}} = Client.prepare_statement(client, conn_id, "SELECT * from APP.TEST", nil, nil, token)
+
+Client.execute_prepared(client, statement_id,
+ %SnappyData.Thrift.Row{
+      values: []}, 
+      [],
+      %SnappyData.Thrift.StatementAttrs{}, 
+      token)
+```

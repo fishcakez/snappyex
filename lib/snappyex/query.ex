@@ -5,6 +5,24 @@ defmodule Snappyex.Query do
              :result_formats, :num_params, :decoders, :types]
 end
 
+# http://michal.muskala.eu/2015/07/30/unix-timestamps-in-elixir.html
+defmodule Convert do
+  epoch = {{1, 1, 1}, {0, 0, 0}}
+  @epoch :calendar.datetime_to_gregorian_seconds(epoch)
+
+  def from_timestamp(timestamp) do
+    timestamp
+    |> +(@epoch)
+    |> :calendar.gregorian_seconds_to_datetime
+  end
+
+  def to_timestamp(datetime) do
+    datetime
+    |> :calendar.datetime_to_gregorian_seconds
+    |> -(@epoch)
+  end
+end
+
 defimpl DBConnection.Query, for: Snappyex.Query do
   alias Snappyex.Query
   use Timex
@@ -31,8 +49,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     %Snappyex.Result{rows: rows, num_rows: num_rows}
   end
   def decode_row([field | rows], [decoder | cols], acc) do 
-    type = Snappyex.Model.SnappyType.value(decoder)
-    decode_row(rows, cols, [decode_field(field, type.ordinal) | acc])
+    {:ok, type} = SnappyData.Thrift.SnappyType.value_to_name(decoder)
+    decode_row(rows, cols, [decode_field(field, type) | acc])
   end
   def decode_row([], [], acc), do: Enum.reverse(acc)
   def decode_field(value, :boolean), do: value.bool_val
@@ -45,21 +63,18 @@ defimpl DBConnection.Query, for: Snappyex.Query do
 #  def decode_field(column_value, :real), do: elem(column_value, @decimal_val)
   def decode_field(value, :double), do: value.double_val
   def decode_field(value, :decimal) do 
-    %Snappyex.Model.Decimal{magnitude: _magnitude, scale: _scale, signum: _signum} = value.decimal_val
+    %SnappyData.Thrift.Decimal{magnitude: _magnitude, scale: _scale, signum: _signum} = value.decimal_val
     #decode_numeric(signum, magnitude)
   end  
 
   def decode_field(value, :char), do: value.string_val
   def decode_field(value, :varchar), do: value.string_val
 #  def decode_field(column_value, :longvarchar), do: elem(column_value, @string_val)
-  def decode_field(value, :date) do
-    %Snappyex.Model.DateTime{secsSinceEpoch: secsSinceEpoch} = value.date_val
-    {:ok, time} = DateTime.from_unix(secsSinceEpoch)
-    time
+  def decode_field(value, :date) do 
+    value.date_val
   end
   def decode_field(value, :time) do
-    %Snappyex.Model.DateTime{secsSinceEpoch: secsSinceEpoch} = value.time_val
-    {:ok, time} = DateTime.from_unix(secsSinceEpoch)
+    {:ok, time} = DateTime.from_unix(value.time_val)
     {_, {hour, minute, second}} = Timex.to_erl(time)
     {hour, minute, second, 0}
   end
@@ -87,8 +102,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
 
   def decode_blob(val) do
     case val do
-      %Snappyex.Model.BlobChunk{chunk: _chunk, last: true} -> val
-      %Snappyex.Model.BlobChunk{last: false} -> raise "Not Implemented"
+      %SnappyData.Thrift.BlobChunk{chunk: _chunk, last: true} -> val
+      %SnappyData.Thrift.BlobChunk{last: false} -> raise "Not Implemented"
       nil -> nil
     end
   end
@@ -96,8 +111,8 @@ defimpl DBConnection.Query, for: Snappyex.Query do
 
   def decode_clob(val) do
     case val do
-      %Snappyex.Model.ClobChunk{chunk: chunk, last: true} -> chunk
-      %Snappyex.Model.ClobChunk{last: false} -> raise "Not Implemented"
+      %SnappyData.Thrift.ClobChunk{chunk: chunk, last: true} -> chunk
+      %SnappyData.Thrift.ClobChunk{last: false} -> raise "Not Implemented"
       nil -> nil
     end
   end
@@ -105,9 +120,9 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     nil
   end
 
-  def decode_row_set(%Snappyex.Model.RowSet{rows: rows, metadata: metadata}) do    
+  def decode_row_set(%SnappyData.Thrift.RowSet{rows: rows, metadata: metadata}) do    
     columns = Enum.map(metadata, fn descriptor ->
-      %Snappyex.Model.ColumnDescriptor{type: ordinal} = descriptor
+      %SnappyData.Thrift.ColumnDescriptor{type: ordinal} = descriptor
       ordinal      
     end)    
     decode(rows, columns)

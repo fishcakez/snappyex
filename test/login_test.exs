@@ -3,10 +3,10 @@ defmodule LoginTest do
   import Snappyex.TestHelper
 
   alias Snappyex, as: S
-
+  require SnappyData.Thrift.SecurityMechanism
   setup do
-    opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), 
-             port: snappydata_port(), username: "APP", password: "APP",  security: Snappyex.Model.SecurityMechanism.plain, 
+    opts = [ host: snappydata_address(), clientID: "ElixirClient1|0x" <> Base.encode16(inspect self()), 
+             port: snappydata_port(), username: "APP", password: "APP",  security: SnappyData.Thrift.SecurityMechanism.plain, 
      token_size: 16, use_string_for_decimal: false, properties: snappydata_properties()]
     {:ok, pid} = S.start_link(opts)    
     Process.flag(:trap_exit, true)
@@ -15,8 +15,7 @@ defmodule LoginTest do
 
   test "login cleartext password", context do
     capture_log fn ->
-    params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-    assert [[1]] == query('SELECT 1', params)
+    assert [[1]] == query("SELECT 1", [])
     end
   end
 end

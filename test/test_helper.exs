@@ -51,11 +51,11 @@ defmodule Snappyex.TestHelper do
   end
 
   def snappydata_address() do
-     "192.168.1.69" 
+     "192.168.0.21" 
   end
 
   def snappydata_port() do
-    31654
+     1531
   end
 
   def snappydata_properties() do

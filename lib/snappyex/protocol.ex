@@ -5,6 +5,8 @@ defmodule Snappyex.Protocol do
 
   require Logger
 
+  alias SnappyData.Thrift.SnappyDataService.Binary.Framed.Client
+
 #  defmodule Error do
 #     defexception [:message]
 
@@ -18,7 +20,7 @@ defmodule Snappyex.Protocol do
     Process.flag(:trap_exit, true)
     {:ok, host} = Keyword.fetch(opts, :host)
     {:ok, port} = Keyword.fetch(opts, :port)
-    status = Snappyex.Client.start_link(host, port)
+    status = Client.start_link(host, port)
     connect_start_link(status, opts)
   end
 
@@ -34,12 +36,13 @@ defmodule Snappyex.Protocol do
     {:ok, security} = Keyword.fetch(opts, :security)
     {:ok, conn_properties} = Keyword.fetch(opts, :properties)
     {:ok, local_hostname} = :inet.gethostname
-    {:ok, properties} = Snappyex.Client.openConnection(pid, Snappyex.Model.OpenConnectionArgs.new(clientHostName: local_hostname, clientID: "ElixirClient1|0x" <> Base.encode16(inspect self), userName: username, password: password, security: security, properties: conn_properties, tokenSize: token_size, useStringForDecimal: use_string_for_decimal))
+    local_hostname = to_string(local_hostname)
+    {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: local_hostname, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self), user_name: username, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
     case properties do
       :retries_exceeded ->
         {:error, %DBConnection.ConnectionError{message: "Retries exceeded"}}
        _ ->
-        state = [process_id: pid, connection_id: properties.connId, client_host_name: properties.clientHostName, client_id: properties.clientID, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
+        state = [process_id: pid, connection_id: properties.conn_id, client_host_name: properties.client_host_name, client_id: properties.client_id, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
         {:ok, state}
     end
   end
@@ -57,8 +60,7 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, connection_id} = Keyword.fetch(state, :connection_id)
     {:ok, token} = Keyword.fetch(state, :token)
-    Snappyex.Client.closeConnection(process_id, connection_id, token)
-    Snappyex.Client.close(process_id)
+    Client.close(process_id)
     :ok
   end
 
@@ -68,8 +70,7 @@ defmodule Snappyex.Protocol do
   def ping(state) do
     query  = %Snappyex.Query{statement: 'SELECT 1'}
     {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
-    params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
-    case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
+    case Snappyex.Protocol.handle_execute(prepared_query, [] , [], state) do
       {:ok, _, state} ->
         {:ok, state}
       {:disconnect, err, state} ->
@@ -88,7 +89,7 @@ defmodule Snappyex.Protocol do
   def handle_commit(_opts, state) do
     query = %Snappyex.Query{statement: 'COMMIT'}
     {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
-    params = Map.put_new(Map.new, :params, Snappyex.Model.Row.new(values: []))
+    params = Map.put_new(Map.new, :params, %SnappyData.Thrift.Row{values: []})
     case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
       {:ok, result, state} ->
         {:ok, result, state}
@@ -101,7 +102,8 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, flags} = Map.fetch(opts, :flags)
-    case Snappyex.Client.beginTransaction(process_id, @repeatable_read, flags, token) do
+    # TODO FIX TransactionAttribute
+    case Client.begin_transaction(process_id, @repeatable_read, %{}, token) do
       {:ok, result} ->
         {:ok, result, state}
       {:error, error} ->
@@ -115,7 +117,7 @@ defmodule Snappyex.Protocol do
     {:ok, token} = Keyword.fetch(state, :token)
     case close_lookup(query, state) do
       {:close, statement_id} ->
-        Snappyex.Client.closeStatement(process_id, statement_id, token)
+        Client.close_statement(process_id, statement_id, token)
         {:ok, nil, state}
       :closed ->
         {:ok, nil, state}
@@ -162,27 +164,33 @@ defmodule Snappyex.Protocol do
     {:ok, token} = Keyword.fetch(state,
       :token)
     params = case params do
-             [] -> Snappyex.Model.Row.new
-             [0, {{2016, 10, _}, _}] ->
-               Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i64_val: 0), Snappyex.Model.ColumnValue.new(timestamp_val: Snappyex.Model.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479))])
-             [42, "fortytwo"] -> Snappyex.Model.Row.new(values: [Snappyex.Model.ColumnValue.new(i32_val: 42),
-                                                                Snappyex.Model.ColumnValue.new(ClobChunk_val:
-                                                                  Snappyex.Model.ClobChunk.new(
+             [] -> nil
+#             [0, {{2016, 10, _}, _}] ->
+#               SnappyData.Thrift.Row.new(values: [%SnappyData.Thrift.ColumnValue{i64_val: 0}, SnappyData.Thrift.ColumnValue{timestamp_val: SnappyData.Thrift.Timestamp.new(secsSinceEpoch: 12345, nanos: 162479)}])
+             [42, "fortytwo"] -> %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 42},
+                                                                %SnappyData.Thrift.ColumnValue{clob_val:
+                                                                  %SnappyData.Thrift.ClobChunk{
                                                                     chunk: "fortytwo",
                                                                     last: true,
-                                                                    length: byte_size("fortytwo")
-                                                                  )
-                                                                )
-                                                                ])
-             %{params: %Snappyex.Model.Row{values: []}} ->
-               Snappyex.Model.Row.new(values: [])
+                                                                    total_length: byte_size("fortytwo")
+                                                                  }
+                                                                }
+                                                                ]}
+#             %{params: %SnappyData.Thrift.Row{values: []}} ->
+#               SnappyData.Thrift.Row.new(values: [])
+
+             _ -> %SnappyData.Thrift.Row{}
            end
     case execute_lookup(query, state) do
       {:execute, statement_id, query} ->
-        case Snappyex.Client.executePrepared(process_id, statement_id, params, Map.new, token) do
+#        IO.inspect process_id
+#        IO.inspect statement_id
+#        IO.inspect token
+        # TODO StatementAttrs
+        case Client.execute_prepared(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token) do
           {:ok, statement} ->
             result = Map.new
-            result = Map.put_new(result, :rows, statement.resultSet)
+            result = Map.put_new(result, :rows, statement.result_set)
             {:ok, result, state}
           {:error, error} ->
             {:disconnect, error, state}
@@ -234,7 +242,7 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
-    Snappyex.Client.closeStatement(process_id, statement_id, token)
+    Client.close_statement(process_id, statement_id, token)
     prepare(query, state)
   end
 
@@ -250,12 +258,12 @@ defmodule Snappyex.Protocol do
         Map.new)
       _statement_attributes = Map.get(query,
         :statement_attributes,
-        %Snappyex.Model.StatementAttrs{})
-      case Snappyex.Client.prepareStatement(
-        process_id, connection_id, query.statement, output_parameters,
+        %SnappyData.Thrift.StatementAttrs{})
+      case Client.prepare_statement(
+        process_id, connection_id, to_string(query.statement), output_parameters,
         nil, token) do
           {:ok, prepared_result} ->
-            query = %{query | columns: prepared_result.resultSetMetaData}
+            query = %{query | columns: prepared_result.result_set_meta_data}
             prepare_result(query, prepared_result, state)
         {:error, error} ->
           {:disconnect, error.exceptionData.reason, state}
@@ -263,12 +271,12 @@ defmodule Snappyex.Protocol do
   end
 
   defp prepare_result(query, prepared_result, state) do
-    query = %{query | columns: prepared_result.resultSetMetaData}
-    num_params = case prepared_result.resultSetMetaData do
+    query = %{query | columns: prepared_result.result_set_meta_data}
+    num_params = case prepared_result.result_set_meta_data do
       nil -> 0
       result -> Enum.count(result)
     end
-    query = prepare_insert(prepared_result.statementId, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
+    query = prepare_insert(prepared_result.statement_id, num_params, %Snappyex.Query{query | ref: make_ref()}, state)
     {:ok, query, state}
   end
 
