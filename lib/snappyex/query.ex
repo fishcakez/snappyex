@@ -96,6 +96,11 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     {_, {hour, minute, second}} = Timex.to_erl(time)
     {hour, minute, second, 0}
   end
+  def decode_field(value, :nulltype) do
+    if value.null_val do
+      nil
+    end
+  end
   def decode_field(value, :timestamp) do
     # TODO Extract nanoseconds and add it to time
     # https://github.com/elixir-ecto/postgrex/blob/master/lib/postgrex/extensions/timestamp.ex#L24
@@ -105,12 +110,12 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   def decode_field(value, :binary), do: value.binary_val
   def decode_field(value, :varbinary), do: value.binary_val
   def decode_field(value, :longvarbinary), do: value.binary_val
+  def decode_field(value, :longvarchar), do: value.string_val
   def decode_field(value, :blob), do: decode_blob(value.blob_val)
   def decode_field(value, :clob) do 
     decode_clob(value.clob_val)
   end
 #  def decode_field(column_value, :sqlxml), do: elem(column_value, @string_val)
-#  def decode_field(column_value, :nulltype), do: elem(column_value, )
 #  def decode_field(column_value, :array), do: elem(column_value, )
 #  def decode_field(column_value, :map), do: elem(column_value, )
 #  def decode_field(column_value, :struct), do: elem(column_value, )
