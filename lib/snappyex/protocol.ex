@@ -22,13 +22,13 @@ defmodule Snappyex.Protocol do
   def connect_start_link({:ok, pid}, opts) do
     {:ok, token_size} = Keyword.fetch(opts, :token_size)
     use_string_for_decimal = Keyword.get(opts, :use_string_for_decimal, false)
-    {:ok, username} = Keyword.fetch(opts, :username)
+    {:ok, user_name} = Keyword.fetch(opts, :user_name)
     {:ok, password} = Keyword.fetch(opts, :password)
     {:ok, security} = Keyword.fetch(opts, :security)
     {:ok, conn_properties} = Keyword.fetch(opts, :properties)
-    {:ok, local_hostname} = :inet.gethostname
-    local_hostname = to_string(local_hostname)
-    {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: local_hostname, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: username, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
+    {:ok, client_host_name} = :inet.gethostname
+    client_host_name = to_string(client_host_name)
+    {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: client_host_name, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: user_name, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
     state = [process_id: pid, connection_id: properties.conn_id, client_host_name: properties.client_host_name, client_id: properties.client_id, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
     {:ok, state}
   end
