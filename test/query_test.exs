@@ -91,7 +91,6 @@ defmodule QueryTest do
            query("VALUES DATE('2013-09-23')", [])
   end
   
-
   test "insert query", context do
     query("DROP TABLE IF EXISTS SNAPPYEX_TEST.TEST_INSERT", [])   
     nil = query("CREATE TABLE SNAPPYEX_TEST.TEST_INSERT (id int primary key, text varchar(10))", [])  
