@@ -51,11 +51,11 @@ defmodule Snappyex.TestHelper do
   end
 
   def snappydata_address() do
-     "192.168.0.21" 
+    Application.fetch_env!(:snappyex, :host) 
   end
 
   def snappydata_port() do
-     1531
+    Application.fetch_env!(:snappyex, :port)
   end
 
   def snappydata_properties() do
