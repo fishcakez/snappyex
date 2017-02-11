@@ -35,7 +35,6 @@ defmodule Snappyex.Protocol do
   end
 
   def checkout(state) do
-    disconnect(nil, state)
     {:ok, state}
   end
 
