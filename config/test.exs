@@ -4,5 +4,5 @@ config :snappyex,
   host: "localhost",
   port: 1531
 
-conf :tzdata,
+config :tzdata,
   autoupdate: :disabled
