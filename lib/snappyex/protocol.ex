@@ -6,12 +6,13 @@ defmodule Snappyex.Protocol do
   require Logger
 
   alias SnappyData.Thrift.SnappyDataService.Binary.Framed.Client
+  @time_out 10_000
 
   def connect(opts) do
     Process.flag(:trap_exit, true)
     {:ok, host} = Keyword.fetch(opts, :host)
     {:ok, port} = Keyword.fetch(opts, :port)
-    status = Client.start_link(host, port, gen_server_opts: [timeout: 10_000])
+    status = Client.start_link(host, port)
     connect_start_link(status, opts)
   end
 
@@ -28,7 +29,7 @@ defmodule Snappyex.Protocol do
     {:ok, conn_properties} = Keyword.fetch(opts, :properties)
     {:ok, client_host_name} = :inet.gethostname
     client_host_name = to_string(client_host_name)
-    {:ok, properties} = Client.open_connection(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: client_host_name, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: user_name, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal})
+    {:ok, properties} = Client.open_connection_with_options(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: client_host_name, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: user_name, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal}, gen_server_opts: [timeout: @time_out])
     state = [process_id: pid, connection_id: properties.conn_id, client_host_name: properties.client_host_name, client_id: properties.client_id, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
     {:ok, state}
   end
@@ -89,7 +90,7 @@ defmodule Snappyex.Protocol do
     {:ok, flags} = Map.fetch(opts, :flags)
     {:ok, connection_id} = Keyword.fetch(state,
       :connection_id)  
-    case Client.begin_transaction(process_id, connection_id, @repeatable_read, flags, token) do
+    case Client.begin_transaction_with_options(process_id, connection_id, @repeatable_read, flags, token,  gen_server_opts: [timeout: @time_out]) do
       {:ok, result} ->
         {:ok, result, state}
       {:error, error} ->
@@ -147,6 +148,7 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
+    # Get metadata of the column's particular type so the tuples can converted.
     params = case params do
              [] -> nil
              [42, "fortytwo"] -> %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 42},
@@ -161,7 +163,7 @@ defmodule Snappyex.Protocol do
            end
     case execute_lookup(query, state) do
       {:execute, statement_id, _query} ->
-        case Client.execute_prepared(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token) do
+        case Client.execute_prepared_with_options(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token, gen_server_opts: [timeout: @time_out]) do
           {:ok, statement} ->
             result = Map.new
             result = Map.put_new(result, :rows, statement.result_set)
@@ -216,7 +218,7 @@ defmodule Snappyex.Protocol do
       :process_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
-    Client.close_statement(process_id, statement_id, token)
+    Client.close_statement_with_options(process_id, statement_id, token, gen_server_opts: [timeout: @time_out])
     prepare(query, state)
   end
 
@@ -233,9 +235,9 @@ defmodule Snappyex.Protocol do
       _statement_attributes = Map.get(query,
         :statement_attributes,
         %SnappyData.Thrift.StatementAttrs{})
-      case Client.prepare_statement(
+      case Client.prepare_statement_with_options(
         process_id, connection_id, to_string(query.statement), output_parameters,
-        nil, token) do
+        nil, token, gen_server_opts: [timeout: @time_out]) do
           {:ok, prepared_result} ->
             query = %{query | columns: prepared_result.result_set_meta_data}
             prepare_result(query, prepared_result, state)
