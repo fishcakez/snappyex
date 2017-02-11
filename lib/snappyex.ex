@@ -1,6 +1,7 @@
 defmodule Snappyex do
 
   alias Snappyex.Query
+  @timeout 20_000
   def start_link(opts) do
     DBConnection.start_link(Snappyex.Protocol, defaults(opts))
   end
@@ -35,5 +36,6 @@ defmodule Snappyex do
 
   defp defaults(opts) do
     opts
+    |> Keyword.put_new(:pool_timeout, @timeout)
   end
 end
