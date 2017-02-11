@@ -41,9 +41,6 @@ defimpl DBConnection.Query, for: Snappyex.Query do
     value.i32_val
   end
   def decode_field(value, :bigint), do: value.i64_val
-  def float_to_int_bits(float) do
-  
-  end
   def decode_field(value, :float) do 
   # http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/6-b27/java/lang/Float.java#Float.floatToIntBits%28float%29
   #  public static int floatToIntBits(float value) {
