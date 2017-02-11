@@ -1,7 +1,7 @@
 ExUnit.start()
 
 defmodule Snappyex.TestHelper do
-  @timeout :infinity
+  @timeout 216_000_000
   defmacro query(stat, params, opts \\ []) do
     quote do
       case Snappyex.prepare_execute(var!(context)[:pid], "", unquote(stat),
