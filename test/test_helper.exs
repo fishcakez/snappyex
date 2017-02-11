@@ -71,5 +71,6 @@ defmodule Snappyex.TestHelper do
   defp defaults(opts) do
     opts
     |> Keyword.put_new(:pool_timeout, @timeout)
+    |> Keyword.put_new(:timeout, @timeout)
   end
 end
