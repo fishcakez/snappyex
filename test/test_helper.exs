@@ -1,7 +1,7 @@
 ExUnit.start()
 
 defmodule Snappyex.TestHelper do
-  @timeout 40_000
+  @timeout :infinity
   defmacro query(stat, params, opts \\ []) do
     quote do
       case Snappyex.prepare_execute(var!(context)[:pid], "", unquote(stat),
@@ -70,7 +70,7 @@ defmodule Snappyex.TestHelper do
 
   defp defaults(opts) do
     opts
-    |> Keyword.put_new(:pool_timeout, @timeout)
-    |> Keyword.put_new(:timeout, @timeout)
+    |> Keyword.put(:pool_timeout, @timeout)
+    |> Keyword.put(:timeout, @timeout)
   end
 end
