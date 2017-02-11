@@ -6,7 +6,7 @@ defmodule Snappyex.Protocol do
   require Logger
 
   alias SnappyData.Thrift.SnappyDataService.Binary.Framed.Client
-  @time_out 20_000
+  @time_out 15_000
 
   def connect(opts) do
     Process.flag(:trap_exit, true)
