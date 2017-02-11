@@ -15,7 +15,7 @@ before_script:
   - echo "localhost -J-Duser.timezone=UTC -J-Djava.net.preferIPv4Stack=true -spray.can.server.parsing.max-content-length=400m -heap-size=4096m" | tee -a ./snappydata-0.7-bin/conf/leads
   - ./snappydata-0.7-bin/sbin/snappy-start-all.sh 
 script:
-  - mix test --timeout 300
+  - mix test --timeout 300000
 env:
   global:
     - MIX_ENV=test
