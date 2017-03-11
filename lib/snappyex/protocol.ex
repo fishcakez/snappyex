@@ -62,8 +62,7 @@ defmodule Snappyex.Protocol do
   end
 
   defp prepare_insert(statement_id, num_params, %Snappyex.Query{name: name, ref: ref} = query, state) do
-    {:ok, cache} = Keyword.fetch(state,
-      :cache)
+    {:ok, cache} = Keyword.fetch(state, :cache)
     ref = ref || make_ref()
     true = Snappyex.Cache.insert_new(cache, name, statement_id, ref)
     %{query | ref: ref, num_params: num_params}
@@ -81,12 +80,10 @@ defmodule Snappyex.Protocol do
     end
   end
   def handle_begin(opts, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
+    {:ok, process_id} = Keyword.fetch(state, :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     {:ok, flags} = Map.fetch(opts, :flags)
-    {:ok, connection_id} = Keyword.fetch(state,
-      :connection_id)  
+    {:ok, connection_id} = Keyword.fetch(state, :connection_id)  
     case Client.begin_transaction_with_options(process_id, connection_id, @repeatable_read, flags, token,  gen_server_opts: [timeout: @time_out]) do
       {:ok, result} ->
         {:ok, result, state}
@@ -96,8 +93,7 @@ defmodule Snappyex.Protocol do
   end
 
   def handle_close(query, _opts, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
+    {:ok, process_id} = Keyword.fetch(state, :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     case close_lookup(query, state) do
       {:close, statement_id} ->
@@ -109,8 +105,7 @@ defmodule Snappyex.Protocol do
   end
 
   defp close_lookup(%Snappyex.Query{name: name}, state) do
-    {:ok, cache} = Keyword.fetch(state,
-      :cache)
+    {:ok, cache} = Keyword.fetch(state, :cache)
     case Snappyex.Cache.take(cache, name) do
       {statement_id, _ref} when is_integer(statement_id) ->
         {:close, statement_id}
@@ -155,10 +150,8 @@ defmodule Snappyex.Protocol do
   end
 
   def execute(_statement_id, query, params, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
-    {:ok, token} = Keyword.fetch(state,
-      :token)
+    {:ok, process_id} = Keyword.fetch(state, :process_id)
+    {:ok, token} = Keyword.fetch(state, :token)
     case execute_lookup(query, state) do
       {:execute, statement_id, query} ->
         params = case params do
@@ -194,14 +187,12 @@ defmodule Snappyex.Protocol do
     end
 
  defp prepare_execute_lookup(%Snappyex.Query{name: name}, state) do
-    {:ok, cache} = Keyword.fetch(state,
-      :cache)
+    {:ok, cache} = Keyword.fetch(state, :cache)
     Snappyex.Cache.id(cache, name)
   end
 
   defp execute_lookup(%Snappyex.Query{name: name, ref: ref} = query, state) do
-    {:ok, cache} = Keyword.fetch(state,
-      :cache)
+    {:ok, cache} = Keyword.fetch(state, :cache)
     case Snappyex.Cache.lookup(cache, name) do
       {statement_id, ^ref} ->
         {:execute, statement_id, query}
@@ -226,24 +217,17 @@ defmodule Snappyex.Protocol do
   end
 
   defp close_prepare(statement_id, %Snappyex.Query{statement: _statement} = query, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
-    {:ok, token} = Keyword.fetch(state,
-      :token)
+    {:ok, process_id} = Keyword.fetch(state, :process_id)
+    {:ok, token} = Keyword.fetch(state, :token)
     Client.close_statement_with_options(process_id, statement_id, token, gen_server_opts: [timeout: @time_out])
     prepare(query, state)
   end
 
   def prepare(query, state) do
-      {:ok, process_id} = Keyword.fetch(state,
-        :process_id)
-      {:ok, connection_id} = Keyword.fetch(state,
-        :connection_id)
-      {:ok, token} = Keyword.fetch(state,
-        :token)
-      output_parameters = Map.get(query,
-        :output_parameters,
-        Map.new)
+      {:ok, process_id} = Keyword.fetch(state, :process_id)
+      {:ok, connection_id} = Keyword.fetch(state, :connection_id)
+      {:ok, token} = Keyword.fetch(state, :token)
+      output_parameters = Map.get(query, :output_parameters, Map.new)
       _statement_attributes = Map.get(query,
         :statement_attributes,
         %SnappyData.Thrift.StatementAttrs{})
@@ -269,8 +253,7 @@ defmodule Snappyex.Protocol do
   end
 
   defp prepare_lookup(%Snappyex.Query{name: name} = query, state) do
-    {:ok, cache} = Keyword.fetch(state,
-      :cache)
+    {:ok, cache} = Keyword.fetch(state, :cache)
     case Snappyex.Cache.take(cache, name) do
       {statement_id, ref} when is_integer(statement_id) ->
         {:prepared,  %{query | ref: ref}}
