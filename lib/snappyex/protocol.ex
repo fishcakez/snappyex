@@ -71,12 +71,7 @@ defmodule Snappyex.Protocol do
     query = %Snappyex.Query{statement: 'COMMIT'}
     {:ok, prepared_query, state} = Snappyex.Protocol.handle_prepare(query, [], state)
     params = Map.put_new(Map.new, :params, %SnappyData.Thrift.Row{values: []})
-    case Snappyex.Protocol.handle_execute(prepared_query, params , [], state) do
-      {:ok, result, state} ->
-        {:ok, result, state}
-      {:disconnect, err, state} ->
-        {:disconnect, err, state}
-    end
+    Snappyex.Protocol.handle_execute(prepared_query, params , [], state)
   end
   def handle_begin(opts, state) do
     {:ok, process_id} = Keyword.fetch(state, :process_id)
