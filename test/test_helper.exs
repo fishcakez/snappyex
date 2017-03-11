@@ -17,7 +17,8 @@ defmodule Snappyex.TestHelper do
     quote do
       case Snappyex.prepare(var!(context)[:pid], unquote(name), unquote(stat),
                                      unquote(params), unquote(opts)) do
-        {:ok, %Snappyex.Query{} = query} -> query
+        {:ok, query} -> 
+          query
         {:error, err} -> err
       end
     end

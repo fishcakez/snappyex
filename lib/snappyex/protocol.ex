@@ -140,26 +140,41 @@ defmodule Snappyex.Protocol do
     end
   end
 
+  def query_columns_list(map) do
+      columns = Enum.reduce(
+        map, [], fn (x, acc) -> 
+            if is_map(x) and Map.has_key?(x, :name) do
+              {:ok, type} = SnappyData.Thrift.SnappyType.value_to_name(x.type)
+              [{x.name, type} |  acc ]
+            else
+              acc
+            end
+          end
+        )
+        Enum.reverse(columns)
+  end
+
   def execute(_statement_id, query, params, state) do
     {:ok, process_id} = Keyword.fetch(state,
       :process_id)
     {:ok, token} = Keyword.fetch(state,
       :token)
-    # Get metadata of the column's particular type so the tuples can converted.
-    params = case params do
-             [] -> nil
-             [42, "fortytwo"] -> %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 42},
-                                                                %SnappyData.Thrift.ColumnValue{clob_val:
-                                                                  %SnappyData.Thrift.ClobChunk{
-                                                                    chunk: "fortytwo",
-                                                                    last: true,
-                                                                    total_length: byte_size("fortytwo")
-                                                                  }
-                                                                }
-                                                                ]}
-           end
     case execute_lookup(query, state) do
-      {:execute, statement_id, _query} ->
+      {:execute, statement_id, query} ->
+        params = case params do
+                [] -> nil
+        # TODO For each element in list take type and convert it.         
+                [42, "fortytwo"] -> 
+                %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 42},
+                                                                    %SnappyData.Thrift.ColumnValue{clob_val:
+                                                                      %SnappyData.Thrift.ClobChunk{
+                                                                        chunk: "fortytwo",
+                                                                        last: true,
+                                                                        total_length: byte_size("fortytwo")
+                                                                      }
+                                                                    }
+                                                                    ]}
+        end            
         case Client.execute_prepared_with_options(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token, gen_server_opts: [timeout: @time_out]) do
           {:ok, statement} ->
             result = Map.new
@@ -235,7 +250,7 @@ defmodule Snappyex.Protocol do
       case Client.prepare_statement_with_options(
         process_id, connection_id, to_string(query.statement), output_parameters,
         nil, token, gen_server_opts: [timeout: @time_out]) do
-          {:ok, prepared_result} ->
+        {:ok, prepared_result} ->
             query = %{query | columns: prepared_result.result_set_meta_data}
             prepare_result(query, prepared_result, state)
         {:error, error} ->
