@@ -165,12 +165,103 @@ defmodule(SnappyData.Thrift.SnappyType) do
   def(value_to_name(v)) do
     {:error, {:invalid_enum_value, v}}
   end
+  def(name_to_value(:boolean)) do
+    {:ok, 1}
+  end
+  def(name_to_value(:tinyint)) do
+    {:ok, 2}
+  end
+  def(name_to_value(:smallint)) do
+    {:ok, 3}
+  end
+  def(name_to_value(:integer)) do
+    {:ok, 4}
+  end
+  def(name_to_value(:bigint)) do
+    {:ok, 5}
+  end
+  def(name_to_value(:float)) do
+    {:ok, 6}
+  end
+  def(name_to_value(:double)) do
+    {:ok, 7}
+  end
+  def(name_to_value(:decimal)) do
+    {:ok, 8}
+  end
+  def(name_to_value(:char)) do
+    {:ok, 9}
+  end
+  def(name_to_value(:varchar)) do
+    {:ok, 10}
+  end
+  def(name_to_value(:longvarchar)) do
+    {:ok, 11}
+  end
+  def(name_to_value(:date)) do
+    {:ok, 12}
+  end
+  def(name_to_value(:time)) do
+    {:ok, 13}
+  end
+  def(name_to_value(:timestamp)) do
+    {:ok, 14}
+  end
+  def(name_to_value(:binary)) do
+    {:ok, 15}
+  end
+  def(name_to_value(:varbinary)) do
+    {:ok, 16}
+  end
+  def(name_to_value(:longvarbinary)) do
+    {:ok, 17}
+  end
+  def(name_to_value(:blob)) do
+    {:ok, 18}
+  end
+  def(name_to_value(:clob)) do
+    {:ok, 19}
+  end
+  def(name_to_value(:sqlxml)) do
+    {:ok, 20}
+  end
+  def(name_to_value(:array)) do
+    {:ok, 21}
+  end
+  def(name_to_value(:map)) do
+    {:ok, 22}
+  end
+  def(name_to_value(:struct)) do
+    {:ok, 23}
+  end
+  def(name_to_value(:nulltype)) do
+    {:ok, 24}
+  end
+  def(name_to_value(:json)) do
+    {:ok, 25}
+  end
+  def(name_to_value(:java_object)) do
+    {:ok, 26}
+  end
+  def(name_to_value(:other)) do
+    {:ok, 27}
+  end
+  def(name_to_value(k)) do
+    {:error, {:invalid_enum_name, k}}
+  end
   def(value_to_name!(value)) do
     {:ok, name} = value_to_name(value)
     name
   end
-  def(names) do
+  def(name_to_value!(name)) do
+    {:ok, value} = name_to_value(name)
+    value
+  end
+  def(meta(:names)) do
     [:boolean, :tinyint, :smallint, :integer, :bigint, :float, :double, :decimal, :char, :varchar, :longvarchar, :date, :time, :timestamp, :binary, :varbinary, :longvarbinary, :blob, :clob, :sqlxml, :array, :map, :struct, :nulltype, :json, :java_object, :other]
+  end
+  def(meta(:values)) do
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
   end
   def(member?(1)) do
     true
@@ -254,6 +345,90 @@ defmodule(SnappyData.Thrift.SnappyType) do
     true
   end
   def(member?(_)) do
+    false
+  end
+  def(name?(:boolean)) do
+    true
+  end
+  def(name?(:tinyint)) do
+    true
+  end
+  def(name?(:smallint)) do
+    true
+  end
+  def(name?(:integer)) do
+    true
+  end
+  def(name?(:bigint)) do
+    true
+  end
+  def(name?(:float)) do
+    true
+  end
+  def(name?(:double)) do
+    true
+  end
+  def(name?(:decimal)) do
+    true
+  end
+  def(name?(:char)) do
+    true
+  end
+  def(name?(:varchar)) do
+    true
+  end
+  def(name?(:longvarchar)) do
+    true
+  end
+  def(name?(:date)) do
+    true
+  end
+  def(name?(:time)) do
+    true
+  end
+  def(name?(:timestamp)) do
+    true
+  end
+  def(name?(:binary)) do
+    true
+  end
+  def(name?(:varbinary)) do
+    true
+  end
+  def(name?(:longvarbinary)) do
+    true
+  end
+  def(name?(:blob)) do
+    true
+  end
+  def(name?(:clob)) do
+    true
+  end
+  def(name?(:sqlxml)) do
+    true
+  end
+  def(name?(:array)) do
+    true
+  end
+  def(name?(:map)) do
+    true
+  end
+  def(name?(:struct)) do
+    true
+  end
+  def(name?(:nulltype)) do
+    true
+  end
+  def(name?(:json)) do
+    true
+  end
+  def(name?(:java_object)) do
+    true
+  end
+  def(name?(:other)) do
+    true
+  end
+  def(name?(_)) do
     false
   end
 end

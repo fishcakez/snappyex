@@ -26,13 +26,13 @@ defmodule(SnappyData.Thrift.BlobChunk) do
     defp(deserialize(<<2, 2::16-signed, 0, rest::binary>>, acc)) do
       deserialize(rest, %{acc | last: false})
     end
-    defp(deserialize(<<10, 3::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 3::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | lob_id: value})
     end
-    defp(deserialize(<<10, 4::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 4::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | offset: value})
     end
-    defp(deserialize(<<10, 5::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 5::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | total_length: value})
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -46,29 +46,29 @@ defmodule(SnappyData.Thrift.BlobChunk) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :chunk on SnappyData.Thrift.BlobChunk must not be nil")
         _ ->
-          [<<11, 1::size(16), byte_size(chunk)::size(32)>> | chunk]
+          [<<11, 1::16-signed, byte_size(chunk)::32-signed>> | chunk]
       end, case(last) do
         false ->
-          <<2, 2::size(16), 0>>
+          <<2, 2::16-signed, 0>>
         true ->
-          <<2, 2::size(16), 1>>
+          <<2, 2::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Required boolean field :last on SnappyData.Thrift.BlobChunk must be true or false")
       end, case(lob_id) do
         nil ->
           <<>>
         _ ->
-          <<10, 3::size(16), lob_id::64-signed>>
+          <<10, 3::16-signed, lob_id::64-signed>>
       end, case(offset) do
         nil ->
           <<>>
         _ ->
-          <<10, 4::size(16), offset::64-signed>>
+          <<10, 4::16-signed, offset::64-signed>>
       end, case(total_length) do
         nil ->
           <<>>
         _ ->
-          <<10, 5::size(16), total_length::64-signed>>
+          <<10, 5::16-signed, total_length::64-signed>>
       end | <<0>>]
     end
   end

@@ -18,7 +18,7 @@ defmodule(SnappyData.Thrift.ConnectionProperties) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.ConnectionProperties{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<10, 1::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 1::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | conn_id: value})
     end
     defp(deserialize(<<11, 2::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -47,32 +47,32 @@ defmodule(SnappyData.Thrift.ConnectionProperties) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :conn_id on SnappyData.Thrift.ConnectionProperties must not be nil")
         _ ->
-          <<10, 1::size(16), conn_id::64-signed>>
+          <<10, 1::16-signed, conn_id::64-signed>>
       end, case(client_host_name) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :client_host_name on SnappyData.Thrift.ConnectionProperties must not be nil")
         _ ->
-          [<<11, 2::size(16), byte_size(client_host_name)::size(32)>> | client_host_name]
+          [<<11, 2::16-signed, byte_size(client_host_name)::32-signed>> | client_host_name]
       end, case(client_id) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :client_id on SnappyData.Thrift.ConnectionProperties must not be nil")
         _ ->
-          [<<11, 3::size(16), byte_size(client_id)::size(32)>> | client_id]
+          [<<11, 3::16-signed, byte_size(client_id)::32-signed>> | client_id]
       end, case(user_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 4::size(16), byte_size(user_name)::size(32)>> | user_name]
+          [<<11, 4::16-signed, byte_size(user_name)::32-signed>> | user_name]
       end, case(token) do
         nil ->
           <<>>
         _ ->
-          [<<11, 5::size(16), byte_size(token)::size(32)>> | token]
+          [<<11, 5::16-signed, byte_size(token)::32-signed>> | token]
       end, case(default_schema) do
         nil ->
           <<>>
         _ ->
-          [<<11, 6::size(16), byte_size(default_schema)::size(32)>> | default_schema]
+          [<<11, 6::16-signed, byte_size(default_schema)::32-signed>> | default_schema]
       end | <<0>>]
     end
   end

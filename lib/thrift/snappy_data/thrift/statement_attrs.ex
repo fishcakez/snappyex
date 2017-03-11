@@ -29,7 +29,7 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.StatementAttrs{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<3, 1::16-signed, value, rest::binary>>, acc)) do
+    defp(deserialize(<<3, 1::16-signed, value::8-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | result_set_type: value})
     end
     defp(deserialize(<<2, 2::16-signed, 1, rest::binary>>, acc)) do
@@ -50,13 +50,13 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
     defp(deserialize(<<2, 4::16-signed, 0, rest::binary>>, acc)) do
       deserialize(rest, %{acc | require_auto_inc_cols: false})
     end
-    defp(deserialize(<<15, 5::16-signed, 8, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 5::16-signed, 8, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__auto_inc_columns(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<15, 6::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 6::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__auto_inc_column_names(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<8, 7::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 7::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | batch_size: value})
     end
     defp(deserialize(<<2, 8::16-signed, 1, rest::binary>>, acc)) do
@@ -65,16 +65,16 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
     defp(deserialize(<<2, 8::16-signed, 0, rest::binary>>, acc)) do
       deserialize(rest, %{acc | fetch_reverse: false})
     end
-    defp(deserialize(<<8, 9::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 9::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | lob_chunk_size: value})
     end
-    defp(deserialize(<<8, 10::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 10::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_rows: value})
     end
-    defp(deserialize(<<8, 11::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 11::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_field_size: value})
     end
-    defp(deserialize(<<8, 12::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 12::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | timeout: value})
     end
     defp(deserialize(<<11, 13::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -98,7 +98,7 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
     defp(deserialize(<<2, 16::16-signed, 0, rest::binary>>, acc)) do
       deserialize(rest, %{acc | do_escape_processing: false})
     end
-    defp(deserialize(<<13, 17::16-signed, 8, 2, map_size::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<13, 17::16-signed, 8, 2, map_size::32-signed, rest::binary>>, struct)) do
       deserialize__pending_transaction_attrs__key(rest, [%{}, map_size, struct])
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -119,7 +119,7 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
     defp(deserialize__auto_inc_columns(<<rest::binary>>, [list, 0, struct])) do
       deserialize(rest, %{struct | auto_inc_columns: Enum.reverse(list)})
     end
-    defp(deserialize__auto_inc_columns(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+    defp(deserialize__auto_inc_columns(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
       deserialize__auto_inc_columns(rest, [[element | list], remaining - 1 | stack])
     end
     defp(deserialize__auto_inc_columns(_, _)) do
@@ -128,7 +128,7 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
     defp(deserialize__pending_transaction_attrs__key(<<rest::binary>>, [map, 0, struct])) do
       deserialize(rest, %{struct | pending_transaction_attrs: map})
     end
-    defp(deserialize__pending_transaction_attrs__key(<<key::size(32), rest::binary>>, stack)) do
+    defp(deserialize__pending_transaction_attrs__key(<<key::32-signed, rest::binary>>, stack)) do
       deserialize__pending_transaction_attrs__value(rest, key, stack)
     end
     defp(deserialize__pending_transaction_attrs__key(_, _)) do
@@ -148,119 +148,119 @@ defmodule(SnappyData.Thrift.StatementAttrs) do
         nil ->
           <<>>
         _ ->
-          <<3, 1::size(16), result_set_type::8-signed>>
+          <<3, 1::16-signed, result_set_type::8-signed>>
       end, case(updatable) do
         nil ->
           <<>>
         false ->
-          <<2, 2::size(16), 0>>
+          <<2, 2::16-signed, 0>>
         true ->
-          <<2, 2::size(16), 1>>
+          <<2, 2::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :updatable on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(hold_cursors_over_commit) do
         nil ->
           <<>>
         false ->
-          <<2, 3::size(16), 0>>
+          <<2, 3::16-signed, 0>>
         true ->
-          <<2, 3::size(16), 1>>
+          <<2, 3::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :hold_cursors_over_commit on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(require_auto_inc_cols) do
         nil ->
           <<>>
         false ->
-          <<2, 4::size(16), 0>>
+          <<2, 4::16-signed, 0>>
         true ->
-          <<2, 4::size(16), 1>>
+          <<2, 4::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :require_auto_inc_cols on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(auto_inc_columns) do
         nil ->
           <<>>
         _ ->
-          [<<15, 5::size(16), 8, length(auto_inc_columns)::size(32)>> | for(e <- auto_inc_columns) do
+          [<<15, 5::16-signed, 8, length(auto_inc_columns)::32-signed>> | for(e <- auto_inc_columns) do
             <<e::32-signed>>
           end]
       end, case(auto_inc_column_names) do
         nil ->
           <<>>
         _ ->
-          [<<15, 6::size(16), 11, length(auto_inc_column_names)::size(32)>> | for(e <- auto_inc_column_names) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 6::16-signed, 11, length(auto_inc_column_names)::32-signed>> | for(e <- auto_inc_column_names) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(batch_size) do
         nil ->
           <<>>
         _ ->
-          <<8, 7::size(16), batch_size::32-signed>>
+          <<8, 7::16-signed, batch_size::32-signed>>
       end, case(fetch_reverse) do
         nil ->
           <<>>
         false ->
-          <<2, 8::size(16), 0>>
+          <<2, 8::16-signed, 0>>
         true ->
-          <<2, 8::size(16), 1>>
+          <<2, 8::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :fetch_reverse on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(lob_chunk_size) do
         nil ->
           <<>>
         _ ->
-          <<8, 9::size(16), lob_chunk_size::32-signed>>
+          <<8, 9::16-signed, lob_chunk_size::32-signed>>
       end, case(max_rows) do
         nil ->
           <<>>
         _ ->
-          <<8, 10::size(16), max_rows::32-signed>>
+          <<8, 10::16-signed, max_rows::32-signed>>
       end, case(max_field_size) do
         nil ->
           <<>>
         _ ->
-          <<8, 11::size(16), max_field_size::32-signed>>
+          <<8, 11::16-signed, max_field_size::32-signed>>
       end, case(timeout) do
         nil ->
           <<>>
         _ ->
-          <<8, 12::size(16), timeout::32-signed>>
+          <<8, 12::16-signed, timeout::32-signed>>
       end, case(cursor_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 13::size(16), byte_size(cursor_name)::size(32)>> | cursor_name]
+          [<<11, 13::16-signed, byte_size(cursor_name)::32-signed>> | cursor_name]
       end, case(possible_duplicate) do
         nil ->
           <<>>
         false ->
-          <<2, 14::size(16), 0>>
+          <<2, 14::16-signed, 0>>
         true ->
-          <<2, 14::size(16), 1>>
+          <<2, 14::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :possible_duplicate on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(poolable) do
         nil ->
           <<>>
         false ->
-          <<2, 15::size(16), 0>>
+          <<2, 15::16-signed, 0>>
         true ->
-          <<2, 15::size(16), 1>>
+          <<2, 15::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :poolable on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(do_escape_processing) do
         nil ->
           <<>>
         false ->
-          <<2, 16::size(16), 0>>
+          <<2, 16::16-signed, 0>>
         true ->
-          <<2, 16::size(16), 1>>
+          <<2, 16::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Optional boolean field :do_escape_processing on SnappyData.Thrift.StatementAttrs must be true, false, or nil")
       end, case(pending_transaction_attrs) do
         nil ->
           <<>>
         _ ->
-          [<<13, 17::size(16), 8, 2, Enum.count(pending_transaction_attrs)::size(32)>> | for({k, v} <- pending_transaction_attrs) do
+          [<<13, 17::16-signed, 8, 2, Enum.count(pending_transaction_attrs)::32-signed>> | for({k, v} <- pending_transaction_attrs) do
             [<<k::32-signed>> | case(v) do
               nil ->
                 <<0>>

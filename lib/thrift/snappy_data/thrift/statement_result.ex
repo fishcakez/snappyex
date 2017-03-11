@@ -28,13 +28,13 @@ defmodule(SnappyData.Thrift.StatementResult) do
           :error
       end
     end
-    defp(deserialize(<<8, 2::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 2::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | update_count: value})
     end
-    defp(deserialize(<<15, 3::16-signed, 8, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 3::16-signed, 8, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__batch_update_counts(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<13, 4::16-signed, 8, 12, map_size::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<13, 4::16-signed, 8, 12, map_size::32-signed, rest::binary>>, struct)) do
       deserialize__procedure_out_params__key(rest, [%{}, map_size, struct])
     end
     defp(deserialize(<<12, 5::16-signed, rest::binary>>, acc)) do
@@ -73,7 +73,7 @@ defmodule(SnappyData.Thrift.StatementResult) do
     defp(deserialize__batch_update_counts(<<rest::binary>>, [list, 0, struct])) do
       deserialize(rest, %{struct | batch_update_counts: Enum.reverse(list)})
     end
-    defp(deserialize__batch_update_counts(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+    defp(deserialize__batch_update_counts(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
       deserialize__batch_update_counts(rest, [[element | list], remaining - 1 | stack])
     end
     defp(deserialize__batch_update_counts(_, _)) do
@@ -82,7 +82,7 @@ defmodule(SnappyData.Thrift.StatementResult) do
     defp(deserialize__procedure_out_params__key(<<rest::binary>>, [map, 0, struct])) do
       deserialize(rest, %{struct | procedure_out_params: map})
     end
-    defp(deserialize__procedure_out_params__key(<<key::size(32), rest::binary>>, stack)) do
+    defp(deserialize__procedure_out_params__key(<<key::32-signed, rest::binary>>, stack)) do
       deserialize__procedure_out_params__value(rest, key, stack)
     end
     defp(deserialize__procedure_out_params__key(_, _)) do
@@ -104,46 +104,46 @@ defmodule(SnappyData.Thrift.StatementResult) do
         nil ->
           <<>>
         _ ->
-          [<<12, 1::size(16)>> | SnappyData.Thrift.RowSet.serialize(result_set)]
+          [<<12, 1::16-signed>> | SnappyData.Thrift.RowSet.serialize(result_set)]
       end, case(update_count) do
         nil ->
           <<>>
         _ ->
-          <<8, 2::size(16), update_count::32-signed>>
+          <<8, 2::16-signed, update_count::32-signed>>
       end, case(batch_update_counts) do
         nil ->
           <<>>
         _ ->
-          [<<15, 3::size(16), 8, length(batch_update_counts)::size(32)>> | for(e <- batch_update_counts) do
+          [<<15, 3::16-signed, 8, length(batch_update_counts)::32-signed>> | for(e <- batch_update_counts) do
             <<e::32-signed>>
           end]
       end, case(procedure_out_params) do
         nil ->
           <<>>
         _ ->
-          [<<13, 4::size(16), 8, 12, Enum.count(procedure_out_params)::size(32)>> | for({k, v} <- procedure_out_params) do
+          [<<13, 4::16-signed, 8, 12, Enum.count(procedure_out_params)::32-signed>> | for({k, v} <- procedure_out_params) do
             [<<k::32-signed>> | SnappyData.Thrift.ColumnValue.serialize(v)]
           end]
       end, case(generated_keys) do
         nil ->
           <<>>
         _ ->
-          [<<12, 5::size(16)>> | SnappyData.Thrift.RowSet.serialize(generated_keys)]
+          [<<12, 5::16-signed>> | SnappyData.Thrift.RowSet.serialize(generated_keys)]
       end, case(new_default_schema) do
         nil ->
           <<>>
         _ ->
-          [<<11, 6::size(16), byte_size(new_default_schema)::size(32)>> | new_default_schema]
+          [<<11, 6::16-signed, byte_size(new_default_schema)::32-signed>> | new_default_schema]
       end, case(warnings) do
         nil ->
           <<>>
         _ ->
-          [<<12, 7::size(16)>> | SnappyData.Thrift.SnappyExceptionData.serialize(warnings)]
+          [<<12, 7::16-signed>> | SnappyData.Thrift.SnappyExceptionData.serialize(warnings)]
       end, case(prepared_result) do
         nil ->
           <<>>
         _ ->
-          [<<12, 8::size(16)>> | SnappyData.Thrift.PrepareResult.serialize(prepared_result)]
+          [<<12, 8::16-signed>> | SnappyData.Thrift.PrepareResult.serialize(prepared_result)]
       end | <<0>>]
     end
   end

@@ -38,22 +38,22 @@ defmodule(SnappyData.Thrift.ColumnValue) do
     defp(deserialize(<<2, 1::16-signed, 0, rest::binary>>, acc)) do
       deserialize(rest, %{acc | bool_val: false})
     end
-    defp(deserialize(<<3, 2::16-signed, value, rest::binary>>, acc)) do
+    defp(deserialize(<<3, 2::16-signed, value::8-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | byte_val: value})
     end
-    defp(deserialize(<<6, 3::16-signed, value::size(16), rest::binary>>, acc)) do
+    defp(deserialize(<<6, 3::16-signed, value::16-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | i16_val: value})
     end
-    defp(deserialize(<<8, 4::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 4::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | i32_val: value})
     end
-    defp(deserialize(<<10, 5::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 5::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | i64_val: value})
     end
-    defp(deserialize(<<8, 6::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 6::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | float_val: value})
     end
-    defp(deserialize(<<4, 7::16-signed, value::signed-float, rest::binary>>, acc)) do
+    defp(deserialize(<<4, 7::16-signed, value::float-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | double_val: value})
     end
     defp(deserialize(<<11, 8::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -67,13 +67,13 @@ defmodule(SnappyData.Thrift.ColumnValue) do
           :error
       end
     end
-    defp(deserialize(<<10, 10::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 10::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | date_val: value})
     end
-    defp(deserialize(<<10, 11::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 11::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | time_val: value})
     end
-    defp(deserialize(<<10, 12::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 12::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | timestamp_val: value})
     end
     defp(deserialize(<<11, 13::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -95,13 +95,13 @@ defmodule(SnappyData.Thrift.ColumnValue) do
           :error
       end
     end
-    defp(deserialize(<<15, 16::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 16::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__array_val(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<13, 17::16-signed, 12, 12, map_size::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<13, 17::16-signed, 12, 12, map_size::32-signed, rest::binary>>, struct)) do
       deserialize__map_val__key(rest, [%{}, map_size, struct])
     end
-    defp(deserialize(<<15, 18::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 18::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__struct_val(rest, [[], remaining, struct])
     end
     defp(deserialize(<<2, 19::16-signed, 1, rest::binary>>, acc)) do
@@ -176,7 +176,7 @@ defmodule(SnappyData.Thrift.ColumnValue) do
       <<0>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: bool_val, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<2, 1::size(16)>>, case(bool_val) do
+      [<<2, 1::16-signed>>, case(bool_val) do
         nil ->
           <<0>>
         false ->
@@ -186,64 +186,64 @@ defmodule(SnappyData.Thrift.ColumnValue) do
       end | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: byte_val, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<3, 2::size(16), byte_val::8-signed, (<<0>>)>>
+      <<3, 2::16-signed, byte_val::8-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: i16_val, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<6, 3::size(16), i16_val::16-signed, (<<0>>)>>
+      <<6, 3::16-signed, i16_val::16-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: i32_val, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<8, 4::size(16), i32_val::32-signed, (<<0>>)>>
+      <<8, 4::16-signed, i32_val::32-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: i64_val, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<10, 5::size(16), i64_val::64-signed, (<<0>>)>>
+      <<10, 5::16-signed, i64_val::64-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: float_val, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<8, 6::size(16), float_val::32-signed, (<<0>>)>>
+      <<8, 6::16-signed, float_val::32-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: double_val, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<4, 7::size(16), double_val::signed-float, (<<0>>)>>
+      <<4, 7::16-signed, double_val::float-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: string_val, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<11, 8::size(16), byte_size(string_val)::size(32)>>, string_val | <<0>>]
+      [<<11, 8::16-signed, byte_size(string_val)::32-signed>>, string_val | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: decimal_val, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<12, 9::size(16)>>, SnappyData.Thrift.Decimal.serialize(decimal_val) | <<0>>]
+      [<<12, 9::16-signed>>, SnappyData.Thrift.Decimal.serialize(decimal_val) | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: date_val, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<10, 10::size(16), date_val::64-signed, (<<0>>)>>
+      <<10, 10::16-signed, date_val::64-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: time_val, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<10, 11::size(16), time_val::64-signed, (<<0>>)>>
+      <<10, 11::16-signed, time_val::64-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: timestamp_val, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      <<10, 12::size(16), timestamp_val::64-signed, (<<0>>)>>
+      <<10, 12::16-signed, timestamp_val::64-signed, (<<0>>)>>
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: binary_val, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<11, 13::size(16), byte_size(binary_val)::size(32)>>, binary_val | <<0>>]
+      [<<11, 13::16-signed, byte_size(binary_val)::32-signed>>, binary_val | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: blob_val, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<12, 14::size(16)>>, SnappyData.Thrift.BlobChunk.serialize(blob_val) | <<0>>]
+      [<<12, 14::16-signed>>, SnappyData.Thrift.BlobChunk.serialize(blob_val) | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: clob_val, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<12, 15::size(16)>>, SnappyData.Thrift.ClobChunk.serialize(clob_val) | <<0>>]
+      [<<12, 15::16-signed>>, SnappyData.Thrift.ClobChunk.serialize(clob_val) | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: array_val, map_val: nil, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<15, 16::size(16), 12, length(array_val)::size(32)>>, for(e <- array_val) do
+      [<<15, 16::16-signed, 12, length(array_val)::32-signed>>, for(e <- array_val) do
         SnappyData.Thrift.ColumnValue.serialize(e)
       end | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: map_val, struct_val: nil, null_val: nil, java_val: nil})) do
-      [<<13, 17::size(16), 12, 12, Enum.count(map_val)::size(32)>>, for({k, v} <- map_val) do
+      [<<13, 17::16-signed, 12, 12, Enum.count(map_val)::32-signed>>, for({k, v} <- map_val) do
         [SnappyData.Thrift.ColumnValue.serialize(k) | SnappyData.Thrift.ColumnValue.serialize(v)]
       end | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: struct_val, null_val: nil, java_val: nil})) do
-      [<<15, 18::size(16), 12, length(struct_val)::size(32)>>, for(e <- struct_val) do
+      [<<15, 18::16-signed, 12, length(struct_val)::32-signed>>, for(e <- struct_val) do
         SnappyData.Thrift.ColumnValue.serialize(e)
       end | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: null_val, java_val: nil})) do
-      [<<2, 19::size(16)>>, case(null_val) do
+      [<<2, 19::16-signed>>, case(null_val) do
         nil ->
           <<0>>
         false ->
@@ -253,7 +253,7 @@ defmodule(SnappyData.Thrift.ColumnValue) do
       end | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{bool_val: nil, byte_val: nil, i16_val: nil, i32_val: nil, i64_val: nil, float_val: nil, double_val: nil, string_val: nil, decimal_val: nil, date_val: nil, time_val: nil, timestamp_val: nil, binary_val: nil, blob_val: nil, clob_val: nil, array_val: nil, map_val: nil, struct_val: nil, null_val: nil, java_val: java_val})) do
-      [<<11, 20::size(16), byte_size(java_val)::size(32)>>, java_val | <<0>>]
+      [<<11, 20::16-signed, byte_size(java_val)::32-signed>>, java_val | <<0>>]
     end
     def(serialize(%SnappyData.Thrift.ColumnValue{} = value)) do
       set_fields = value |> Map.from_struct() |> Enum.flat_map(fn

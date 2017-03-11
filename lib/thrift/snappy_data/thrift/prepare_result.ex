@@ -17,16 +17,16 @@ defmodule(SnappyData.Thrift.PrepareResult) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.PrepareResult{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<10, 1::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 1::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | statement_id: value})
     end
-    defp(deserialize(<<3, 2::16-signed, value, rest::binary>>, acc)) do
+    defp(deserialize(<<3, 2::16-signed, value::8-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | statement_type: value})
     end
-    defp(deserialize(<<15, 3::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 3::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__parameter_meta_data(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<15, 4::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 4::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__result_set_meta_data(rest, [[], remaining, struct])
     end
     defp(deserialize(<<12, 5::16-signed, rest::binary>>, acc)) do
@@ -76,31 +76,31 @@ defmodule(SnappyData.Thrift.PrepareResult) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :statement_id on SnappyData.Thrift.PrepareResult must not be nil")
         _ ->
-          <<10, 1::size(16), statement_id::64-signed>>
+          <<10, 1::16-signed, statement_id::64-signed>>
       end, case(statement_type) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :statement_type on SnappyData.Thrift.PrepareResult must not be nil")
         _ ->
-          <<3, 2::size(16), statement_type::8-signed>>
+          <<3, 2::16-signed, statement_type::8-signed>>
       end, case(parameter_meta_data) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :parameter_meta_data on SnappyData.Thrift.PrepareResult must not be nil")
         _ ->
-          [<<15, 3::size(16), 12, length(parameter_meta_data)::size(32)>> | for(e <- parameter_meta_data) do
+          [<<15, 3::16-signed, 12, length(parameter_meta_data)::32-signed>> | for(e <- parameter_meta_data) do
             SnappyData.Thrift.ColumnDescriptor.serialize(e)
           end]
       end, case(result_set_meta_data) do
         nil ->
           <<>>
         _ ->
-          [<<15, 4::size(16), 12, length(result_set_meta_data)::size(32)>> | for(e <- result_set_meta_data) do
+          [<<15, 4::16-signed, 12, length(result_set_meta_data)::32-signed>> | for(e <- result_set_meta_data) do
             SnappyData.Thrift.ColumnDescriptor.serialize(e)
           end]
       end, case(warnings) do
         nil ->
           <<>>
         _ ->
-          [<<12, 5::size(16)>> | SnappyData.Thrift.SnappyExceptionData.serialize(warnings)]
+          [<<12, 5::16-signed>> | SnappyData.Thrift.SnappyExceptionData.serialize(warnings)]
       end | <<0>>]
     end
   end

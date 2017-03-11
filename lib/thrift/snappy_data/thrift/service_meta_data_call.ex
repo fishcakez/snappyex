@@ -135,12 +135,88 @@ defmodule(SnappyData.Thrift.ServiceMetaDataCall) do
   def(value_to_name(v)) do
     {:error, {:invalid_enum_value, v}}
   end
+  def(name_to_value(:catalogs)) do
+    {:ok, 1}
+  end
+  def(name_to_value(:schemas)) do
+    {:ok, 2}
+  end
+  def(name_to_value(:tables)) do
+    {:ok, 3}
+  end
+  def(name_to_value(:tabletypes)) do
+    {:ok, 4}
+  end
+  def(name_to_value(:columns)) do
+    {:ok, 5}
+  end
+  def(name_to_value(:tableprivileges)) do
+    {:ok, 6}
+  end
+  def(name_to_value(:columnprivileges)) do
+    {:ok, 7}
+  end
+  def(name_to_value(:primarykeys)) do
+    {:ok, 8}
+  end
+  def(name_to_value(:importedkeys)) do
+    {:ok, 9}
+  end
+  def(name_to_value(:exportedkeys)) do
+    {:ok, 10}
+  end
+  def(name_to_value(:crossreference)) do
+    {:ok, 11}
+  end
+  def(name_to_value(:procedures)) do
+    {:ok, 12}
+  end
+  def(name_to_value(:functions)) do
+    {:ok, 13}
+  end
+  def(name_to_value(:procedurecolumns)) do
+    {:ok, 14}
+  end
+  def(name_to_value(:functioncolumns)) do
+    {:ok, 15}
+  end
+  def(name_to_value(:attributes)) do
+    {:ok, 16}
+  end
+  def(name_to_value(:typeinfo)) do
+    {:ok, 17}
+  end
+  def(name_to_value(:supertypes)) do
+    {:ok, 18}
+  end
+  def(name_to_value(:supertables)) do
+    {:ok, 19}
+  end
+  def(name_to_value(:versioncolumns)) do
+    {:ok, 20}
+  end
+  def(name_to_value(:clientinfoprops)) do
+    {:ok, 21}
+  end
+  def(name_to_value(:pseudocolumns)) do
+    {:ok, 22}
+  end
+  def(name_to_value(k)) do
+    {:error, {:invalid_enum_name, k}}
+  end
   def(value_to_name!(value)) do
     {:ok, name} = value_to_name(value)
     name
   end
-  def(names) do
+  def(name_to_value!(name)) do
+    {:ok, value} = name_to_value(name)
+    value
+  end
+  def(meta(:names)) do
     [:catalogs, :schemas, :tables, :tabletypes, :columns, :tableprivileges, :columnprivileges, :primarykeys, :importedkeys, :exportedkeys, :crossreference, :procedures, :functions, :procedurecolumns, :functioncolumns, :attributes, :typeinfo, :supertypes, :supertables, :versioncolumns, :clientinfoprops, :pseudocolumns]
+  end
+  def(meta(:values)) do
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
   end
   def(member?(1)) do
     true
@@ -209,6 +285,75 @@ defmodule(SnappyData.Thrift.ServiceMetaDataCall) do
     true
   end
   def(member?(_)) do
+    false
+  end
+  def(name?(:catalogs)) do
+    true
+  end
+  def(name?(:schemas)) do
+    true
+  end
+  def(name?(:tables)) do
+    true
+  end
+  def(name?(:tabletypes)) do
+    true
+  end
+  def(name?(:columns)) do
+    true
+  end
+  def(name?(:tableprivileges)) do
+    true
+  end
+  def(name?(:columnprivileges)) do
+    true
+  end
+  def(name?(:primarykeys)) do
+    true
+  end
+  def(name?(:importedkeys)) do
+    true
+  end
+  def(name?(:exportedkeys)) do
+    true
+  end
+  def(name?(:crossreference)) do
+    true
+  end
+  def(name?(:procedures)) do
+    true
+  end
+  def(name?(:functions)) do
+    true
+  end
+  def(name?(:procedurecolumns)) do
+    true
+  end
+  def(name?(:functioncolumns)) do
+    true
+  end
+  def(name?(:attributes)) do
+    true
+  end
+  def(name?(:typeinfo)) do
+    true
+  end
+  def(name?(:supertypes)) do
+    true
+  end
+  def(name?(:supertables)) do
+    true
+  end
+  def(name?(:versioncolumns)) do
+    true
+  end
+  def(name?(:clientinfoprops)) do
+    true
+  end
+  def(name?(:pseudocolumns)) do
+    true
+  end
+  def(name?(_)) do
     false
   end
 end

@@ -7,7 +7,7 @@
 defmodule QueryTest do
   use ExUnit.Case
   import Snappyex.TestHelper
-  require Decimal
+#  require Decimal
   alias Snappyex, as: S
   require SnappyData.Thrift.SecurityMechanism
 

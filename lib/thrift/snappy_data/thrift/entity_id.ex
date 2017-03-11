@@ -16,13 +16,13 @@ defmodule(SnappyData.Thrift.EntityId) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.EntityId{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<10, 1::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 1::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | id: value})
     end
-    defp(deserialize(<<3, 2::16-signed, value, rest::binary>>, acc)) do
+    defp(deserialize(<<3, 2::16-signed, value::8-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | type: value})
     end
-    defp(deserialize(<<10, 3::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 3::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | conn_id: value})
     end
     defp(deserialize(<<11, 4::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -39,22 +39,22 @@ defmodule(SnappyData.Thrift.EntityId) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :id on SnappyData.Thrift.EntityId must not be nil")
         _ ->
-          <<10, 1::size(16), id::64-signed>>
+          <<10, 1::16-signed, id::64-signed>>
       end, case(type) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :type on SnappyData.Thrift.EntityId must not be nil")
         _ ->
-          <<3, 2::size(16), type::8-signed>>
+          <<3, 2::16-signed, type::8-signed>>
       end, case(conn_id) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :conn_id on SnappyData.Thrift.EntityId must not be nil")
         _ ->
-          <<10, 3::size(16), conn_id::64-signed>>
+          <<10, 3::16-signed, conn_id::64-signed>>
       end, case(token) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :token on SnappyData.Thrift.EntityId must not be nil")
         _ ->
-          [<<11, 4::size(16), byte_size(token)::size(32)>> | token]
+          [<<11, 4::16-signed, byte_size(token)::32-signed>> | token]
       end | <<0>>]
     end
   end

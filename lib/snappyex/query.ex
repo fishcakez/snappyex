@@ -76,10 +76,10 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   end  
 #  def decode_field(column_value, :real), do: elem(column_value, @decimal_val)
   def decode_field(value, :double), do: value.double_val
-  def decode_field(value, :decimal) do 
-    %SnappyData.Thrift.Decimal{magnitude: _magnitude, scale: _scale, signum: _signum} = value.decimal_val
-    #decode_numeric(signum, magnitude)
-  end  
+#  def decode_field(value, :decimal) do 
+#    %SnappyData.Thrift.Decimal{magnitude: _magnitude, scale: _scale, signum: _signum} = value.decimal_val
+#    #decode_numeric(signum, magnitude)
+#  end  
 
   def decode_field(value, :char), do: value.string_val
   def decode_field(value, :varchar), do: value.string_val

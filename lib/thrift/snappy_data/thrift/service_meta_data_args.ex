@@ -26,10 +26,10 @@ defmodule(SnappyData.Thrift.ServiceMetaDataArgs) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.ServiceMetaDataArgs{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<10, 1::16-signed, value::size(64), rest::binary>>, acc)) do
+    defp(deserialize(<<10, 1::16-signed, value::64-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | conn_id: value})
     end
-    defp(deserialize(<<3, 2::16-signed, value, rest::binary>>, acc)) do
+    defp(deserialize(<<3, 2::16-signed, value::8-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | driver_type: value})
     end
     defp(deserialize(<<11, 3::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -41,7 +41,7 @@ defmodule(SnappyData.Thrift.ServiceMetaDataArgs) do
     defp(deserialize(<<11, 5::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | table: value})
     end
-    defp(deserialize(<<15, 6::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 6::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__table_types(rest, [[], remaining, struct])
     end
     defp(deserialize(<<11, 7::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -65,7 +65,7 @@ defmodule(SnappyData.Thrift.ServiceMetaDataArgs) do
     defp(deserialize(<<11, 13::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | type_name: value})
     end
-    defp(deserialize(<<8, 14::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 14::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | type_id: value})
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -88,74 +88,74 @@ defmodule(SnappyData.Thrift.ServiceMetaDataArgs) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :conn_id on SnappyData.Thrift.ServiceMetaDataArgs must not be nil")
         _ ->
-          <<10, 1::size(16), conn_id::64-signed>>
+          <<10, 1::16-signed, conn_id::64-signed>>
       end, case(driver_type) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :driver_type on SnappyData.Thrift.ServiceMetaDataArgs must not be nil")
         _ ->
-          <<3, 2::size(16), driver_type::8-signed>>
+          <<3, 2::16-signed, driver_type::8-signed>>
       end, case(token) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :token on SnappyData.Thrift.ServiceMetaDataArgs must not be nil")
         _ ->
-          [<<11, 3::size(16), byte_size(token)::size(32)>> | token]
+          [<<11, 3::16-signed, byte_size(token)::32-signed>> | token]
       end, case(schema) do
         nil ->
           <<>>
         _ ->
-          [<<11, 4::size(16), byte_size(schema)::size(32)>> | schema]
+          [<<11, 4::16-signed, byte_size(schema)::32-signed>> | schema]
       end, case(table) do
         nil ->
           <<>>
         _ ->
-          [<<11, 5::size(16), byte_size(table)::size(32)>> | table]
+          [<<11, 5::16-signed, byte_size(table)::32-signed>> | table]
       end, case(table_types) do
         nil ->
           <<>>
         _ ->
-          [<<15, 6::size(16), 11, length(table_types)::size(32)>> | for(e <- table_types) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 6::16-signed, 11, length(table_types)::32-signed>> | for(e <- table_types) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(column_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 7::size(16), byte_size(column_name)::size(32)>> | column_name]
+          [<<11, 7::16-signed, byte_size(column_name)::32-signed>> | column_name]
       end, case(foreign_schema) do
         nil ->
           <<>>
         _ ->
-          [<<11, 8::size(16), byte_size(foreign_schema)::size(32)>> | foreign_schema]
+          [<<11, 8::16-signed, byte_size(foreign_schema)::32-signed>> | foreign_schema]
       end, case(foreign_table) do
         nil ->
           <<>>
         _ ->
-          [<<11, 9::size(16), byte_size(foreign_table)::size(32)>> | foreign_table]
+          [<<11, 9::16-signed, byte_size(foreign_table)::32-signed>> | foreign_table]
       end, case(procedure_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 10::size(16), byte_size(procedure_name)::size(32)>> | procedure_name]
+          [<<11, 10::16-signed, byte_size(procedure_name)::32-signed>> | procedure_name]
       end, case(function_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 11::size(16), byte_size(function_name)::size(32)>> | function_name]
+          [<<11, 11::16-signed, byte_size(function_name)::32-signed>> | function_name]
       end, case(attribute_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 12::size(16), byte_size(attribute_name)::size(32)>> | attribute_name]
+          [<<11, 12::16-signed, byte_size(attribute_name)::32-signed>> | attribute_name]
       end, case(type_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 13::size(16), byte_size(type_name)::size(32)>> | type_name]
+          [<<11, 13::16-signed, byte_size(type_name)::32-signed>> | type_name]
       end, case(type_id) do
         nil ->
           <<>>
         _ ->
-          <<8, 14::size(16), type_id::32-signed>>
+          <<8, 14::16-signed, type_id::32-signed>>
       end | <<0>>]
     end
   end

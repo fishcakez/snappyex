@@ -15,10 +15,10 @@ defmodule(SnappyData.Thrift.OutputParameter) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.OutputParameter{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<8, 1::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 1::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | type: value})
     end
-    defp(deserialize(<<8, 2::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 2::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | scale: value})
     end
     defp(deserialize(<<11, 3::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -35,17 +35,17 @@ defmodule(SnappyData.Thrift.OutputParameter) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :type on SnappyData.Thrift.OutputParameter must not be nil")
         _ ->
-          <<8, 1::size(16), type::32-signed>>
+          <<8, 1::16-signed, type::32-signed>>
       end, case(scale) do
         nil ->
           <<>>
         _ ->
-          <<8, 2::size(16), scale::32-signed>>
+          <<8, 2::16-signed, scale::32-signed>>
       end, case(type_name) do
         nil ->
           <<>>
         _ ->
-          [<<11, 3::size(16), byte_size(type_name)::size(32)>> | type_name]
+          [<<11, 3::16-signed, byte_size(type_name)::32-signed>> | type_name]
       end | <<0>>]
     end
   end

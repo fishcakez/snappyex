@@ -66,34 +66,34 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize(<<11, 2::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | product_version: value})
     end
-    defp(deserialize(<<8, 3::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 3::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | product_major_version: value})
     end
-    defp(deserialize(<<8, 4::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 4::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | product_minor_version: value})
     end
-    defp(deserialize(<<8, 5::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 5::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | jdbc_major_version: value})
     end
-    defp(deserialize(<<8, 6::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 6::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | jdbc_minor_version: value})
     end
     defp(deserialize(<<11, 7::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | identifier_quote: value})
     end
-    defp(deserialize(<<15, 8::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 8::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__sql_keywords(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<15, 9::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 9::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__numeric_functions(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<15, 10::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 10::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__string_functions(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<15, 11::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 11::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__system_functions(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<15, 12::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 12::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__date_time_functions(rest, [[], remaining, struct])
     end
     defp(deserialize(<<11, 13::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -102,7 +102,7 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize(<<11, 14::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | extra_name_characters: value})
     end
-    defp(deserialize(<<13, 15::16-signed, 8, 14, map_size::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<13, 15::16-signed, 8, 14, map_size::32-signed, rest::binary>>, struct)) do
       deserialize__supported_convert__key(rest, [%{}, map_size, struct])
     end
     defp(deserialize(<<11, 16::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -117,70 +117,70 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize(<<11, 19::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | catalog_separator: value})
     end
-    defp(deserialize(<<8, 20::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 20::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_binary_literal_length: value})
     end
-    defp(deserialize(<<8, 21::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 21::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_char_literal_length: value})
     end
-    defp(deserialize(<<8, 22::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 22::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_columns_in_group_by: value})
     end
-    defp(deserialize(<<8, 23::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 23::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_columns_in_index: value})
     end
-    defp(deserialize(<<8, 24::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 24::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_columns_in_order_by: value})
     end
-    defp(deserialize(<<8, 25::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 25::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_columns_in_select: value})
     end
-    defp(deserialize(<<8, 26::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 26::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_columns_in_table: value})
     end
-    defp(deserialize(<<8, 27::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 27::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_connections: value})
     end
-    defp(deserialize(<<8, 28::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 28::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_index_length: value})
     end
-    defp(deserialize(<<8, 29::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 29::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_row_size: value})
     end
-    defp(deserialize(<<8, 30::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 30::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_statement_length: value})
     end
-    defp(deserialize(<<8, 31::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 31::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_open_statements: value})
     end
-    defp(deserialize(<<8, 32::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 32::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_table_names_in_select: value})
     end
-    defp(deserialize(<<8, 33::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 33::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_column_name_length: value})
     end
-    defp(deserialize(<<8, 34::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 34::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_cursor_name_length: value})
     end
-    defp(deserialize(<<8, 35::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 35::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_schema_name_length: value})
     end
-    defp(deserialize(<<8, 36::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 36::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_procedure_name_length: value})
     end
-    defp(deserialize(<<8, 37::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 37::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_catalog_name_length: value})
     end
-    defp(deserialize(<<8, 38::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 38::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_table_name_length: value})
     end
-    defp(deserialize(<<8, 39::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 39::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | max_user_name_length: value})
     end
-    defp(deserialize(<<8, 40::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 40::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | default_transaction_isolation: value})
     end
-    defp(deserialize(<<3, 41::16-signed, value, rest::binary>>, acc)) do
+    defp(deserialize(<<3, 41::16-signed, value::8-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | default_result_set_type: value})
     end
     defp(deserialize(<<2, 42::16-signed, 1, rest::binary>>, acc)) do
@@ -201,16 +201,16 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize(<<2, 44::16-signed, 0, rest::binary>>, acc)) do
       deserialize(rest, %{acc | catalog_at_start: false})
     end
-    defp(deserialize(<<13, 45::16-signed, 8, 2, map_size::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<13, 45::16-signed, 8, 2, map_size::32-signed, rest::binary>>, struct)) do
       deserialize__transaction_defaults__key(rest, [%{}, map_size, struct])
     end
-    defp(deserialize(<<8, 46::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 46::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | row_id_life_time: value})
     end
-    defp(deserialize(<<14, 47::16-signed, 8, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<14, 47::16-signed, 8, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__supported_features(rest, [[], remaining, struct])
     end
-    defp(deserialize(<<13, 48::16-signed, 8, 15, map_size::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<13, 48::16-signed, 8, 15, map_size::32-signed, rest::binary>>, struct)) do
       deserialize__features_with_params__key(rest, [%{}, map_size, struct])
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -231,13 +231,13 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize__features_with_params__key(<<rest::binary>>, [map, 0, struct])) do
       deserialize(rest, %{struct | features_with_params: map})
     end
-    defp(deserialize__features_with_params__key(<<key::size(32), rest::binary>>, stack)) do
+    defp(deserialize__features_with_params__key(<<key::32-signed, rest::binary>>, stack)) do
       deserialize__features_with_params__value(rest, key, stack)
     end
     defp(deserialize__features_with_params__key(_, _)) do
       :error
     end
-    defp(deserialize__features_with_params__value(<<8, remaining::size(32), rest::binary>>, key, stack)) do
+    defp(deserialize__features_with_params__value(<<8, remaining::32-signed, rest::binary>>, key, stack)) do
       deserialize__features_with_params__value__element(rest, [[], remaining, key | stack])
     end
     defp(deserialize__features_with_params__value(_, _, _)) do
@@ -246,7 +246,7 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize__features_with_params__value__element(<<rest::binary>>, [value, 0, key, map, remaining | stack])) do
       deserialize__features_with_params__key(rest, [Map.put(map, key, Enum.reverse(value)), remaining - 1 | stack])
     end
-    defp(deserialize__features_with_params__value__element(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+    defp(deserialize__features_with_params__value__element(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
       deserialize__features_with_params__value__element(rest, [[element | list], remaining - 1 | stack])
     end
     defp(deserialize__features_with_params__value__element(_, _)) do
@@ -282,13 +282,13 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize__supported_convert__key(<<rest::binary>>, [map, 0, struct])) do
       deserialize(rest, %{struct | supported_convert: map})
     end
-    defp(deserialize__supported_convert__key(<<key::size(32), rest::binary>>, stack)) do
+    defp(deserialize__supported_convert__key(<<key::32-signed, rest::binary>>, stack)) do
       deserialize__supported_convert__value(rest, key, stack)
     end
     defp(deserialize__supported_convert__key(_, _)) do
       :error
     end
-    defp(deserialize__supported_convert__value(<<8, remaining::size(32), rest::binary>>, key, stack)) do
+    defp(deserialize__supported_convert__value(<<8, remaining::32-signed, rest::binary>>, key, stack)) do
       deserialize__supported_convert__value__element(rest, [[], remaining, key | stack])
     end
     defp(deserialize__supported_convert__value(_, _, _)) do
@@ -297,7 +297,7 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize__supported_convert__value__element(<<rest::binary>>, [value, 0, key, map, remaining | stack])) do
       deserialize__supported_convert__key(rest, [Map.put(map, key, MapSet.new(value)), remaining - 1 | stack])
     end
-    defp(deserialize__supported_convert__value__element(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+    defp(deserialize__supported_convert__value__element(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
       deserialize__supported_convert__value__element(rest, [[element | list], remaining - 1 | stack])
     end
     defp(deserialize__supported_convert__value__element(_, _)) do
@@ -306,7 +306,7 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize__supported_features(<<rest::binary>>, [list, 0, struct])) do
       deserialize(rest, %{struct | supported_features: MapSet.new(list)})
     end
-    defp(deserialize__supported_features(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+    defp(deserialize__supported_features(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
       deserialize__supported_features(rest, [[element | list], remaining - 1 | stack])
     end
     defp(deserialize__supported_features(_, _)) do
@@ -324,7 +324,7 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
     defp(deserialize__transaction_defaults__key(<<rest::binary>>, [map, 0, struct])) do
       deserialize(rest, %{struct | transaction_defaults: map})
     end
-    defp(deserialize__transaction_defaults__key(<<key::size(32), rest::binary>>, stack)) do
+    defp(deserialize__transaction_defaults__key(<<key::32-signed, rest::binary>>, stack)) do
       deserialize__transaction_defaults__value(rest, key, stack)
     end
     defp(deserialize__transaction_defaults__key(_, _)) do
@@ -344,88 +344,88 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :product_name on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 1::size(16), byte_size(product_name)::size(32)>> | product_name]
+          [<<11, 1::16-signed, byte_size(product_name)::32-signed>> | product_name]
       end, case(product_version) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :product_version on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 2::size(16), byte_size(product_version)::size(32)>> | product_version]
+          [<<11, 2::16-signed, byte_size(product_version)::32-signed>> | product_version]
       end, case(product_major_version) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :product_major_version on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 3::size(16), product_major_version::32-signed>>
+          <<8, 3::16-signed, product_major_version::32-signed>>
       end, case(product_minor_version) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :product_minor_version on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 4::size(16), product_minor_version::32-signed>>
+          <<8, 4::16-signed, product_minor_version::32-signed>>
       end, case(jdbc_major_version) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :jdbc_major_version on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 5::size(16), jdbc_major_version::32-signed>>
+          <<8, 5::16-signed, jdbc_major_version::32-signed>>
       end, case(jdbc_minor_version) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :jdbc_minor_version on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 6::size(16), jdbc_minor_version::32-signed>>
+          <<8, 6::16-signed, jdbc_minor_version::32-signed>>
       end, case(identifier_quote) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :identifier_quote on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 7::size(16), byte_size(identifier_quote)::size(32)>> | identifier_quote]
+          [<<11, 7::16-signed, byte_size(identifier_quote)::32-signed>> | identifier_quote]
       end, case(sql_keywords) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :sql_keywords on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<15, 8::size(16), 11, length(sql_keywords)::size(32)>> | for(e <- sql_keywords) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 8::16-signed, 11, length(sql_keywords)::32-signed>> | for(e <- sql_keywords) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(numeric_functions) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :numeric_functions on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<15, 9::size(16), 11, length(numeric_functions)::size(32)>> | for(e <- numeric_functions) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 9::16-signed, 11, length(numeric_functions)::32-signed>> | for(e <- numeric_functions) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(string_functions) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :string_functions on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<15, 10::size(16), 11, length(string_functions)::size(32)>> | for(e <- string_functions) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 10::16-signed, 11, length(string_functions)::32-signed>> | for(e <- string_functions) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(system_functions) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :system_functions on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<15, 11::size(16), 11, length(system_functions)::size(32)>> | for(e <- system_functions) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 11::16-signed, 11, length(system_functions)::32-signed>> | for(e <- system_functions) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(date_time_functions) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :date_time_functions on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<15, 12::size(16), 11, length(date_time_functions)::size(32)>> | for(e <- date_time_functions) do
-            [<<byte_size(e)::size(32)>> | e]
+          [<<15, 12::16-signed, 11, length(date_time_functions)::32-signed>> | for(e <- date_time_functions) do
+            [<<byte_size(e)::32-signed>> | e]
           end]
       end, case(search_string_escape) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :search_string_escape on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 13::size(16), byte_size(search_string_escape)::size(32)>> | search_string_escape]
+          [<<11, 13::16-signed, byte_size(search_string_escape)::32-signed>> | search_string_escape]
       end, case(extra_name_characters) do
         nil ->
           <<>>
         _ ->
-          [<<11, 14::size(16), byte_size(extra_name_characters)::size(32)>> | extra_name_characters]
+          [<<11, 14::16-signed, byte_size(extra_name_characters)::32-signed>> | extra_name_characters]
       end, case(supported_convert) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :supported_convert on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<13, 15::size(16), 8, 14, Enum.count(supported_convert)::size(32)>> | for({k, v} <- supported_convert) do
-            [<<k::32-signed, 8, Enum.count(v)::size(32)>> | for(e <- v) do
+          [<<13, 15::16-signed, 8, 14, Enum.count(supported_convert)::32-signed>> | for({k, v} <- supported_convert) do
+            [<<k::32-signed, 8, Enum.count(v)::32-signed>> | for(e <- v) do
               <<e::32-signed>>
             end]
           end]
@@ -433,158 +433,158 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :schema_term on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 16::size(16), byte_size(schema_term)::size(32)>> | schema_term]
+          [<<11, 16::16-signed, byte_size(schema_term)::32-signed>> | schema_term]
       end, case(procedure_term) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :procedure_term on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 17::size(16), byte_size(procedure_term)::size(32)>> | procedure_term]
+          [<<11, 17::16-signed, byte_size(procedure_term)::32-signed>> | procedure_term]
       end, case(catalog_term) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :catalog_term on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 18::size(16), byte_size(catalog_term)::size(32)>> | catalog_term]
+          [<<11, 18::16-signed, byte_size(catalog_term)::32-signed>> | catalog_term]
       end, case(catalog_separator) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :catalog_separator on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<11, 19::size(16), byte_size(catalog_separator)::size(32)>> | catalog_separator]
+          [<<11, 19::16-signed, byte_size(catalog_separator)::32-signed>> | catalog_separator]
       end, case(max_binary_literal_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_binary_literal_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 20::size(16), max_binary_literal_length::32-signed>>
+          <<8, 20::16-signed, max_binary_literal_length::32-signed>>
       end, case(max_char_literal_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_char_literal_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 21::size(16), max_char_literal_length::32-signed>>
+          <<8, 21::16-signed, max_char_literal_length::32-signed>>
       end, case(max_columns_in_group_by) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_columns_in_group_by on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 22::size(16), max_columns_in_group_by::32-signed>>
+          <<8, 22::16-signed, max_columns_in_group_by::32-signed>>
       end, case(max_columns_in_index) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_columns_in_index on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 23::size(16), max_columns_in_index::32-signed>>
+          <<8, 23::16-signed, max_columns_in_index::32-signed>>
       end, case(max_columns_in_order_by) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_columns_in_order_by on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 24::size(16), max_columns_in_order_by::32-signed>>
+          <<8, 24::16-signed, max_columns_in_order_by::32-signed>>
       end, case(max_columns_in_select) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_columns_in_select on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 25::size(16), max_columns_in_select::32-signed>>
+          <<8, 25::16-signed, max_columns_in_select::32-signed>>
       end, case(max_columns_in_table) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_columns_in_table on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 26::size(16), max_columns_in_table::32-signed>>
+          <<8, 26::16-signed, max_columns_in_table::32-signed>>
       end, case(max_connections) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_connections on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 27::size(16), max_connections::32-signed>>
+          <<8, 27::16-signed, max_connections::32-signed>>
       end, case(max_index_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_index_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 28::size(16), max_index_length::32-signed>>
+          <<8, 28::16-signed, max_index_length::32-signed>>
       end, case(max_row_size) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_row_size on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 29::size(16), max_row_size::32-signed>>
+          <<8, 29::16-signed, max_row_size::32-signed>>
       end, case(max_statement_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_statement_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 30::size(16), max_statement_length::32-signed>>
+          <<8, 30::16-signed, max_statement_length::32-signed>>
       end, case(max_open_statements) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_open_statements on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 31::size(16), max_open_statements::32-signed>>
+          <<8, 31::16-signed, max_open_statements::32-signed>>
       end, case(max_table_names_in_select) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_table_names_in_select on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 32::size(16), max_table_names_in_select::32-signed>>
+          <<8, 32::16-signed, max_table_names_in_select::32-signed>>
       end, case(max_column_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_column_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 33::size(16), max_column_name_length::32-signed>>
+          <<8, 33::16-signed, max_column_name_length::32-signed>>
       end, case(max_cursor_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_cursor_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 34::size(16), max_cursor_name_length::32-signed>>
+          <<8, 34::16-signed, max_cursor_name_length::32-signed>>
       end, case(max_schema_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_schema_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 35::size(16), max_schema_name_length::32-signed>>
+          <<8, 35::16-signed, max_schema_name_length::32-signed>>
       end, case(max_procedure_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_procedure_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 36::size(16), max_procedure_name_length::32-signed>>
+          <<8, 36::16-signed, max_procedure_name_length::32-signed>>
       end, case(max_catalog_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_catalog_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 37::size(16), max_catalog_name_length::32-signed>>
+          <<8, 37::16-signed, max_catalog_name_length::32-signed>>
       end, case(max_table_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_table_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 38::size(16), max_table_name_length::32-signed>>
+          <<8, 38::16-signed, max_table_name_length::32-signed>>
       end, case(max_user_name_length) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :max_user_name_length on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 39::size(16), max_user_name_length::32-signed>>
+          <<8, 39::16-signed, max_user_name_length::32-signed>>
       end, case(default_transaction_isolation) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :default_transaction_isolation on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 40::size(16), default_transaction_isolation::32-signed>>
+          <<8, 40::16-signed, default_transaction_isolation::32-signed>>
       end, case(default_result_set_type) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :default_result_set_type on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<3, 41::size(16), default_result_set_type::8-signed>>
+          <<3, 41::16-signed, default_result_set_type::8-signed>>
       end, case(default_result_set_holdability_hold_cursors_over_commit) do
         false ->
-          <<2, 42::size(16), 0>>
+          <<2, 42::16-signed, 0>>
         true ->
-          <<2, 42::size(16), 1>>
+          <<2, 42::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Required boolean field :default_result_set_holdability_hold_cursors_over_commit on SnappyData.Thrift.ServiceMetaData must be true or false")
       end, case(sql_state_is_x_open) do
         false ->
-          <<2, 43::size(16), 0>>
+          <<2, 43::16-signed, 0>>
         true ->
-          <<2, 43::size(16), 1>>
+          <<2, 43::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Required boolean field :sql_state_is_x_open on SnappyData.Thrift.ServiceMetaData must be true or false")
       end, case(catalog_at_start) do
         false ->
-          <<2, 44::size(16), 0>>
+          <<2, 44::16-signed, 0>>
         true ->
-          <<2, 44::size(16), 1>>
+          <<2, 44::16-signed, 1>>
         _ ->
           raise(Thrift.InvalidValueException, "Required boolean field :catalog_at_start on SnappyData.Thrift.ServiceMetaData must be true or false")
       end, case(transaction_defaults) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :transaction_defaults on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<13, 45::size(16), 8, 2, Enum.count(transaction_defaults)::size(32)>> | for({k, v} <- transaction_defaults) do
+          [<<13, 45::16-signed, 8, 2, Enum.count(transaction_defaults)::32-signed>> | for({k, v} <- transaction_defaults) do
             [<<k::32-signed>> | case(v) do
               nil ->
                 <<0>>
@@ -598,20 +598,20 @@ defmodule(SnappyData.Thrift.ServiceMetaData) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :row_id_life_time on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          <<8, 46::size(16), row_id_life_time::32-signed>>
+          <<8, 46::16-signed, row_id_life_time::32-signed>>
       end, case(supported_features) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :supported_features on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<14, 47::size(16), 8, Enum.count(supported_features)::size(32)>> | for(e <- supported_features) do
+          [<<14, 47::16-signed, 8, Enum.count(supported_features)::32-signed>> | for(e <- supported_features) do
             <<e::32-signed>>
           end]
       end, case(features_with_params) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :features_with_params on SnappyData.Thrift.ServiceMetaData must not be nil")
         _ ->
-          [<<13, 48::size(16), 8, 15, Enum.count(features_with_params)::size(32)>> | for({k, v} <- features_with_params) do
-            [<<k::32-signed, 8, length(v)::size(32)>> | for(e <- v) do
+          [<<13, 48::16-signed, 8, 15, Enum.count(features_with_params)::32-signed>> | for({k, v} <- features_with_params) do
+            [<<k::32-signed, 8, length(v)::32-signed>> | for(e <- v) do
               <<e::32-signed>>
             end]
           end]

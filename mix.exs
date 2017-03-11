@@ -24,7 +24,7 @@ defmodule Snappyex.Mixfile do
     [{:dialyxir, "~> 0.3.5", only: [:dev]},
      {:db_connection, "~> 1.1.0"},
      {:thrift, github: "pinterest/elixir-thrift", ref: "thrift_tng"},
-     {:decimal, "~> 1.3.1"},
+#     {:decimal, "~> 1.3.1"},
      {:timex, "~> 3.0.8"} # Downloads tzdata every day
     ]
   end

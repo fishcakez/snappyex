@@ -19,13 +19,13 @@ defmodule(SnappyData.Thrift.HostAddress) do
     defp(deserialize(<<11, 1::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | host_name: value})
     end
-    defp(deserialize(<<8, 2::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 2::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | port: value})
     end
     defp(deserialize(<<11, 3::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | ip_address: value})
     end
-    defp(deserialize(<<8, 4::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 4::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | server_type: value})
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -39,22 +39,22 @@ defmodule(SnappyData.Thrift.HostAddress) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :host_name on SnappyData.Thrift.HostAddress must not be nil")
         _ ->
-          [<<11, 1::size(16), byte_size(host_name)::size(32)>> | host_name]
+          [<<11, 1::16-signed, byte_size(host_name)::32-signed>> | host_name]
       end, case(port) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :port on SnappyData.Thrift.HostAddress must not be nil")
         _ ->
-          <<8, 2::size(16), port::32-signed>>
+          <<8, 2::16-signed, port::32-signed>>
       end, case(ip_address) do
         nil ->
           <<>>
         _ ->
-          [<<11, 3::size(16), byte_size(ip_address)::size(32)>> | ip_address]
+          [<<11, 3::16-signed, byte_size(ip_address)::32-signed>> | ip_address]
       end, case(server_type) do
         nil ->
           <<>>
         _ ->
-          <<8, 4::size(16), server_type::32-signed>>
+          <<8, 4::16-signed, server_type::32-signed>>
       end | <<0>>]
     end
   end

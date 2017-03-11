@@ -13,7 +13,7 @@ defmodule(SnappyData.Thrift.Row) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.Row{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<15, 1::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 1::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__values(rest, [[], remaining, struct])
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -41,7 +41,7 @@ defmodule(SnappyData.Thrift.Row) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :values on SnappyData.Thrift.Row must not be nil")
         _ ->
-          [<<15, 1::size(16), 12, length(values)::size(32)>> | for(e <- values) do
+          [<<15, 1::16-signed, 12, length(values)::32-signed>> | for(e <- values) do
             SnappyData.Thrift.ColumnValue.serialize(e)
           end]
       end | <<0>>]

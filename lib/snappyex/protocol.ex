@@ -27,7 +27,7 @@ defmodule Snappyex.Protocol do
     {:ok, conn_properties} = Keyword.fetch(opts, :properties)
     {:ok, client_host_name} = :inet.gethostname
     client_host_name = to_string(client_host_name)
-    {:ok, properties} = Client.open_connection_with_options(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: client_host_name, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: user_name, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal}, gen_server_opts: [timeout: @time_out])
+    {:ok, properties} = Client.open_connection_with_options(pid, %SnappyData.Thrift.OpenConnectionArgs{client_host_name: client_host_name, client_id: "ElixirClient1|0x" <> Base.encode16(inspect self()), user_name: user_name, password: password, security: security, properties: conn_properties, token_size: token_size, use_string_for_decimal: use_string_for_decimal, for_xa: false}, gen_server_opts: [timeout: @time_out])
     state = [process_id: pid, connection_id: properties.conn_id, client_host_name: properties.client_host_name, client_id: properties.client_id, cache: Snappyex.Cache.new(), token: properties.token, opts: opts]
     {:ok, state}
   end

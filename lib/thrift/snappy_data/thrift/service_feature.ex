@@ -531,12 +531,286 @@ defmodule(SnappyData.Thrift.ServiceFeature) do
   def(value_to_name(v)) do
     {:error, {:invalid_enum_value, v}}
   end
+  def(name_to_value(:all_procedures_callable)) do
+    {:ok, 1}
+  end
+  def(name_to_value(:all_tables_selectable)) do
+    {:ok, 2}
+  end
+  def(name_to_value(:integrity_enhancement)) do
+    {:ok, 3}
+  end
+  def(name_to_value(:nulls_sorted_high)) do
+    {:ok, 4}
+  end
+  def(name_to_value(:nulls_sorted_low)) do
+    {:ok, 5}
+  end
+  def(name_to_value(:nulls_sorted_start)) do
+    {:ok, 6}
+  end
+  def(name_to_value(:nulls_sorted_end)) do
+    {:ok, 7}
+  end
+  def(name_to_value(:uses_local_files)) do
+    {:ok, 8}
+  end
+  def(name_to_value(:uses_local_file_per_table)) do
+    {:ok, 9}
+  end
+  def(name_to_value(:mixedcase_identifiers)) do
+    {:ok, 10}
+  end
+  def(name_to_value(:mixedcase_quoted_identifiers)) do
+    {:ok, 11}
+  end
+  def(name_to_value(:stores_uppercase_identifiers)) do
+    {:ok, 12}
+  end
+  def(name_to_value(:stores_lowercase_identifiers)) do
+    {:ok, 13}
+  end
+  def(name_to_value(:stores_mixedcase_identifiers)) do
+    {:ok, 14}
+  end
+  def(name_to_value(:stores_uppercase_quoted_identifiers)) do
+    {:ok, 15}
+  end
+  def(name_to_value(:stores_lowercase_quoted_identifiers)) do
+    {:ok, 16}
+  end
+  def(name_to_value(:stores_mixedcase_quoted_identifiers)) do
+    {:ok, 17}
+  end
+  def(name_to_value(:alter_table_add_column)) do
+    {:ok, 18}
+  end
+  def(name_to_value(:alter_table_drop_column)) do
+    {:ok, 19}
+  end
+  def(name_to_value(:column_aliasing)) do
+    {:ok, 20}
+  end
+  def(name_to_value(:null_concat_non_null_is_null)) do
+    {:ok, 21}
+  end
+  def(name_to_value(:convert)) do
+    {:ok, 22}
+  end
+  def(name_to_value(:table_correlation_names)) do
+    {:ok, 23}
+  end
+  def(name_to_value(:table_correlation_names_different)) do
+    {:ok, 24}
+  end
+  def(name_to_value(:order_by_expressions)) do
+    {:ok, 25}
+  end
+  def(name_to_value(:order_by_unrelated)) do
+    {:ok, 26}
+  end
+  def(name_to_value(:group_by)) do
+    {:ok, 27}
+  end
+  def(name_to_value(:group_by_unrelated)) do
+    {:ok, 28}
+  end
+  def(name_to_value(:group_by_beyond_select)) do
+    {:ok, 29}
+  end
+  def(name_to_value(:like_escape)) do
+    {:ok, 30}
+  end
+  def(name_to_value(:multiple_resultsets)) do
+    {:ok, 31}
+  end
+  def(name_to_value(:multiple_transactions)) do
+    {:ok, 32}
+  end
+  def(name_to_value(:non_nullable_columns)) do
+    {:ok, 33}
+  end
+  def(name_to_value(:sql_grammar_minimum)) do
+    {:ok, 34}
+  end
+  def(name_to_value(:sql_grammar_core)) do
+    {:ok, 35}
+  end
+  def(name_to_value(:sql_grammar_extended)) do
+    {:ok, 36}
+  end
+  def(name_to_value(:sql_grammar_ansi92_entry)) do
+    {:ok, 37}
+  end
+  def(name_to_value(:sql_grammar_ansi92_intermediate)) do
+    {:ok, 38}
+  end
+  def(name_to_value(:sql_grammar_ansi92_full)) do
+    {:ok, 39}
+  end
+  def(name_to_value(:outer_joins)) do
+    {:ok, 40}
+  end
+  def(name_to_value(:outer_joins_full)) do
+    {:ok, 41}
+  end
+  def(name_to_value(:outer_joins_limited)) do
+    {:ok, 42}
+  end
+  def(name_to_value(:schemas_in_dmls)) do
+    {:ok, 43}
+  end
+  def(name_to_value(:schemas_in_procedure_calls)) do
+    {:ok, 44}
+  end
+  def(name_to_value(:schemas_in_table_defs)) do
+    {:ok, 45}
+  end
+  def(name_to_value(:schemas_in_index_defs)) do
+    {:ok, 46}
+  end
+  def(name_to_value(:schemas_in_privilege_defs)) do
+    {:ok, 47}
+  end
+  def(name_to_value(:autocommit_failure_closes_all_resultsets)) do
+    {:ok, 48}
+  end
+  def(name_to_value(:catalogs_in_dmls)) do
+    {:ok, 49}
+  end
+  def(name_to_value(:catalogs_in_procedure_calls)) do
+    {:ok, 50}
+  end
+  def(name_to_value(:catalogs_in_table_defs)) do
+    {:ok, 51}
+  end
+  def(name_to_value(:catalogs_in_index_defs)) do
+    {:ok, 52}
+  end
+  def(name_to_value(:catalogs_in_privilege_defs)) do
+    {:ok, 53}
+  end
+  def(name_to_value(:positioned_delete)) do
+    {:ok, 54}
+  end
+  def(name_to_value(:positioned_update)) do
+    {:ok, 55}
+  end
+  def(name_to_value(:select_for_update)) do
+    {:ok, 56}
+  end
+  def(name_to_value(:stored_procedures)) do
+    {:ok, 57}
+  end
+  def(name_to_value(:subqueries_in_comparisons)) do
+    {:ok, 58}
+  end
+  def(name_to_value(:subqueries_in_exists)) do
+    {:ok, 59}
+  end
+  def(name_to_value(:subqueries_in_ins)) do
+    {:ok, 60}
+  end
+  def(name_to_value(:subqueries_in_quantifieds)) do
+    {:ok, 61}
+  end
+  def(name_to_value(:subqueries_correlated)) do
+    {:ok, 62}
+  end
+  def(name_to_value(:union)) do
+    {:ok, 63}
+  end
+  def(name_to_value(:union_all)) do
+    {:ok, 64}
+  end
+  def(name_to_value(:open_cursors_across_commit)) do
+    {:ok, 65}
+  end
+  def(name_to_value(:open_cursors_across_rollback)) do
+    {:ok, 66}
+  end
+  def(name_to_value(:open_statements_across_commit)) do
+    {:ok, 67}
+  end
+  def(name_to_value(:open_statements_across_rollback)) do
+    {:ok, 68}
+  end
+  def(name_to_value(:max_rowsize_includes_blobsize)) do
+    {:ok, 69}
+  end
+  def(name_to_value(:transactions)) do
+    {:ok, 70}
+  end
+  def(name_to_value(:transactions_both_dmls_and_ddls)) do
+    {:ok, 71}
+  end
+  def(name_to_value(:transactions_dmls_only)) do
+    {:ok, 72}
+  end
+  def(name_to_value(:transactions_ddls_implicit_commit)) do
+    {:ok, 73}
+  end
+  def(name_to_value(:transactions_ddls_ignored)) do
+    {:ok, 74}
+  end
+  def(name_to_value(:transactions_savepoints)) do
+    {:ok, 75}
+  end
+  def(name_to_value(:callable_named_parameters)) do
+    {:ok, 76}
+  end
+  def(name_to_value(:callable_multiple_open_resultsets)) do
+    {:ok, 77}
+  end
+  def(name_to_value(:generated_keys_retrieval)) do
+    {:ok, 78}
+  end
+  def(name_to_value(:generated_keys_always_returned)) do
+    {:ok, 79}
+  end
+  def(name_to_value(:batch_updates)) do
+    {:ok, 80}
+  end
+  def(name_to_value(:resultset_forward_only)) do
+    {:ok, 81}
+  end
+  def(name_to_value(:resultset_scroll_insensitive)) do
+    {:ok, 82}
+  end
+  def(name_to_value(:resultset_scroll_sensitive)) do
+    {:ok, 83}
+  end
+  def(name_to_value(:resultset_holdability_close_cursors_at_commit)) do
+    {:ok, 84}
+  end
+  def(name_to_value(:resultset_holdability_hold_cursors_over_commit)) do
+    {:ok, 85}
+  end
+  def(name_to_value(:lob_updates_copy)) do
+    {:ok, 86}
+  end
+  def(name_to_value(:statement_pooling)) do
+    {:ok, 87}
+  end
+  def(name_to_value(:stored_functions_using_call)) do
+    {:ok, 88}
+  end
+  def(name_to_value(k)) do
+    {:error, {:invalid_enum_name, k}}
+  end
   def(value_to_name!(value)) do
     {:ok, name} = value_to_name(value)
     name
   end
-  def(names) do
+  def(name_to_value!(name)) do
+    {:ok, value} = name_to_value(name)
+    value
+  end
+  def(meta(:names)) do
     [:all_procedures_callable, :all_tables_selectable, :integrity_enhancement, :nulls_sorted_high, :nulls_sorted_low, :nulls_sorted_start, :nulls_sorted_end, :uses_local_files, :uses_local_file_per_table, :mixedcase_identifiers, :mixedcase_quoted_identifiers, :stores_uppercase_identifiers, :stores_lowercase_identifiers, :stores_mixedcase_identifiers, :stores_uppercase_quoted_identifiers, :stores_lowercase_quoted_identifiers, :stores_mixedcase_quoted_identifiers, :alter_table_add_column, :alter_table_drop_column, :column_aliasing, :null_concat_non_null_is_null, :convert, :table_correlation_names, :table_correlation_names_different, :order_by_expressions, :order_by_unrelated, :group_by, :group_by_unrelated, :group_by_beyond_select, :like_escape, :multiple_resultsets, :multiple_transactions, :non_nullable_columns, :sql_grammar_minimum, :sql_grammar_core, :sql_grammar_extended, :sql_grammar_ansi92_entry, :sql_grammar_ansi92_intermediate, :sql_grammar_ansi92_full, :outer_joins, :outer_joins_full, :outer_joins_limited, :schemas_in_dmls, :schemas_in_procedure_calls, :schemas_in_table_defs, :schemas_in_index_defs, :schemas_in_privilege_defs, :autocommit_failure_closes_all_resultsets, :catalogs_in_dmls, :catalogs_in_procedure_calls, :catalogs_in_table_defs, :catalogs_in_index_defs, :catalogs_in_privilege_defs, :positioned_delete, :positioned_update, :select_for_update, :stored_procedures, :subqueries_in_comparisons, :subqueries_in_exists, :subqueries_in_ins, :subqueries_in_quantifieds, :subqueries_correlated, :union, :union_all, :open_cursors_across_commit, :open_cursors_across_rollback, :open_statements_across_commit, :open_statements_across_rollback, :max_rowsize_includes_blobsize, :transactions, :transactions_both_dmls_and_ddls, :transactions_dmls_only, :transactions_ddls_implicit_commit, :transactions_ddls_ignored, :transactions_savepoints, :callable_named_parameters, :callable_multiple_open_resultsets, :generated_keys_retrieval, :generated_keys_always_returned, :batch_updates, :resultset_forward_only, :resultset_scroll_insensitive, :resultset_scroll_sensitive, :resultset_holdability_close_cursors_at_commit, :resultset_holdability_hold_cursors_over_commit, :lob_updates_copy, :statement_pooling, :stored_functions_using_call]
+  end
+  def(meta(:values)) do
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
   end
   def(member?(1)) do
     true
@@ -803,6 +1077,273 @@ defmodule(SnappyData.Thrift.ServiceFeature) do
     true
   end
   def(member?(_)) do
+    false
+  end
+  def(name?(:all_procedures_callable)) do
+    true
+  end
+  def(name?(:all_tables_selectable)) do
+    true
+  end
+  def(name?(:integrity_enhancement)) do
+    true
+  end
+  def(name?(:nulls_sorted_high)) do
+    true
+  end
+  def(name?(:nulls_sorted_low)) do
+    true
+  end
+  def(name?(:nulls_sorted_start)) do
+    true
+  end
+  def(name?(:nulls_sorted_end)) do
+    true
+  end
+  def(name?(:uses_local_files)) do
+    true
+  end
+  def(name?(:uses_local_file_per_table)) do
+    true
+  end
+  def(name?(:mixedcase_identifiers)) do
+    true
+  end
+  def(name?(:mixedcase_quoted_identifiers)) do
+    true
+  end
+  def(name?(:stores_uppercase_identifiers)) do
+    true
+  end
+  def(name?(:stores_lowercase_identifiers)) do
+    true
+  end
+  def(name?(:stores_mixedcase_identifiers)) do
+    true
+  end
+  def(name?(:stores_uppercase_quoted_identifiers)) do
+    true
+  end
+  def(name?(:stores_lowercase_quoted_identifiers)) do
+    true
+  end
+  def(name?(:stores_mixedcase_quoted_identifiers)) do
+    true
+  end
+  def(name?(:alter_table_add_column)) do
+    true
+  end
+  def(name?(:alter_table_drop_column)) do
+    true
+  end
+  def(name?(:column_aliasing)) do
+    true
+  end
+  def(name?(:null_concat_non_null_is_null)) do
+    true
+  end
+  def(name?(:convert)) do
+    true
+  end
+  def(name?(:table_correlation_names)) do
+    true
+  end
+  def(name?(:table_correlation_names_different)) do
+    true
+  end
+  def(name?(:order_by_expressions)) do
+    true
+  end
+  def(name?(:order_by_unrelated)) do
+    true
+  end
+  def(name?(:group_by)) do
+    true
+  end
+  def(name?(:group_by_unrelated)) do
+    true
+  end
+  def(name?(:group_by_beyond_select)) do
+    true
+  end
+  def(name?(:like_escape)) do
+    true
+  end
+  def(name?(:multiple_resultsets)) do
+    true
+  end
+  def(name?(:multiple_transactions)) do
+    true
+  end
+  def(name?(:non_nullable_columns)) do
+    true
+  end
+  def(name?(:sql_grammar_minimum)) do
+    true
+  end
+  def(name?(:sql_grammar_core)) do
+    true
+  end
+  def(name?(:sql_grammar_extended)) do
+    true
+  end
+  def(name?(:sql_grammar_ansi92_entry)) do
+    true
+  end
+  def(name?(:sql_grammar_ansi92_intermediate)) do
+    true
+  end
+  def(name?(:sql_grammar_ansi92_full)) do
+    true
+  end
+  def(name?(:outer_joins)) do
+    true
+  end
+  def(name?(:outer_joins_full)) do
+    true
+  end
+  def(name?(:outer_joins_limited)) do
+    true
+  end
+  def(name?(:schemas_in_dmls)) do
+    true
+  end
+  def(name?(:schemas_in_procedure_calls)) do
+    true
+  end
+  def(name?(:schemas_in_table_defs)) do
+    true
+  end
+  def(name?(:schemas_in_index_defs)) do
+    true
+  end
+  def(name?(:schemas_in_privilege_defs)) do
+    true
+  end
+  def(name?(:autocommit_failure_closes_all_resultsets)) do
+    true
+  end
+  def(name?(:catalogs_in_dmls)) do
+    true
+  end
+  def(name?(:catalogs_in_procedure_calls)) do
+    true
+  end
+  def(name?(:catalogs_in_table_defs)) do
+    true
+  end
+  def(name?(:catalogs_in_index_defs)) do
+    true
+  end
+  def(name?(:catalogs_in_privilege_defs)) do
+    true
+  end
+  def(name?(:positioned_delete)) do
+    true
+  end
+  def(name?(:positioned_update)) do
+    true
+  end
+  def(name?(:select_for_update)) do
+    true
+  end
+  def(name?(:stored_procedures)) do
+    true
+  end
+  def(name?(:subqueries_in_comparisons)) do
+    true
+  end
+  def(name?(:subqueries_in_exists)) do
+    true
+  end
+  def(name?(:subqueries_in_ins)) do
+    true
+  end
+  def(name?(:subqueries_in_quantifieds)) do
+    true
+  end
+  def(name?(:subqueries_correlated)) do
+    true
+  end
+  def(name?(:union)) do
+    true
+  end
+  def(name?(:union_all)) do
+    true
+  end
+  def(name?(:open_cursors_across_commit)) do
+    true
+  end
+  def(name?(:open_cursors_across_rollback)) do
+    true
+  end
+  def(name?(:open_statements_across_commit)) do
+    true
+  end
+  def(name?(:open_statements_across_rollback)) do
+    true
+  end
+  def(name?(:max_rowsize_includes_blobsize)) do
+    true
+  end
+  def(name?(:transactions)) do
+    true
+  end
+  def(name?(:transactions_both_dmls_and_ddls)) do
+    true
+  end
+  def(name?(:transactions_dmls_only)) do
+    true
+  end
+  def(name?(:transactions_ddls_implicit_commit)) do
+    true
+  end
+  def(name?(:transactions_ddls_ignored)) do
+    true
+  end
+  def(name?(:transactions_savepoints)) do
+    true
+  end
+  def(name?(:callable_named_parameters)) do
+    true
+  end
+  def(name?(:callable_multiple_open_resultsets)) do
+    true
+  end
+  def(name?(:generated_keys_retrieval)) do
+    true
+  end
+  def(name?(:generated_keys_always_returned)) do
+    true
+  end
+  def(name?(:batch_updates)) do
+    true
+  end
+  def(name?(:resultset_forward_only)) do
+    true
+  end
+  def(name?(:resultset_scroll_insensitive)) do
+    true
+  end
+  def(name?(:resultset_scroll_sensitive)) do
+    true
+  end
+  def(name?(:resultset_holdability_close_cursors_at_commit)) do
+    true
+  end
+  def(name?(:resultset_holdability_hold_cursors_over_commit)) do
+    true
+  end
+  def(name?(:lob_updates_copy)) do
+    true
+  end
+  def(name?(:statement_pooling)) do
+    true
+  end
+  def(name?(:stored_functions_using_call)) do
+    true
+  end
+  def(name?(_)) do
     false
   end
 end

@@ -8,6 +8,12 @@ defmodule(SnappyData.Thrift.SnappyException) do
   def(new) do
     %__MODULE__{}
   end
+  (
+    @spec(message(Exception.t()) :: String.t())
+    def(message(exception)) do
+      inspect(exception)
+    end
+  )
   defmodule(BinaryProtocol) do
     def(deserialize(binary)) do
       deserialize(binary, %SnappyData.Thrift.SnappyException{})
@@ -26,7 +32,7 @@ defmodule(SnappyData.Thrift.SnappyException) do
     defp(deserialize(<<11, 2::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
       deserialize(rest, %{acc | server_info: value})
     end
-    defp(deserialize(<<15, 3::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+    defp(deserialize(<<15, 3::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
       deserialize__next_exceptions(rest, [[], remaining, struct])
     end
     defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -54,17 +60,17 @@ defmodule(SnappyData.Thrift.SnappyException) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :exception_data on SnappyData.Thrift.SnappyException must not be nil")
         _ ->
-          [<<12, 1::size(16)>> | SnappyData.Thrift.SnappyExceptionData.serialize(exception_data)]
+          [<<12, 1::16-signed>> | SnappyData.Thrift.SnappyExceptionData.serialize(exception_data)]
       end, case(server_info) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :server_info on SnappyData.Thrift.SnappyException must not be nil")
         _ ->
-          [<<11, 2::size(16), byte_size(server_info)::size(32)>> | server_info]
+          [<<11, 2::16-signed, byte_size(server_info)::32-signed>> | server_info]
       end, case(next_exceptions) do
         nil ->
           <<>>
         _ ->
-          [<<15, 3::size(16), 12, length(next_exceptions)::size(32)>> | for(e <- next_exceptions) do
+          [<<15, 3::16-signed, 12, length(next_exceptions)::32-signed>> | for(e <- next_exceptions) do
             SnappyData.Thrift.SnappyExceptionData.serialize(e)
           end]
       end | <<0>>]

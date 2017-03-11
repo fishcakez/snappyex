@@ -1,38 +1,4 @@
 defmodule(SnappyData.Thrift.LocatorService) do
-  defmodule(CloseConnectionArgs) do
-    _ = "Auto-generated Thrift struct Elixir.CloseConnectionArgs"
-    defstruct([])
-    @type(t :: %__MODULE__{})
-    def(new) do
-      %__MODULE__{}
-    end
-    defmodule(BinaryProtocol) do
-      def(deserialize(binary)) do
-        deserialize(binary, %CloseConnectionArgs{})
-      end
-      defp(deserialize(<<0, rest::binary>>, %CloseConnectionArgs{} = acc)) do
-        {acc, rest}
-      end
-      defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
-        rest |> Thrift.Protocol.Binary.skip_field(field_type) |> deserialize(acc)
-      end
-      defp(deserialize(_, _)) do
-        :error
-      end
-      def(serialize(%CloseConnectionArgs{})) do
-        <<0>>
-      end
-    end
-    def(serialize(struct)) do
-      BinaryProtocol.serialize(struct)
-    end
-    def(serialize(struct, :binary)) do
-      BinaryProtocol.serialize(struct)
-    end
-    def(deserialize(binary)) do
-      BinaryProtocol.deserialize(binary)
-    end
-  end
   defmodule(GetAllServersWithPreferredServerArgs) do
     _ = "Auto-generated Thrift struct Elixir.GetAllServersWithPreferredServerArgs"
     _ = "1: set<snappydata.ServerType> server_types"
@@ -50,13 +16,13 @@ defmodule(SnappyData.Thrift.LocatorService) do
       defp(deserialize(<<0, rest::binary>>, %GetAllServersWithPreferredServerArgs{} = acc)) do
         {acc, rest}
       end
-      defp(deserialize(<<14, 1::16-signed, 8, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<14, 1::16-signed, 8, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__server_types(rest, [[], remaining, struct])
       end
-      defp(deserialize(<<14, 2::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<14, 2::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__server_groups(rest, [[], remaining, struct])
       end
-      defp(deserialize(<<14, 3::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<14, 3::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__failed_servers(rest, [[], remaining, struct])
       end
       defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -91,7 +57,7 @@ defmodule(SnappyData.Thrift.LocatorService) do
       defp(deserialize__server_types(<<rest::binary>>, [list, 0, struct])) do
         deserialize(rest, %{struct | server_types: MapSet.new(list)})
       end
-      defp(deserialize__server_types(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+      defp(deserialize__server_types(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
         deserialize__server_types(rest, [[element | list], remaining - 1 | stack])
       end
       defp(deserialize__server_types(_, _)) do
@@ -102,21 +68,21 @@ defmodule(SnappyData.Thrift.LocatorService) do
           nil ->
             <<>>
           _ ->
-            [<<14, 1::size(16), 8, Enum.count(server_types)::size(32)>> | for(e <- server_types) do
+            [<<14, 1::16-signed, 8, Enum.count(server_types)::32-signed>> | for(e <- server_types) do
               <<e::32-signed>>
             end]
         end, case(server_groups) do
           nil ->
             <<>>
           _ ->
-            [<<14, 2::size(16), 11, Enum.count(server_groups)::size(32)>> | for(e <- server_groups) do
-              [<<byte_size(e)::size(32)>> | e]
+            [<<14, 2::16-signed, 11, Enum.count(server_groups)::32-signed>> | for(e <- server_groups) do
+              [<<byte_size(e)::32-signed>> | e]
             end]
         end, case(failed_servers) do
           nil ->
             <<>>
           _ ->
-            [<<14, 3::size(16), 12, Enum.count(failed_servers)::size(32)>> | for(e <- failed_servers) do
+            [<<14, 3::16-signed, 12, Enum.count(failed_servers)::32-signed>> | for(e <- failed_servers) do
               SnappyData.Thrift.HostAddress.serialize(e)
             end]
         end | <<0>>]
@@ -149,13 +115,13 @@ defmodule(SnappyData.Thrift.LocatorService) do
       defp(deserialize(<<0, rest::binary>>, %GetPreferredServerArgs{} = acc)) do
         {acc, rest}
       end
-      defp(deserialize(<<14, 1::16-signed, 8, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<14, 1::16-signed, 8, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__server_types(rest, [[], remaining, struct])
       end
-      defp(deserialize(<<14, 2::16-signed, 11, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<14, 2::16-signed, 11, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__server_groups(rest, [[], remaining, struct])
       end
-      defp(deserialize(<<14, 3::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<14, 3::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__failed_servers(rest, [[], remaining, struct])
       end
       defp(deserialize(<<field_type, _id::16-signed, rest::binary>>, acc)) do
@@ -190,7 +156,7 @@ defmodule(SnappyData.Thrift.LocatorService) do
       defp(deserialize__server_types(<<rest::binary>>, [list, 0, struct])) do
         deserialize(rest, %{struct | server_types: MapSet.new(list)})
       end
-      defp(deserialize__server_types(<<element::size(32), rest::binary>>, [list, remaining | stack])) do
+      defp(deserialize__server_types(<<element::32-signed, rest::binary>>, [list, remaining | stack])) do
         deserialize__server_types(rest, [[element | list], remaining - 1 | stack])
       end
       defp(deserialize__server_types(_, _)) do
@@ -201,21 +167,21 @@ defmodule(SnappyData.Thrift.LocatorService) do
           nil ->
             <<>>
           _ ->
-            [<<14, 1::size(16), 8, Enum.count(server_types)::size(32)>> | for(e <- server_types) do
+            [<<14, 1::16-signed, 8, Enum.count(server_types)::32-signed>> | for(e <- server_types) do
               <<e::32-signed>>
             end]
         end, case(server_groups) do
           nil ->
             <<>>
           _ ->
-            [<<14, 2::size(16), 11, Enum.count(server_groups)::size(32)>> | for(e <- server_groups) do
-              [<<byte_size(e)::size(32)>> | e]
+            [<<14, 2::16-signed, 11, Enum.count(server_groups)::32-signed>> | for(e <- server_groups) do
+              [<<byte_size(e)::32-signed>> | e]
             end]
         end, case(failed_servers) do
           nil ->
             <<>>
           _ ->
-            [<<14, 3::size(16), 12, Enum.count(failed_servers)::size(32)>> | for(e <- failed_servers) do
+            [<<14, 3::16-signed, 12, Enum.count(failed_servers)::32-signed>> | for(e <- failed_servers) do
               SnappyData.Thrift.HostAddress.serialize(e)
             end]
         end | <<0>>]
@@ -247,7 +213,7 @@ defmodule(SnappyData.Thrift.LocatorService) do
       defp(deserialize(<<0, rest::binary>>, %GetAllServersWithPreferredServerResponse{} = acc)) do
         {acc, rest}
       end
-      defp(deserialize(<<15, 0::16-signed, 12, remaining::size(32), rest::binary>>, struct)) do
+      defp(deserialize(<<15, 0::16-signed, 12, remaining::32-signed, rest::binary>>, struct)) do
         deserialize__success(rest, [[], remaining, struct])
       end
       defp(deserialize(<<12, 1::16-signed, rest::binary>>, acc)) do
@@ -283,14 +249,14 @@ defmodule(SnappyData.Thrift.LocatorService) do
           nil ->
             <<>>
           _ ->
-            [<<15, 0::size(16), 12, length(success)::size(32)>> | for(e <- success) do
+            [<<15, 0::16-signed, 12, length(success)::32-signed>> | for(e <- success) do
               SnappyData.Thrift.HostAddress.serialize(e)
             end]
         end, case(error) do
           nil ->
             <<>>
           _ ->
-            [<<12, 1::size(16)>> | SnappyData.Thrift.SnappyException.serialize(error)]
+            [<<12, 1::16-signed>> | SnappyData.Thrift.SnappyException.serialize(error)]
         end | <<0>>]
       end
     end
@@ -347,12 +313,12 @@ defmodule(SnappyData.Thrift.LocatorService) do
           nil ->
             <<>>
           _ ->
-            [<<12, 0::size(16)>> | SnappyData.Thrift.HostAddress.serialize(success)]
+            [<<12, 0::16-signed>> | SnappyData.Thrift.HostAddress.serialize(success)]
         end, case(error) do
           nil ->
             <<>>
           _ ->
-            [<<12, 1::size(16)>> | SnappyData.Thrift.SnappyException.serialize(error)]
+            [<<12, 1::16-signed>> | SnappyData.Thrift.SnappyException.serialize(error)]
         end | <<0>>]
       end
     end
@@ -373,30 +339,6 @@ defmodule(SnappyData.Thrift.LocatorService) do
     defdelegate(connect(conn, opts), to: ClientImpl)
     def(start_link(host, port, opts \\ [])) do
       ClientImpl.start_link(host, port, opts)
-    end
-    defp(close_connection_with_options(client, opts)) do
-      args = %SnappyData.Thrift.LocatorService.CloseConnectionArgs{}
-      serialized_args = Elixir.SnappyData.Thrift.LocatorService.CloseConnectionArgs.BinaryProtocol.serialize(args)
-      (
-        :ok = ClientImpl.oneway(client, "closeConnection", serialized_args, opts)
-        {:ok, nil}
-      )
-    end
-    def(close_connection(client)) do
-      close_connection_with_options(client, [])
-    end
-    defp(close_connection_with_options!(client, opts)) do
-      case(close_connection_with_options(client, opts)) do
-        {:ok, rsp} ->
-          rsp
-        {:error, {:exception, ex}} ->
-          raise(ex)
-        {:error, _} = err ->
-          raise(err)
-      end
-    end
-    def(close_connection!(client)) do
-      close_connection_with_options!(client, [])
     end
     def(get_all_servers_with_preferred_server_with_options(client, server_types, server_groups, failed_servers, opts)) do
       args = %SnappyData.Thrift.LocatorService.GetAllServersWithPreferredServerArgs{server_types: server_types, server_groups: server_groups, failed_servers: failed_servers}
@@ -480,22 +422,6 @@ defmodule(SnappyData.Thrift.LocatorService) do
     defdelegate(stop(name), to: ServerImpl)
     def(start_link(handler_module, port, opts \\ [])) do
       ServerImpl.start_link(__MODULE__, port, handler_module, opts)
-    end
-    def(handle_thrift("closeConnection", _binary_data, handler_module)) do
-      try() do
-        rsp = handler_module.close_connection()
-        (
-          _ = rsp
-          :noreply
-        )
-      catch
-        kind, reason ->
-          formatted_exception = Exception.format(kind, reason, System.stacktrace())
-          Logger.error("Exception not defined in thrift spec was thrown: #{formatted_exception}")
-          {:server_error, Thrift.TApplicationException.exception(message: "Server error: #{formatted_exception}", type: :internal_error)}
-      rescue
-        []
-      end
     end
     def(handle_thrift("getAllServersWithPreferredServer", binary_data, handler_module)) do
       case(Elixir.SnappyData.Thrift.LocatorService.GetAllServersWithPreferredServerArgs.BinaryProtocol.deserialize(binary_data)) do

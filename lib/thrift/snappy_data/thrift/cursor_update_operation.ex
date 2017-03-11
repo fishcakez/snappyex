@@ -21,12 +21,31 @@ defmodule(SnappyData.Thrift.CursorUpdateOperation) do
   def(value_to_name(v)) do
     {:error, {:invalid_enum_value, v}}
   end
+  def(name_to_value(:update_op)) do
+    {:ok, 1}
+  end
+  def(name_to_value(:insert_op)) do
+    {:ok, 2}
+  end
+  def(name_to_value(:delete_op)) do
+    {:ok, 3}
+  end
+  def(name_to_value(k)) do
+    {:error, {:invalid_enum_name, k}}
+  end
   def(value_to_name!(value)) do
     {:ok, name} = value_to_name(value)
     name
   end
-  def(names) do
+  def(name_to_value!(name)) do
+    {:ok, value} = name_to_value(name)
+    value
+  end
+  def(meta(:names)) do
     [:update_op, :insert_op, :delete_op]
+  end
+  def(meta(:values)) do
+    [1, 2, 3]
   end
   def(member?(1)) do
     true
@@ -38,6 +57,18 @@ defmodule(SnappyData.Thrift.CursorUpdateOperation) do
     true
   end
   def(member?(_)) do
+    false
+  end
+  def(name?(:update_op)) do
+    true
+  end
+  def(name?(:insert_op)) do
+    true
+  end
+  def(name?(:delete_op)) do
+    true
+  end
+  def(name?(_)) do
     false
   end
 end

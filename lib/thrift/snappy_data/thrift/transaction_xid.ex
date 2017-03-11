@@ -15,7 +15,7 @@ defmodule(SnappyData.Thrift.TransactionXid) do
     defp(deserialize(<<0, rest::binary>>, %SnappyData.Thrift.TransactionXid{} = acc)) do
       {acc, rest}
     end
-    defp(deserialize(<<8, 1::16-signed, value::size(32), rest::binary>>, acc)) do
+    defp(deserialize(<<8, 1::16-signed, value::32-signed, rest::binary>>, acc)) do
       deserialize(rest, %{acc | format_id: value})
     end
     defp(deserialize(<<11, 2::16-signed, string_size::32-signed, value::binary-size(string_size), rest::binary>>, acc)) do
@@ -35,17 +35,17 @@ defmodule(SnappyData.Thrift.TransactionXid) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :format_id on SnappyData.Thrift.TransactionXid must not be nil")
         _ ->
-          <<8, 1::size(16), format_id::32-signed>>
+          <<8, 1::16-signed, format_id::32-signed>>
       end, case(global_id) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :global_id on SnappyData.Thrift.TransactionXid must not be nil")
         _ ->
-          [<<11, 2::size(16), byte_size(global_id)::size(32)>> | global_id]
+          [<<11, 2::16-signed, byte_size(global_id)::32-signed>> | global_id]
       end, case(branch_qualifier) do
         nil ->
           raise(Thrift.InvalidValueException, "Required field :branch_qualifier on SnappyData.Thrift.TransactionXid must not be nil")
         _ ->
-          [<<11, 3::size(16), byte_size(branch_qualifier)::size(32)>> | branch_qualifier]
+          [<<11, 3::16-signed, byte_size(branch_qualifier)::32-signed>> | branch_qualifier]
       end | <<0>>]
     end
   end
