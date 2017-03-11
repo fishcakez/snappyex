@@ -41,8 +41,7 @@ defmodule Snappyex.Protocol do
   end
 
   def disconnect(_, state) do
-    {:ok, process_id} = Keyword.fetch(state,
-      :process_id)
+    {:ok, process_id} = Keyword.fetch(state, :process_id)
     Client.close(process_id)
     :ok
   end
