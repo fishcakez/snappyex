@@ -3,11 +3,6 @@
 defmodule Snappyex.Query do
   defstruct [:ref, :name, :statement, :param_formats, :encoders, :columns, :result_set_meta_data,
              :result_formats, :num_params, :decoders, :types]
-end
-
-defimpl DBConnection.Query, for: Snappyex.Query do
-  alias Snappyex.Query
-  use Timex
 
   def query_columns_list(map) do
     columns = Enum.reduce(
@@ -22,14 +17,15 @@ defimpl DBConnection.Query, for: Snappyex.Query do
       )
       Enum.reverse(columns)
   end
+end
 
-
+defimpl DBConnection.Query, for: Snappyex.Query do
+  alias Snappyex.Query
+  use Timex
   def describe(query, _opts) do
-    require Logger
-    Logger.debug inspect query
     query
   end
-  def encode(%Query{}, params, _opts) do  
+  def encode(%Snappyex.Query{} = query, params, _opts) do  
      params = case params do
                 [] -> nil
         # TODO For each element in list take type and convert it.         

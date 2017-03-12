@@ -133,7 +133,7 @@ defmodule Snappyex.Protocol do
     {:ok, process_id} = Keyword.fetch(state, :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     case execute_lookup(query, state) do
-      {:execute, statement_id, query} ->          
+      {:execute, statement_id, _query} ->          
         case Client.execute_prepared_with_options(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token, gen_server_opts: [timeout: @time_out]) do
           {:ok, statement} ->            
             result = Map.new
@@ -202,6 +202,9 @@ defmodule Snappyex.Protocol do
         nil, token, gen_server_opts: [timeout: @time_out]) do
         {:ok, prepared_result} ->
             query = %{query | result_set_meta_data: prepared_result.result_set_meta_data}
+            unless query.result_set_meta_data == nil do
+              query = %{query | columns: Snappyex.Query.query_columns_list(prepared_result.result_set_meta_data)}
+            end
             prepare_result(query, prepared_result, state)
         {:error, error} ->
           {:disconnect, error.exceptionData.reason, state}
