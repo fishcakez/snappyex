@@ -129,41 +129,13 @@ defmodule Snappyex.Protocol do
     end
   end
 
-  def query_columns_list(map) do
-      columns = Enum.reduce(
-        map, [], fn (x, acc) -> 
-            if is_map(x) and Map.has_key?(x, :name) do
-              {:ok, type} = SnappyData.Thrift.SnappyType.value_to_name(x.type)
-              [{x.name, type} |  acc ]
-            else
-              acc
-            end
-          end
-        )
-        Enum.reverse(columns)
-  end
-
   def execute(_statement_id, query, params, state) do
     {:ok, process_id} = Keyword.fetch(state, :process_id)
     {:ok, token} = Keyword.fetch(state, :token)
     case execute_lookup(query, state) do
-      {:execute, statement_id, query} ->
-        params = case params do
-                [] -> nil
-        # TODO For each element in list take type and convert it.         
-                [42, "fortytwo"] -> 
-                %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 42},
-                                                                    %SnappyData.Thrift.ColumnValue{clob_val:
-                                                                      %SnappyData.Thrift.ClobChunk{
-                                                                        chunk: "fortytwo",
-                                                                        last: true,
-                                                                        total_length: byte_size("fortytwo")
-                                                                      }
-                                                                    }
-                                                                    ]}
-        end            
+      {:execute, statement_id, query} ->          
         case Client.execute_prepared_with_options(process_id, statement_id, params, Map.new, %SnappyData.Thrift.StatementAttrs{}, token, gen_server_opts: [timeout: @time_out]) do
-          {:ok, statement} ->
+          {:ok, statement} ->            
             result = Map.new
             result = Map.put_new(result, :rows, statement.result_set)
             {:ok, result, state}
@@ -229,7 +201,7 @@ defmodule Snappyex.Protocol do
         process_id, connection_id, to_string(query.statement), output_parameters,
         nil, token, gen_server_opts: [timeout: @time_out]) do
         {:ok, prepared_result} ->
-            query = %{query | columns: prepared_result.result_set_meta_data}
+            query = %{query | result_set_meta_data: prepared_result.result_set_meta_data}
             prepare_result(query, prepared_result, state)
         {:error, error} ->
           {:disconnect, error.exceptionData.reason, state}
@@ -237,7 +209,6 @@ defmodule Snappyex.Protocol do
   end
 
   defp prepare_result(query, prepared_result, state) do
-    query = %{query | columns: prepared_result.result_set_meta_data}
     num_params = case prepared_result.result_set_meta_data do
       nil -> 0
       result -> Enum.count(result)

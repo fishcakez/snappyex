@@ -94,8 +94,8 @@ defmodule QueryTest do
   test "insert query", context do
     query("DROP TABLE IF EXISTS SNAPPYEX_TEST.TEST_INSERT", [])   
     nil = query("CREATE TABLE SNAPPYEX_TEST.TEST_INSERT (id int primary key, text varchar(10))", [])  
-    assert nil == query("INSERT INTO SNAPPYEX_TEST.TEST_INSERT (id, text) VALUES (?, ?)", [42, "fortytwo"])
-    assert [[42, "fortytwo"]] == query("SELECT * FROM SNAPPYEX_TEST.TEST_INSERT", [])
+    assert nil == query("INSERT INTO SNAPPYEX_TEST.TEST_INSERT (id, text) VALUES (?, ?)", [43, "fortythree"])
+    assert [[43, "fortythree"]] == query("SELECT * FROM SNAPPYEX_TEST.TEST_INSERT", [])
     query("DROP TABLE SNAPPYEX_TEST.TEST_INSERT", [])
   end
 
@@ -103,8 +103,8 @@ defmodule QueryTest do
     query("DROP TABLE IF EXISTS SNAPPYEX_TEST.TEST_INSERT_PREPARED", [])   
     nil = query("CREATE TABLE SNAPPYEX_TEST.TEST_INSERT_PREPARED (id int primary key, text varchar(10))", [])  
     query = prepare("Insert", "INSERT INTO SNAPPYEX_TEST.TEST_INSERT_PREPARED (id, text) VALUES (?, ?)", [])
-    assert :ok == execute(query, [42, "fortytwo"])
-    assert [[42, "fortytwo"]] == query("SELECT * FROM SNAPPYEX_TEST.TEST_INSERT_PREPARED", [])
+    assert :ok == execute(query, [43, "fortythree"])
+    assert [[43, "fortythree"]] == query("SELECT * FROM SNAPPYEX_TEST.TEST_INSERT_PREPARED", [])
     query("DROP TABLE SNAPPYEX_TEST.TEST_INSERT_PREPARED", [])
   end
 

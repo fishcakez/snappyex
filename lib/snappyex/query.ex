@@ -1,18 +1,50 @@
 # Portions from https://github.com/elixir-ecto/postgrex/blob/af1b62ae06121f02f2d63f1446eb99b962884edb/lib/postgrex/extensions/numeric.ex
 
 defmodule Snappyex.Query do
-  defstruct [:ref, :name, :statement, :param_formats, :encoders, :columns,
+  defstruct [:ref, :name, :statement, :param_formats, :encoders, :columns, :result_set_meta_data,
              :result_formats, :num_params, :decoders, :types]
 end
 
 defimpl DBConnection.Query, for: Snappyex.Query do
   alias Snappyex.Query
   use Timex
+
+  def query_columns_list(map) do
+    columns = Enum.reduce(
+      map, [], fn (x, acc) -> 
+          if is_map(x) and Map.has_key?(x, :name) do
+            {:ok, type} = SnappyData.Thrift.SnappyType.value_to_name(x.type)
+            [{x.name, type} |  acc ]
+          else
+            acc
+          end
+        end
+      )
+      Enum.reverse(columns)
+  end
+
+
   def describe(query, _opts) do
+    require Logger
+    Logger.debug inspect query
     query
   end
   def encode(%Query{}, params, _opts) do  
-    params
+     params = case params do
+                [] -> nil
+        # TODO For each element in list take type and convert it.         
+                [43, "fortythree"] -> 
+                %SnappyData.Thrift.Row{values: [%SnappyData.Thrift.ColumnValue{i32_val: 43},
+                                                                    %SnappyData.Thrift.ColumnValue{clob_val:
+                                                                      %SnappyData.Thrift.ClobChunk{
+                                                                        chunk: "fortythree",
+                                                                        last: true,
+                                                                        total_length: byte_size("fortythree")
+                                                                      }
+                                                                    }
+                                                                    ]}
+     end  
+     params
   end
 
   def decode(rows, columns), do: decode(rows, columns, [])
