@@ -23,7 +23,7 @@ defimpl DBConnection.Query, for: Snappyex.Query do
   alias Snappyex.Query
   use Timex
   def describe(query, _opts) do
-    query
+    IO.inspect query
   end
   def encode(%Snappyex.Query{} = query, params, _opts) do  
      params = case params do
